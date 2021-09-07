@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group 'org.uniqueapps'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jsoup:jsoup:1.14.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'org.javacord:javacord:3.3.2'
+}
+
+test {
+    useJUnitPlatform()
+}
