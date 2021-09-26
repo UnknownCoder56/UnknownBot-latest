@@ -1,4 +1,5 @@
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
@@ -9,7 +10,7 @@ public class Listener implements MessageCreateListener {
     public void onMessageCreate(MessageCreateEvent event) {
         Message message = event.getMessage();
         if (!message.getAuthor().isBotUser()) {
-            if (message.getContent().contains(">")) {
+            if (message.getContent().startsWith(">")) {
                 if (message.getContent().toLowerCase(Locale.ROOT).contains(">ping")) Commands.ping(event);
                 else if (message.getContent().toLowerCase(Locale.ROOT).contains(">hello")) Commands.hello(event);
                 else if (message.getContent().toLowerCase(Locale.ROOT).contains(">hello")) Commands.hello(event);
@@ -26,7 +27,9 @@ public class Listener implements MessageCreateListener {
                 else if (message.getContent().toLowerCase(Locale.ROOT).contains(">noreply")) Commands.noReply(event);
                 else if (message.getContent().toLowerCase(Locale.ROOT).contains(">clear")) Commands.clearMessages(event);
 
-                else event.getChannel().sendMessage("No such command was found! Type '>help' to view available commands.");
+                else event.getChannel().sendMessage(new EmbedBuilder()
+                		.setTitle("Error!")
+                		.setDescription("No such command was found! Type '>help' to view available commands."));
             } else {
                 if (getReply(message.getContent()) != null) Commands.customReply(event, getReply(message.getContent()));
             }

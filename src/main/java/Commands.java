@@ -1,131 +1,126 @@
-import org.javacord.api.entity.message.MessageSet;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.awt.*;
 import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class Commands {
 
-    public static final String GOOGLE_SEARCH_URL = "https://www.google.com/search";
     public static Map<String, String> customReplies = new HashMap<>();
+    public static final String version = "2.0.0";
 
     public static void admes(MessageCreateEvent event) {
         try {
-            event.getChannel().sendMessage("Info: Bot will be halted until it replies to you.");
-            String text = event.getMessage().getContent();
-            String asked = text.substring(7);
-            if (event.getServer().isPresent()) {
-                System.out.println("'" + event.getMessageAuthor().getName() + "'" + " asked in " + "'" + event.getServer().get().getName()
-                        + "'" + ": " + asked);
-            }
-            @SuppressWarnings("resource")
-			Scanner scn = new Scanner(System.in);
-            System.out.println("Reply: ");
-            if (scn.hasNextLine()) {
-                String text2 = scn.nextLine();
-                event.getChannel().sendMessage("Reply: " + text2);
-            } else {
-                event.getChannel().sendMessage("Reply: " + "...");
-            }
-        } catch (StringIndexOutOfBoundsException ex) {
-            event.getChannel().sendMessage("Please ask something after typing '>admes' and " +
-                    "put space between command and asking.");
-        }
-    }
+            Message msg = event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Bot is thinking... :thinking:")).get();
+            AsyncCommands.Admes admes = new AsyncCommands.Admes(event, msg);
+            CompletableFuture<AsyncCommands.Admes> completableFuture = CompletableFuture
+                    .supplyAsync(() -> admes);
 
-    public static void gsearch(MessageCreateEvent event) {
-        try {
-            String search = URLEncoder.encode(event.getMessage().getContent().substring(9), StandardCharsets.UTF_8);
-            String searchURL = GOOGLE_SEARCH_URL + "?q=" + search + "&num=" + 10;
-            System.out.println("SEARCH: " + searchURL);
-            Document doc = Jsoup.connect(searchURL).userAgent("Mozilla/5.0").get();
-            File file = new File("C:\\Users\\Arpan\\OneDrive\\Desktop\\Bot Files\\draft.html");
-            file.delete();
-            file.createNewFile();
-            FileWriter writer = new FileWriter(file);
-            writer.write(doc.html());
-            writer.close();
-            event.getChannel().sendMessage("Here are your results:- " + searchURL);
-            event.getChannel().sendMessage(file);
-        } catch (StringIndexOutOfBoundsException | IOException ex) {
-            event.getChannel().sendMessage("Please type search text after typing '>gsearch' and " +
-                    "put space between command and text.");
-        }
-    }
-
-    public static void makefile(MessageCreateEvent event) {
-        try {
-            String text = event.getMessage().getContent().substring(10);
-            File file = new File("C:\\Users\\Arpan\\OneDrive\\Desktop\\Bot Files\\text.txt");
-            file.delete();
-            file.createNewFile();
-            FileWriter writer = new FileWriter(file);
-            writer.write(text);
-            writer.close();
-            event.getChannel().sendMessage(file);
+            completableFuture
+                    .thenApplyAsync(admes1 -> {
+                        admes1.run();
+                        return admes1;
+                    });
         } catch (StringIndexOutOfBoundsException ex) {
-            event.getChannel().sendMessage("Please type text after typing '>makefile' and " +
-                    "put space between command and text.");
-        } catch (IOException e) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+            		.setTitle("Please ask something after typing '>admes' and " +
+                    "put space between command and asking.")
+            		.setColor(getRandomColor()));
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+    public static void gsearch(MessageCreateEvent event) {
+        AsyncCommands.Gsearch gsearch = new AsyncCommands.Gsearch(event);
+        CompletableFuture<AsyncCommands.Gsearch> completableFuture = CompletableFuture
+                .supplyAsync(() -> gsearch);
+
+        completableFuture
+                .thenApplyAsync(gsearch1 -> {
+                    gsearch1.run();
+                    return gsearch1;
+                });
+    }
+
+    public static void makefile(MessageCreateEvent event) {
+        AsyncCommands.Makefile makefile = new AsyncCommands.Makefile(event);
+        CompletableFuture<AsyncCommands.Makefile> completableFuture = CompletableFuture
+                .supplyAsync(() -> makefile);
+
+        completableFuture
+                .thenApplyAsync(makefile1 -> {
+                    makefile1.run();
+                    return makefile1;
+                });
+    }
+
     public static void calc(MessageCreateEvent event) {
+    	String reply;
         String[] text = event.getMessage().getContent().split(",");
         ArrayList<String> argsList = new ArrayList<>(Arrays.asList(text));
-        String num = argsList.get(0).substring(6);
-        argsList.set(0, num);
-        System.out.println("Args: " + argsList);
         try {
-            switch (argsList.get(1)) {
-                case ("+") -> {
-                    float num1 = Float.parseFloat(argsList.get(0));
-                    float num2 = Float.parseFloat(argsList.get(2));
-                    float result = num1 + num2;
-                    event.getChannel().sendMessage(num1 + " " + argsList.get(1) + " " + num2 + " = " + result);
+            String num = argsList.get(0).substring(6);
+            argsList.set(0, num);
+            System.out.println("Args: " + argsList);
+            try {
+                float num1 = Float.parseFloat(argsList.get(0));
+                float num2 = Float.parseFloat(argsList.get(2));
+                switch (argsList.get(1)) {
+                    case ("+") -> {
+                        float result = num1 + num2;
+                        reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
+                    }
+                    case ("-") -> {
+                        float result = num1 - num2;
+                        reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
+                    }
+                    case ("*") -> {
+                        float result = num1 * num2;
+                        reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
+                    }
+                    case ("/") -> {
+                        float result = num1 / num2;
+                        reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
+                    }
+                    default -> reply = "Not a valid operation symbol. Valid ones are +, -, * and /.";
                 }
-                case ("-") -> {
-                    float num1 = Float.parseFloat(argsList.get(0));
-                    float num2 = Float.parseFloat(argsList.get(2));
-                    float result = num1 - num2;
-                    event.getChannel().sendMessage(num1 + " " + argsList.get(1) + " " + num2 + " = " + result);
-                }
-                case ("*") -> {
-                    float num1 = Float.parseFloat(argsList.get(0));
-                    float num2 = Float.parseFloat(argsList.get(2));
-                    float result = num1 * num2;
-                    event.getChannel().sendMessage(num1 + " " + argsList.get(1) + " " + num2 + " = " + result);
-                }
-                case ("/") -> {
-                    float num1 = Float.parseFloat(argsList.get(0));
-                    float num2 = Float.parseFloat(argsList.get(2));
-                    float result = num1 / num2;
-                    event.getChannel().sendMessage(num1 + " " + argsList.get(1) + " " + num2 + " = " + result);
-                }
-                default -> event.getChannel().sendMessage("Not a valid operation symbol. Valid ones are +, -, * and /.");
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle(reply)
+                        .setColor(getRandomColor()));
+            } catch (NumberFormatException ex) {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("Please provide a number, as '>calc (num1),(+ or - or * or /),(num2)'.")
+                        .setColor(getRandomColor()));
+            } catch (IndexOutOfBoundsException ex) {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("Incorrect number of arguments given. Correct syntax - >calc (num1),(+ or - or * or /),(num2)")
+                        .setColor(getRandomColor()));
+            } catch (Exception ex) {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("Unknown Error Occurred! Please report this to the developer (UnknownPro56).\n" +
+                                "Error: " + ex.getMessage())
+                        .setColor(getRandomColor()));
             }
-        } catch (NumberFormatException ex) {
-            event.getChannel().sendMessage("Please provide a number, as '>calc (num1),(+ or - or * or /),(num2)'.");
         } catch (IndexOutOfBoundsException ex) {
-            event.getChannel().sendMessage("Incorrect number of arguments given!");
-        } catch (Exception ex) {
-            event.getChannel().sendMessage("Unknown Error Occured! Please report this to the developer (UnknownPro56).\n" +
-            "Error: " + ex.getMessage());
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("Incorrect number of arguments given. Correct syntax - >calc (num1),(+ or - or * or /),(num2)")
+                    .setColor(getRandomColor()));
         }
     }
 
@@ -138,14 +133,23 @@ public class Commands {
             System.out.println("Args: " + argsList);
             if (!argsList.get(0).isEmpty() && !argsList.get(1).isEmpty()) {
                 customReplies.put(argsList.get(0), argsList.get(1));
-                event.getChannel().sendMessage("Successfully set custom reply! Bot will now reply with '"
-                + customReplies.get(argsList.get(0)) + "' when any message contains '" + argsList.get(0) + "'.");
+                event.getChannel().sendMessage(new EmbedBuilder()
+                		.setTitle("Success!")
+                		.setDescription("Successfully set custom reply! Bot will now reply with '"
+                		+ customReplies.get(argsList.get(0)) + "' when any message contains '" + argsList.get(0) + "'.")
+                		.setColor(getRandomColor()));
             	refreshReplies();
             } else {
-                event.getChannel().sendMessage("No arguments given! Correct syntax - >reply (text),(reply) _No spaces between commas and arguments!");
+                event.getChannel().sendMessage(new EmbedBuilder()
+                		.setTitle("Error!")
+                		.setDescription("No arguments given! Correct syntax - >reply (text),(reply) _No spaces between commas and arguments!_")
+                		.setColor(getRandomColor()));
             }
         } catch (IndexOutOfBoundsException ex) {
-            event.getChannel().sendMessage("Incorrect arguments given. Correct syntax - >reply (text),(reply) _No spaces between commas and arguments!");
+            event.getChannel().sendMessage(new EmbedBuilder()
+            		.setTitle("Error!")
+            		.setDescription("Incorrect arguments given. Correct syntax - >reply (text),(reply) _No spaces between commas and arguments!_")
+            		.setColor(getRandomColor()));
         }
     }
 
@@ -158,16 +162,29 @@ public class Commands {
             if (event.getMessage().getContent().contains(text)) {
                 customReplies.remove(text);
                 refreshReplies();
-                event.getChannel().sendMessage("Successfully disabled custom reply " + text + "!");
+                event.getChannel().sendMessage(new EmbedBuilder()
+                		.setTitle("Success!")
+                		.setDescription("Successfully disabled custom reply " + text + "!")
+                		.setColor(getRandomColor()));
                 return;
             }
         }
-        event.getChannel().sendMessage("No reply named '" + event.getMessage().getContent().substring(9) + "' was found!");
+        try {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("No reply named '" + event.getMessage().getContent().substring(9) + "' was found!")
+                    .setColor(getRandomColor()));
+        } catch (IndexOutOfBoundsException ex) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("Incorrect arguments given. Correct syntax - >noreply (reply name)")
+                    .setColor(getRandomColor()));
+        }
     }
 
     public static void clearMessages(MessageCreateEvent event) {
-        Clear clear = new Clear(event);
-        CompletableFuture<Clear> completableFuture = CompletableFuture
+        AsyncCommands.Clear clear = new AsyncCommands.Clear(event);
+        CompletableFuture<AsyncCommands.Clear> completableFuture = CompletableFuture
                 .supplyAsync(() -> clear);
 
         completableFuture
@@ -178,26 +195,34 @@ public class Commands {
     }
 
     public static void ping(MessageCreateEvent event) {
-        event.getChannel().sendMessage("Pong! Latency is " + Main.api.measureRestLatency() + " ms");
+        try {
+			event.getChannel().sendMessage(new EmbedBuilder()
+					.setTitle("Pong!")
+					.setDescription("Latency is " + TimeUnit.NANOSECONDS.toMillis(Main.api.measureRestLatency().get().getNano()) + " ms")
+					.setColor(getRandomColor()));
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public static void hello(MessageCreateEvent event) {
-        event.getChannel().sendMessage("Hello, " + event.getMessageAuthor().getName() + "!");
+        event.getChannel().sendMessage(new EmbedBuilder()
+        		.setTitle("Hello!")
+        		.setDescription("Hello There, " + event.getMessageAuthor().getName() + "! UnknownBot"
+        				+ " here at your service. Type '>help for a list of supported commands.")
+        		.setColor(getRandomColor()));
     }
 
     public static void dt(MessageCreateEvent event) {
-        event.getChannel().sendMessage(LocalDateTime.now().format(
-                new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()));
+        event.getChannel().sendMessage(new EmbedBuilder()
+        		.setTitle("Current System Time (IST)")
+        		.setDescription(LocalDateTime.now().format(
+        				new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
+        		.setColor(getRandomColor()));
     }
 
     public static void help(MessageCreateEvent event) {
-        ArrayList<Role> roles = new ArrayList<>(Main.api.getRoles());
-        Color color;
-        if (roles.get(0).getColor().isPresent()) {
-            color = roles.get(0).getColor().get();
-        } else {
-            color = Color.RED;
-        }
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("UnknownBot Commands:-")
                 .setAuthor("UnknownBot")
@@ -214,25 +239,32 @@ public class Commands {
                 .addField(">noreply (text)", "Disables custom reply.", true)
                 .addField(">replies", "Displays all custom replies set.", true)
                 .addField(">clear (amount)", "Clears specified number of messages.", true)
-                .setColor(color)
+                .setColor(getRandomColor())
                 .setTimestamp(Instant.now());
 
         event.getChannel().sendMessage(embed);
     }
 
     public static void botinfo(MessageCreateEvent event) {
-        EmbedBuilder embed = new EmbedBuilder()
-                .setTitle("UnknownBot Status:-")
-                .addField("Server count", String.valueOf(Main.api.getServers().size()), true)
-                .addField("User count", String.valueOf(Main.api.getCachedUsers().size()), true)
-                .addField("Ping", "\nRest ping: " + Main.api.measureRestLatency() +
-                        "\nGateway ping: " + Main.api.getLatestGatewayLatency(), true)
-                .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
-                .addField("Version", "1.5.0", true)
-                .addField("Bot type", "Utility and Fun Bot", true)
-                .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true);
-
-        event.getChannel().sendMessage(embed);
+        EmbedBuilder embed;
+		try {
+			embed = new EmbedBuilder()
+			        .setTitle("UnknownBot Status:-")
+			        .addField("Server count", String.valueOf(Main.api.getServers().size()), true)
+			        .addField("User count", String.valueOf(Main.api.getCachedUsers().size()), true)
+			        .addField("Ping", "\nRest ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.measureRestLatency().get().getNano()) + " ms" +
+			                "\nGateway ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.getLatestGatewayLatency().getNano()) + " ms", true)
+			        .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
+			        .addField("Version", version, true)
+			        .addField("Bot type", "Utility and Fun Bot", true)
+			        .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
+			        .setColor(getRandomColor());
+			
+			event.getChannel().sendMessage(embed);
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public static void replies(MessageCreateEvent event) {
@@ -240,8 +272,12 @@ public class Commands {
         for (String reply : customReplies.keySet()) {
             repl.append(reply).append(": ").append(customReplies.get(reply)).append("\n");
         }
-        event.getChannel().sendMessage("Currently set custom replies:-\n" + repl);
+        event.getChannel().sendMessage(new EmbedBuilder()
+        		.setTitle("Currently set custom replies:-")
+        		.setDescription(repl.toString())
+        		.setColor(getRandomColor()));
     }
+    
     public static void refreshReplies() {
         File arrayFile = new File("C:\\Users\\Arpan\\OneDrive\\Desktop\\Bot Files\\replyArray.data");
         try {
@@ -254,29 +290,12 @@ public class Commands {
             e.printStackTrace();
         }
     }
-}
-
-class Clear implements Runnable {
-
-    MessageCreateEvent event;
-
-    @Override
-    public void run() {
-        String[] args = event.getMessage().getContent().split(" ");
-        try {
-            int messagesToClear = Integer.parseInt(args[1]);
-            MessageSet messages = event.getChannel().getMessages(messagesToClear + 1).get();
-            event.getChannel().deleteMessages(messages);
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle(event.getMessageAuthor().getName() + " cleared " + (messages.size() - 1) + " message(s) in: " + event.getChannel()));
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            event.getChannel().sendMessage("Supplied argument is not a number or is too large!");
-        }
-    }
-
-    public Clear(MessageCreateEvent event1) {
-        event = event1;
+    
+    public static Color getRandomColor() {
+    	Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.CYAN, Color.ORANGE, Color.PINK, Color.GRAY,
+        		Color.MAGENTA, Color.YELLOW};
+        int choice = new Random().nextInt(colors.length);
+        return colors[choice];
     }
 }
+

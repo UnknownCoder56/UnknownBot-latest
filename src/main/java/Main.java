@@ -1,5 +1,6 @@
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.activity.ActivityType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +19,7 @@ public class Main {
                 .login().join();
 
         api.addListener(new Listener());
+        api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
         System.out.println(api.createBotInvite());
     }
 
