@@ -1,11 +1,10 @@
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.server.Server;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -18,21 +17,36 @@ public class Main {
                 .setToken(System.getenv("TOKEN"))
                 .login().join();
 
-        api.addListener(new Listener());
+        api.addListener(new CommandsListener());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
         System.out.println(api.createBotInvite());
     }
 
     @SuppressWarnings("unchecked")
     public static void initData() {
-        File arrayFile = new File("C:\\Users\\Arpan\\OneDrive\\Desktop\\Bot Files\\replyArray.data");
+        File replyArrayFile = new File("replyArray.data");
+        File warnsMapFile = new File("warnsMap.data");
+
         try {
-            arrayFile.createNewFile();
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(arrayFile))) {
-                Commands.customReplies = (Map<String, String>) objectInputStream.readObject();
-            }
+            replyArrayFile.createNewFile();
+            warnsMapFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(replyArrayFile))) {
+            BasicCommands.customReplies = (Map<String, String>) objectInputStream.readObject();
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
+
+        try (ObjectInputStream objectInputStream1 = new ObjectInputStream(new FileInputStream(warnsMapFile))) {
+            ModCommands.warnMap = (Map<Long, Map<Long, Warn>>) objectInputStream1.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (BasicCommands.customReplies == null) BasicCommands.customReplies = new HashMap<>();
+        if (ModCommands.warnMap == null) ModCommands.warnMap = new HashMap<>();
     }
 }

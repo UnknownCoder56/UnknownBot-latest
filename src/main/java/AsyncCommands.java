@@ -32,14 +32,14 @@ public class AsyncCommands {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Success!")
                         .setDescription(event.getMessageAuthor().getName() + " cleared " + (messages.size() - 1) + " message(s) in: " + (event.getServerTextChannel().isPresent() ? event.getServerTextChannel().get().getMentionTag() : null))
-                        .setColor(Commands.getRandomColor()));
+                        .setColor(BasicCommands.getRandomColor()));
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             } catch (NumberFormatException e) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Supplied argument is not a number or is too large!")
-                        .setColor(Commands.getRandomColor()));
+                        .setColor(BasicCommands.getRandomColor()));
             }
         }
     }
@@ -67,13 +67,13 @@ public class AsyncCommands {
             System.out.println("Reply: ");
             if (scn.hasNextLine()) {
                 String text2 = scn.nextLine();
-                message.edit(new EmbedBuilder()
+                event.getMessage().reply(new EmbedBuilder()
                         .setTitle("Reply: " + text2)
-                        .setColor(Commands.getRandomColor()));
+                        .setColor(BasicCommands.getRandomColor()));
             } else {
-                message.edit(new EmbedBuilder()
+                event.getMessage().reply(new EmbedBuilder()
                         .setTitle("Reply: " + "...")
-                        .setColor(Commands.getRandomColor()));
+                        .setColor(BasicCommands.getRandomColor()));
             }
         }
     }
@@ -102,14 +102,14 @@ public class AsyncCommands {
                 writer.close();
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Here are your results:- " + searchURL)
-                        .setColor(Commands.getRandomColor()));
+                        .setColor(BasicCommands.getRandomColor()));
                 event.getChannel().sendMessage(file);
             } catch (StringIndexOutOfBoundsException | IOException ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Please type search text after typing '>gsearch' and " +
                                 "put space between command and text.")
-                        .setColor(Commands.getRandomColor()));
+                        .setColor(BasicCommands.getRandomColor()));
             }
         }
     }
@@ -138,7 +138,7 @@ public class AsyncCommands {
                         .setTitle("Error!")
                         .setDescription("Please type text after typing '>makefile' and " +
                                 "put space between command and text.")
-                        .setColor(Commands.getRandomColor()));
+                        .setColor(BasicCommands.getRandomColor()));
             } catch (IOException e) {
                 e.printStackTrace();
             }

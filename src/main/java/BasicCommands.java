@@ -2,6 +2,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
@@ -14,10 +15,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class Commands {
+public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "2.0.0";
+    public static final String version = "2.5.0";
 
     public static void admes(MessageCreateEvent event) {
         try {
@@ -239,6 +240,17 @@ public class Commands {
                 .addField(">noreply (text)", "Disables custom reply.", true)
                 .addField(">replies", "Displays all custom replies set.", true)
                 .addField(">clear (amount)", "Clears specified number of messages.", true)
+                .addField(">warn (mention) \"cause\"", "Warns a user. _Usage: Type >warn, then mention" +
+                        " user, then put reason within '\"''s (no reason supported too). Put space between each" +
+                        " argument. Multiple warns supported. Warns are isolated for each server._", true)
+                .addField(">kick (mention)", "Kicks the mentioned user.", true)
+                .addField(">ban (mention)", "Bans the mentioned user.", true)
+                .addField(">mute", "Mutes the mentioned user (Mute = Disable chat and VC).", true)
+                .addField(">nowarns (mention)", "Clear all warns for a user (Individual removal not" +
+                        " supported yet).", true)
+                .addField(">unban (mention)", "Unbans the mentioned user.", true)
+                .addField(">unmute", "Unmutes the mentioned user (Mute = Enable chat and VC).", true)
+                .addField(">getwarns (mention)", "Gets all warns for a user.")
                 .setColor(getRandomColor())
                 .setTimestamp(Instant.now());
 
@@ -246,14 +258,29 @@ public class Commands {
     }
 
     public static void botinfo(MessageCreateEvent event) {
-        EmbedBuilder embed;
 		try {
+            EmbedBuilder embed;
+            StringBuilder stringBuilder = new StringBuilder();
+
+            if (event.getServer().isPresent()) {
+                if (!event.getServer().get().getRoles(Main.api.getYourself()).isEmpty()) {
+                    for (Role role : event.getServer().get().getRoles(Main.api.getYourself())) {
+                        stringBuilder.append(role.getMentionTag()).append("\n");
+                    }
+                } else {
+                    stringBuilder.append("None");
+                }
+            } else {
+                stringBuilder.append("None");
+            }
+
 			embed = new EmbedBuilder()
 			        .setTitle("UnknownBot Status:-")
 			        .addField("Server count", String.valueOf(Main.api.getServers().size()), true)
 			        .addField("User count", String.valueOf(Main.api.getCachedUsers().size()), true)
 			        .addField("Ping", "\nRest ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.measureRestLatency().get().getNano()) + " ms" +
 			                "\nGateway ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.getLatestGatewayLatency().getNano()) + " ms", true)
+                    .addField("Roles", stringBuilder.toString(), true)
 			        .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
 			        .addField("Version", version, true)
 			        .addField("Bot type", "Utility and Fun Bot", true)
@@ -279,7 +306,7 @@ public class Commands {
     }
     
     public static void refreshReplies() {
-        File arrayFile = new File("C:\\Users\\Arpan\\OneDrive\\Desktop\\Bot Files\\replyArray.data");
+        File arrayFile = new File("replyArray.data");
         try {
             arrayFile.delete();
             arrayFile.createNewFile();
