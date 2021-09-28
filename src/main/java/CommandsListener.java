@@ -29,29 +29,30 @@ public class CommandsListener implements MessageCreateListener {
                             "\nOn: " + dtf.format(localDateTime).toUpperCase(Locale.ROOT));
                 }
 
-                if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">ping")) BasicCommands.ping(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">hello")) BasicCommands.hello(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">hello")) BasicCommands.hello(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">dt")) BasicCommands.dt(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">help")) BasicCommands.help(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">replies")) BasicCommands.replies(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">botinfo")) BasicCommands.botinfo(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">admes")) BasicCommands.admes(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">gsearch")) BasicCommands.gsearch(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">makefile")) BasicCommands.makefile(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">calc")) BasicCommands.calc(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">reply")) BasicCommands.setCustomReply(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">noreply")) BasicCommands.noReply(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">clear")) BasicCommands.clearMessages(event);
+                String command = message.getContent().toLowerCase(Locale.ROOT);
 
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">warn")) ModCommands.warn(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">kick")) ModCommands.kick(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">ban")) ModCommands.ban(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">mute")) ModCommands.mute(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">nowarns")) ModCommands.clearWarn(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">unban")) ModCommands.unban(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">unmute")) ModCommands.unMute(event);
-                else if (message.getContent().toLowerCase(Locale.ROOT).startsWith(">getwarns")) ModCommands.getWarns(event);
+                if (command.startsWith(">ping")) BasicCommands.ping(event);
+                else if (command.startsWith(">hello")) BasicCommands.hello(event);
+                else if (command.startsWith(">dt")) BasicCommands.dt(event);
+                else if (command.startsWith(">help")) BasicCommands.help(event);
+                else if (command.startsWith(">replies")) BasicCommands.replies(event);
+                else if (command.startsWith(">botinfo")) BasicCommands.botinfo(event);
+                else if (command.startsWith(">admes")) BasicCommands.admes(event);
+                else if (command.startsWith(">gsearch")) BasicCommands.gsearch(event);
+                else if (command.startsWith(">makefile")) BasicCommands.makefile(event);
+                else if (command.startsWith(">calc")) BasicCommands.calc(event);
+                else if (command.startsWith(">reply")) BasicCommands.setCustomReply(event);
+                else if (command.startsWith(">noreply")) BasicCommands.noReply(event);
+                else if (command.startsWith(">clear")) BasicCommands.clearMessages(event);
+
+                else if (command.startsWith(">warn")) ModCommands.warn(event);
+                else if (command.startsWith(">kick")) ModCommands.kick(event);
+                else if (command.startsWith(">ban")) ModCommands.ban(event);
+                else if (command.startsWith(">mute")) ModCommands.mute(event);
+                else if (command.startsWith(">nowarns")) ModCommands.clearWarn(event);
+                else if (command.startsWith(">unban")) ModCommands.unban(event);
+                else if (command.startsWith(">unmute")) ModCommands.unMute(event);
+                else if (command.startsWith(">getwarns")) ModCommands.getWarns(event);
 
                 else event.getChannel().sendMessage(new EmbedBuilder()
                 		.setTitle("Error!")
