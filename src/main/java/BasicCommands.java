@@ -244,7 +244,7 @@ public class BasicCommands {
                 .addField(">replies", "Displays all custom replies set.", true)
                 .addField(">clear (amount)", "Clears specified number of messages.", true)
                 .addField(">warn (mention) \"cause\"", "Warns a user. _Usage: Type >warn, then mention" +
-                        " user, then put reason within '\"''s (no reason supported too). Put space between each" +
+                        " user, then put reason within quotation marks (\") (no reason supported too). Put space between each" +
                         " argument. Multiple warns supported. Warns are isolated for each server._", true)
                 .addField(">kick (mention)", "Kicks the mentioned user.", true)
                 .addField(">ban (mention)", "Bans the mentioned user.", true)
