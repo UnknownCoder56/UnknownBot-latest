@@ -3,6 +3,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.listener.channel.user.PrivateChannelCreateListener;
 import org.javacord.api.listener.message.MessageCreateListener;
 
 import java.text.SimpleDateFormat;
@@ -27,6 +28,13 @@ public class CommandsListener implements MessageCreateListener {
                             "\nAt: " + message.getServer().get().getName() +
                             "\nBy: " + message.getAuthor().getName() +
                             "\nOn: " + dtf.format(localDateTime).toUpperCase(Locale.ROOT));
+                } else {
+                    LocalDateTime localDateTime = message.getCreationTimestamp().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    DateTimeFormatter dtf = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter();
+                    System.out.println("\nBot was asked: " + message.getContent() +
+                            "\nAt: " + "DMs" +
+                            "\nBy: " + message.getAuthor().getName() +
+                            "\nOn: " + dtf.format(localDateTime).toUpperCase(Locale.ROOT));
                 }
 
                 String command = message.getContent().toLowerCase(Locale.ROOT);
@@ -44,6 +52,8 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">reply")) BasicCommands.setCustomReply(event);
                 else if (command.startsWith(">noreply")) BasicCommands.noReply(event);
                 else if (command.startsWith(">clear")) BasicCommands.clearMessages(event);
+                else if (command.startsWith(">dm")) BasicCommands.dm(event);
+                else if (command.startsWith(">nuke")) BasicCommands.nuke(event);
 
                 else if (command.startsWith(">warn")) ModCommands.warn(event);
                 else if (command.startsWith(">kick")) ModCommands.kick(event);

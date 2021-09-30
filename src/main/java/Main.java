@@ -14,7 +14,7 @@ public class Main {
 
         initData();
         api = new DiscordApiBuilder()
-                .setToken(System.getenv("TOKEN"))
+                .setToken(System.getenv("DISCORD_TOKEN"))
                 .login().join();
 
         api.addListener(new CommandsListener());

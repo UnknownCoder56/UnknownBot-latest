@@ -1,8 +1,11 @@
+import org.apache.commons.lang3.StringUtils;
+import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
@@ -304,7 +307,47 @@ public class BasicCommands {
         		.setDescription(repl.toString())
         		.setColor(getRandomColor()));
     }
-    
+
+    public static void dm(MessageCreateEvent event) {
+        User user = event.getMessage().getMentionedUsers().get(0);
+        String message = StringUtils.substringBetween(event.getMessage().getContent(), "\"", "\"");
+        try {
+            PrivateChannel channel = user.openPrivateChannel().get();
+            if (event.getServer().isPresent()) {
+                channel.sendMessage(new EmbedBuilder()
+                        .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + " at " +
+                                event.getServer().get().getName() + " :-")
+                        .setDescription(message));
+            } else {
+                channel.sendMessage(new EmbedBuilder()
+                        .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + ":-")
+                        .setDescription(message));
+            }
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Success!")
+                    .setDescription("Successfully DM-ed message to user."));
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("DM to user failed (Main reason: User's DMs are closed)."));
+        }
+    }
+
+    public static void nuke(MessageCreateEvent event) {
+        AsyncCommands.Nuke nuke = new AsyncCommands.Nuke(event);
+        CompletableFuture<AsyncCommands.Nuke> completableFuture = CompletableFuture
+                .supplyAsync(() -> nuke);
+
+        completableFuture
+                .thenApplyAsync(nuke1 -> {
+                    nuke1.run();
+                    return nuke1;
+                });
+    }
+
+
+    // Helper methods
     public static void refreshReplies() {
         File arrayFile = new File("replyArray.data");
         try {
@@ -320,7 +363,7 @@ public class BasicCommands {
     
     public static Color getRandomColor() {
     	Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.CYAN, Color.ORANGE, Color.PINK, Color.GRAY,
-        		Color.MAGENTA, Color.YELLOW};
+        		Color.MAGENTA, Color.YELLOW, Color.DARK_GRAY, Color.WHITE, Color.BLACK, Color.LIGHT_GRAY};
         int choice = new Random().nextInt(colors.length);
         return colors[choice];
     }

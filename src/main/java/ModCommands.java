@@ -22,18 +22,21 @@ public class ModCommands {
                     server.kickUser(user);
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
-                            .setDescription("Successfully kicked user " + user.getDiscriminatedName() + "."));
+                            .setDescription("Successfully kicked user " + user.getDiscriminatedName() + ".")
+                            .setColor(BasicCommands.getRandomColor()));
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("I can't kick that user! Reasons - No kick permission, lower role or" +
-                                    "lower position."));
+                                    "lower position.")
+                            .setColor(BasicCommands.getRandomColor()));
                 }
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 
@@ -46,18 +49,21 @@ public class ModCommands {
                     server.banUser(user);
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
-                            .setDescription("Successfully banned user " + user.getDiscriminatedName() + "."));
+                            .setDescription("Successfully banned user " + user.getDiscriminatedName() + ".")
+                            .setColor(BasicCommands.getRandomColor()));
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("I can't ban that user! Reasons - No kick permission, lower role or" +
-                                    "lower position."));
+                                    "lower position.")
+                            .setColor(BasicCommands.getRandomColor()));
                 }
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 
@@ -70,18 +76,21 @@ public class ModCommands {
                     server.muteUser(user);
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
-                            .setDescription("Successfully muted user " + user.getDiscriminatedName() + "."));
+                            .setDescription("Successfully muted user " + user.getDiscriminatedName() + ".")
+                            .setColor(BasicCommands.getRandomColor()));
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("I can't mute that user! Reasons - No kick permission, lower role or" +
-                                    "lower position."));
+                                    "lower position.")
+                            .setColor(BasicCommands.getRandomColor()));
                 }
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 
@@ -94,18 +103,21 @@ public class ModCommands {
                     server.unbanUser(user);
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
-                            .setDescription("Successfully unbanned user " + user.getDiscriminatedName() + "."));
+                            .setDescription("Successfully unbanned user " + user.getDiscriminatedName() + ".")
+                            .setColor(BasicCommands.getRandomColor()));
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("I can't unban that user! Reasons - No kick permission, lower role or" +
-                                    "lower position."));
+                                    "lower position.")
+                            .setColor(BasicCommands.getRandomColor()));
                 }
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 
@@ -118,18 +130,21 @@ public class ModCommands {
                     server.unmuteUser(user);
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
-                            .setDescription("Successfully unmuted user " + user.getDiscriminatedName() + "."));
+                            .setDescription("Successfully unmuted user " + user.getDiscriminatedName() + ".")
+                            .setColor(BasicCommands.getRandomColor()));
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("I can't unmute that user! Reasons - No kick permission, lower role or" +
-                                    "lower position."));
+                                    "lower position.")
+                            .setColor(BasicCommands.getRandomColor()));
                 }
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 
@@ -163,13 +178,15 @@ public class ModCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Success!")
                     .setDescription("Successfully warned " + user.getDiscriminatedName() + " for cause:\n" +
-                            cause + "\nHe/She now has " + warnMap.get(event.getServer().get().getId()).get(user.getId()).warns + " warn(s)."));
+                            cause + "\nHe/She now has " + warnMap.get(event.getServer().get().getId()).get(user.getId()).warns + " warn(s).")
+                    .setColor(BasicCommands.getRandomColor()));
             if (user.getPrivateChannel().isPresent()) {
                 if (event.getServer().isPresent()) {
                     user.getPrivateChannel().get().sendMessage(new EmbedBuilder()
                             .setTitle("Alert!")
                             .setDescription("You have been warned in **" + event.getServer().get().getName() + "** for reason: **" + cause +
-                                    "**. You now have **" + warnMap.get(event.getServer().get().getId()).get(user.getId()).warns + "** warn(s) in that server."));
+                                    "**. You now have **" + warnMap.get(event.getServer().get().getId()).get(user.getId()).warns + "** warn(s) in that server.")
+                            .setColor(BasicCommands.getRandomColor()));
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
@@ -178,12 +195,14 @@ public class ModCommands {
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Alert!")
-                        .setDescription("Failed to DM user, but warn was successful."));
+                        .setDescription("Failed to DM user, but warn was successful.")
+                        .setColor(BasicCommands.getRandomColor()));
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
         refreshWarns();
     }
@@ -197,21 +216,25 @@ public class ModCommands {
                             .remove(user.getId());
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
-                            .setDescription("Successfully removed all warnings for " + user.getDiscriminatedName() + "!"));
+                            .setDescription("Successfully removed all warnings for " + user.getDiscriminatedName() + "!")
+                            .setColor(BasicCommands.getRandomColor()));
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
-                            .setDescription("No warns were found for this user!"));
+                            .setDescription("No warns were found for this user!")
+                            .setColor(BasicCommands.getRandomColor()));
                 }
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
-                        .setDescription("No warns were found for this user!"));
+                        .setDescription("No warns were found for this user!")
+                        .setColor(BasicCommands.getRandomColor()));
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
         refreshWarns();
     }
@@ -239,11 +262,13 @@ public class ModCommands {
             }
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Warns for " + user.getDiscriminatedName() + ":-")
-                    .setDescription(stringBuilder.toString()));
+                    .setDescription(stringBuilder.toString())
+                    .setColor(BasicCommands.getRandomColor()));
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("You don't have admin perms, so you cannot use mod commands!"));
+                    .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 

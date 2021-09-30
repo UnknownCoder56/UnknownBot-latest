@@ -1,6 +1,9 @@
+import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,21 +27,28 @@ public class AsyncCommands {
 
         @Override
         public void run() {
-            String[] args = event.getMessage().getContent().split(" ");
-            try {
-                int messagesToClear = Integer.parseInt(args[1]);
-                MessageSet messages = event.getChannel().getMessages(messagesToClear + 1).get();
-                event.getChannel().deleteMessages(messages);
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("Success!")
-                        .setDescription(event.getMessageAuthor().getName() + " cleared " + (messages.size() - 1) + " message(s) in: " + (event.getServerTextChannel().isPresent() ? event.getServerTextChannel().get().getMentionTag() : null))
-                        .setColor(BasicCommands.getRandomColor()));
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            } catch (NumberFormatException e) {
+            if (event.getMessageAuthor().isServerAdmin()) {
+                String[] args = event.getMessage().getContent().split(" ");
+                try {
+                    int messagesToClear = Integer.parseInt(args[1]);
+                    MessageSet messages = event.getChannel().getMessages(messagesToClear + 1).get();
+                    event.getChannel().deleteMessages(messages);
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle("Success!")
+                            .setDescription(event.getMessageAuthor().getName() + " cleared " + (messages.size() - 1) + " message(s) in: " + (event.getServerTextChannel().isPresent() ? event.getServerTextChannel().get().getMentionTag() : null))
+                            .setColor(BasicCommands.getRandomColor()));
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                } catch (NumberFormatException e) {
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("Supplied argument is not a number or is too large!")
+                            .setColor(BasicCommands.getRandomColor()));
+                }
+            } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
-                        .setDescription("Supplied argument is not a number or is too large!")
+                        .setDescription("You don't have admin perms, so you cannot use mod commands!")
                         .setColor(BasicCommands.getRandomColor()));
             }
         }
@@ -141,6 +151,45 @@ public class AsyncCommands {
                         .setColor(BasicCommands.getRandomColor()));
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public static class Nuke implements Runnable {
+
+        MessageCreateEvent event;
+
+        public Nuke(MessageCreateEvent event) {
+            this.event = event;
+        }
+
+        @Override
+        public void run() {
+            if (event.getMessageAuthor().isServerAdmin()) {
+                if (event.getServerTextChannel().isPresent() && event.getServer().isPresent()) {
+                    ServerTextChannel channel = event.getServerTextChannel().get();
+                    channel.delete();
+                    try {
+                        ServerTextChannel serverTextChannel = event.getServer().get().createTextChannelBuilder()
+                                .setName(channel.getName())
+                                .setCategory((channel.getCategory().isPresent() ? channel.getCategory().get() : null))
+                                .setTopic(channel.getTopic())
+                                .setSlowmodeDelayInSeconds(channel.getSlowmodeDelayInSeconds())
+                                .create().get();
+                        serverTextChannel.sendMessage(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Successfully nuked this channel (Nuked By: " +
+                                        event.getMessageAuthor().getName() + ").")
+                                .setColor(BasicCommands.getRandomColor()));
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("You don't have admin perms, so you cannot use mod commands!")
+                        .setColor(BasicCommands.getRandomColor()));
             }
         }
     }

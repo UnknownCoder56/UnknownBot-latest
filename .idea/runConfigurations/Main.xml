@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="DISCORD_TOKEN" value="ODkxNTE4MTU4NzkwMzYxMTM4.YU_g_A.MwaO8dEE9FfDCdCkxgt72Ojwcyc" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="Main" />
+    <module name="UnknownBot_(Javacord).main" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
