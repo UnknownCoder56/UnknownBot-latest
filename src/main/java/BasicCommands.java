@@ -81,24 +81,27 @@ public class BasicCommands {
             try {
                 float num1 = Float.parseFloat(argsList.get(0));
                 float num2 = Float.parseFloat(argsList.get(2));
+                float result;
                 switch (argsList.get(1)) {
-                    case ("+") -> {
-                        float result = num1 + num2;
+                    case ("+"):
+                        result = num1 + num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                    }
-                    case ("-") -> {
-                        float result = num1 - num2;
+                        break;
+                    case ("-"):
+                        result = num1 - num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                    }
-                    case ("*") -> {
-                        float result = num1 * num2;
+                        break;
+                    case ("*"):
+                        result = num1 * num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                    }
-                    case ("/") -> {
-                        float result = num1 / num2;
+                        break;
+                    case ("/"):
+                        result = num1 / num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                    }
-                    default -> reply = "Not a valid operation symbol. Valid ones are +, -, * and /.";
+                        break;
+                    default:
+                        reply = "Not a valid operation symbol. Valid ones are +, -, * and /.";
+                        break;
                 }
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle(reply)

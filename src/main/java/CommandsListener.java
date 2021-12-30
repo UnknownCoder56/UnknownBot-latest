@@ -64,6 +64,10 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">unmute")) ModCommands.unMute(event);
                 else if (command.startsWith(">getwarns")) ModCommands.getWarns(event);
 
+                else if (command.startsWith(">bal")) CurrencyCommands.balance(event);
+                else if (command.startsWith(">deposit") || command.startsWith(">dep")) CurrencyCommands.creditBalance(event);
+                else if (command.startsWith(">withdraw") || command.startsWith(">with")) CurrencyCommands.debitBalance(event);
+
                 else event.getChannel().sendMessage(new EmbedBuilder()
                 		.setTitle("Error!")
                 		.setDescription("No such command was found! Type '>help' to view available commands."));

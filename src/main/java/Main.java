@@ -26,10 +26,12 @@ public class Main {
     public static void initData() {
         File replyArrayFile = new File("replyArray.data");
         File warnsMapFile = new File("warnsMap.data");
+        File balanceMapFile = new File("balanceMap.data");
 
         try {
             replyArrayFile.createNewFile();
             warnsMapFile.createNewFile();
+            balanceMapFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,13 +42,20 @@ public class Main {
             e.printStackTrace();
         }
 
-        try (ObjectInputStream objectInputStream1 = new ObjectInputStream(new FileInputStream(warnsMapFile))) {
-            ModCommands.warnMap = (Map<Long, Map<Long, Warn>>) objectInputStream1.readObject();
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(warnsMapFile))) {
+            ModCommands.warnMap = (Map<Long, Map<Long, Warn>>) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(balanceMapFile))) {
+            CurrencyCommands.balanceMap = (Map<Long, Long>) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
 
         if (BasicCommands.customReplies == null) BasicCommands.customReplies = new HashMap<>();
         if (ModCommands.warnMap == null) ModCommands.warnMap = new HashMap<>();
+        if (CurrencyCommands.balanceMap == null) CurrencyCommands.balanceMap = new HashMap<>();
     }
 }
