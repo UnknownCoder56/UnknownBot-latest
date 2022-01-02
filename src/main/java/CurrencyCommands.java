@@ -74,6 +74,7 @@ public class CurrencyCommands {
                         .append(win)
                         .append(") ")
                         .append(user.getDisplayName(event.getServer().get()))
+                        .append(" (:coin: " + balanceMap.get(user.getId()) + ")")
                         .append("\n");
             }
             event.getChannel().sendMessage(new EmbedBuilder()
