@@ -39,6 +39,7 @@ public class CommandsListener implements MessageCreateListener {
 
                 String command = message.getContent().toLowerCase(Locale.ROOT);
 
+                // Utility commands
                 if (command.startsWith(">ping")) BasicCommands.ping(event);
                 else if (command.startsWith(">hello")) BasicCommands.hello(event);
                 else if (command.startsWith(">dt")) BasicCommands.dt(event);
@@ -55,6 +56,7 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">dm")) BasicCommands.dm(event);
                 else if (command.startsWith(">nuke")) BasicCommands.nuke(event);
 
+                // Mod commands
                 else if (command.startsWith(">warn")) ModCommands.warn(event);
                 else if (command.startsWith(">kick")) ModCommands.kick(event);
                 else if (command.startsWith(">ban")) ModCommands.ban(event);
@@ -64,13 +66,15 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">unmute")) ModCommands.unMute(event);
                 else if (command.startsWith(">getwarns")) ModCommands.getWarns(event);
 
+                // Currency commands
                 else if (command.startsWith(">bal")) CurrencyCommands.balance(event);
-                else if (command.startsWith(">deposit") || command.startsWith(">dep")) CurrencyCommands.creditBalance(event);
-                else if (command.startsWith(">withdraw") || command.startsWith(">with")) CurrencyCommands.debitBalance(event);
+                else if (command.startsWith(">work")) CurrencyCommands.work(event);
+                else if (command.startsWith(">lb")) CurrencyCommands.leaderboard(event);
 
+                // Error handler
                 else event.getChannel().sendMessage(new EmbedBuilder()
-                		.setTitle("Error!")
-                		.setDescription("No such command was found! Type '>help' to view available commands."));
+                            .setTitle("Error!")
+                            .setDescription("No such command was found! Type '>help' to view available commands."));
             } else if (getReply(message.getContent()) != null) {
                 BasicCommands.customReply(event, getReply(message.getContent()));
             }

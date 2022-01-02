@@ -1,6 +1,7 @@
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.server.Server;
 
 import java.io.*;
@@ -15,6 +16,9 @@ public class Main {
         initData();
         api = new DiscordApiBuilder()
                 .setToken(System.getenv("DISCORD_TOKEN"))
+                .setIntents(Intent.DIRECT_MESSAGES, Intent.GUILD_BANS, Intent.GUILD_MEMBERS, Intent.GUILDS,
+                        Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_TYPING, Intent.GUILD_MESSAGES,
+                        Intent.GUILD_PRESENCES)
                 .login().join();
 
         api.addListener(new CommandsListener());
