@@ -279,16 +279,15 @@ public class BasicCommands {
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("UnknownBot's Help docs")
-                    .setDescription("""
-                            UnknownBot is a multipurpose bot, currently under active development.
-                            To get help about commands, type ">help (category)", where categories include:-
-                            
-                            1) Utility ```>help utility```
-                            2) Moderation ```>help moderation```
-                            3) Economy ```>help economy```
-                            
-                            For more information on the bot, how to use it, or queries about, contact us on our official discord server:-
-                            https://discord.gg/t79ZyuHr5K""")
+                    .setDescription("UnknownBot is a multipurpose bot, currently under active development.\n" +
+                                    "To get help about commands, type \">help (category)\", where categories include:-\n" +
+                                    "\n" +
+                                    "1) Utility ```>help utility```\n" +
+                                    "2) Moderation ```>help moderation```\n" +
+                                    "3) Economy ```>help economy```\n" +
+                                    "\n" +
+                                    "For more information on the bot, how to use it, or queries about, contact us on our official discord server:-\n" +
+                                    "https://discord.gg/t79ZyuHr5K")
                     .setColor(getRandomColor()));
         }
     }
