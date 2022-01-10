@@ -17,11 +17,12 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "2.5.0";
+    public static final String version = "3.0.0";
 
     public static void admes(MessageCreateEvent event) {
         try {
@@ -230,37 +231,66 @@ public class BasicCommands {
     }
 
     public static void help(MessageCreateEvent event) {
-        EmbedBuilder embed = new EmbedBuilder()
-                .setTitle("UnknownBot Commands:-")
-                .setAuthor("UnknownBot")
-                .addField(">help", "Displays this help message.", true)
-                .addField(">botinfo", "Shows information about UnknownBot.", true)
-                .addField(">hello", "Says hello to you.", true)
-                .addField(">ping", "Displays bot latency.", true)
-                .addField(">admes (query)", "Ask anything to the bot.", true)
-                .addField(">dt", "Shows the current date and time (AM/PM).", true)
-                .addField(">gsearch (search text)", "Searches google and returns results as html.", true)
-                .addField(">makefile (text)", "Creates file from text.", true)
-                .addField(">calc (num1),(sign),(num2) _Warning: No spaces after/before/in commas_", "Does calculation. Supported signs -> +, -, *, /", true)
-                .addField(">reply (text),(reply) _Warning: No spaces after/before/in commas_", "Makes the bot reply when you send a specific text.", true)
-                .addField(">noreply (text)", "Disables custom reply.", true)
-                .addField(">replies", "Displays all custom replies set.", true)
-                .addField(">clear (amount)", "Clears specified number of messages.", true)
-                .addField(">warn (mention) \"cause\"", "Warns a user. _Usage: Type >warn, then mention" +
-                        " user, then put reason within quotation marks (\") (no reason supported too). Put space between each" +
-                        " argument. Multiple warns supported. Warns are isolated for each server._", true)
-                .addField(">kick (mention)", "Kicks the mentioned user.", true)
-                .addField(">ban (mention)", "Bans the mentioned user.", true)
-                .addField(">mute", "Mutes the mentioned user (Mute = Disable chat and VC).", true)
-                .addField(">nowarns (mention)", "Clear all warns for a user (Individual removal not" +
-                        " supported yet).", true)
-                .addField(">unban (mention)", "Unbans the mentioned user.", true)
-                .addField(">unmute", "Unmutes the mentioned user (Mute = Enable chat and VC).", true)
-                .addField(">getwarns (mention)", "Gets all warns for a user.")
-                .setColor(getRandomColor())
-                .setTimestamp(Instant.now());
-
-        event.getChannel().sendMessage(embed);
+        String[] args = event.getMessage().getContent().split(" ");
+        String category = args.length > 1 ? args[1].toLowerCase(Locale.ROOT) : "";
+        String[] categories = {"utility", "moderation", "economy"};
+        if (Objects.equals(category, categories[0])) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("UnknownBot's Utility commands:-")
+                    .addField(">help (category)", "Displays this help message.", true)
+                    .addField(">botinfo", "Shows information about UnknownBot.", true)
+                    .addField(">hello", "Says hello to you.", true)
+                    .addField(">ping", "Displays bot latency.", true)
+                    .addField(">admes (query)", "Ask anything to the bot.", true)
+                    .addField(">dt", "Shows the current date and time (AM/PM).", true)
+                    .addField(">gsearch (search text)", "Searches google and returns results as html.", true)
+                    .addField(">makefile (text)", "Creates file from text.", true)
+                    .addField(">calc (num1),(sign),(num2) _Warning: No spaces after/before/in commas_", "Does calculation. Supported signs -> +, -, *, /", true)
+                    .addField(">reply (text),(reply) _Warning: No spaces after/before/in commas_", "Makes the bot reply when you send a specific text.", true)
+                    .addField(">noreply (text)", "Disables custom reply.", true)
+                    .addField(">replies", "Displays all custom replies set.", true)
+                    .setColor(getRandomColor()));
+        } else if (Objects.equals(category, categories[1])) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("UnknownBot's Moderation commands:-")
+                    .addField(">clear (amount)", "Clears specified number of messages.", true)
+                    .addField(">warn (mention) \"cause\"", "Warns a user. _Usage: Type >warn, then mention" +
+                            " user, then put reason within quotation marks (\") (no reason supported too). Put space between each" +
+                            " argument. Multiple warns supported. Warns are isolated for each server._", true)
+                    .addField(">kick (mention)", "Kicks the mentioned user.", true)
+                    .addField(">ban (mention)", "Bans the mentioned user.", true)
+                    .addField(">mute", "Mutes the mentioned user (Mute = Disable chat and VC).", true)
+                    .addField(">nowarns (mention)", "Clear all warns for a user (Individual removal not" +
+                            " supported yet).", true)
+                    .addField(">unban (mention)", "Unbans the mentioned user.", true)
+                    .addField(">unmute", "Unmutes the mentioned user (Mute = Enable chat and VC).", true)
+                    .addField(">getwarns (mention)", "Gets all warns for a user.")
+                    .setColor(getRandomColor()));
+        } else if (Objects.equals(category, categories[2])) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("UnknownBot's Economy commands:-")
+                    .addField(">bal", "Shows your current bank balance", true)
+                    .addField(">bal (mention)", "Shows others' current bank balance", true)
+                    .addField(">work", "You work and gain money!", true)
+                    .addField(">lb", "Compare and check top 5 richest users of your server!", true)
+                    .addField(">rob (mention)", "Rob others and get money, the dark way.", true)
+                    .addField(">give (amount) (mention)", "Transfer money to others' accounts!", true)
+                    .setColor(getRandomColor()));
+        } else {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("UnknownBot's Help docs")
+                    .setDescription("""
+                            UnknownBot is a multipurpose bot, currently under active development.
+                            To get help about commands, type ">help (category)", where categories include:-
+                            
+                            1) Utility ```>help utility```
+                            2) Moderation ```>help moderation```
+                            3) Economy ```>help economy```
+                            
+                            For more information on the bot, how to use it, or queries about, contact us on our official discord server:-
+                            https://discord.gg/t79ZyuHr5K""")
+                    .setColor(getRandomColor()));
+        }
     }
 
     public static void botinfo(MessageCreateEvent event) {
@@ -289,7 +319,7 @@ public class BasicCommands {
                     .addField("Roles", stringBuilder.toString(), true)
 			        .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
 			        .addField("Version", version, true)
-			        .addField("Bot type", "Utility and Fun Bot", true)
+			        .addField("Bot type", "Utility, Moderation and Economy Bot", true)
 			        .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
 			        .setColor(getRandomColor());
 			

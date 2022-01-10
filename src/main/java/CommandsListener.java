@@ -70,6 +70,8 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">bal")) CurrencyCommands.balance(event);
                 else if (command.startsWith(">work")) CurrencyCommands.work(event);
                 else if (command.startsWith(">lb")) CurrencyCommands.leaderboard(event);
+                else if (command.startsWith(">rob")) CurrencyCommands.rob(event);
+                else if (command.startsWith(">give")) CurrencyCommands.give(event);
 
                 // Error handler
                 else event.getChannel().sendMessage(new EmbedBuilder()

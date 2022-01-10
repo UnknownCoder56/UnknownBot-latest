@@ -101,11 +101,13 @@ public class AsyncCommands {
         public void run() {
             try {
                 String search = URLEncoder.encode(event.getMessage().getContent().substring(9), StandardCharsets.UTF_8);
-                String searchURL = GOOGLE_SEARCH_URL + "?q=" + search + "&num=" + 10;
+                String searchURL = GOOGLE_SEARCH_URL + "?q=" + search + "&num=" + 10 + "&sourceid=chrome&ie=UTF-8";
                 System.out.println("SEARCH: " + searchURL);
-                Document doc = Jsoup.connect(searchURL).userAgent("Mozilla/5.0").get();
-                File file = new File("C:\\Users\\Arpan\\OneDrive\\Desktop\\Bot Files\\draft.html");
+                Document doc = Jsoup.connect(searchURL).userAgent("Chrome/70.0.3538.77").get();
+                File file = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\draft.html");
+                File dir = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\");
                 file.delete();
+                dir.mkdirs();
                 file.createNewFile();
                 FileWriter writer = new FileWriter(file);
                 writer.write(doc.html());
@@ -115,6 +117,7 @@ public class AsyncCommands {
                         .setColor(BasicCommands.getRandomColor()));
                 event.getChannel().sendMessage(file);
             } catch (StringIndexOutOfBoundsException | IOException ex) {
+                ex.printStackTrace();
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Please type search text after typing '>gsearch' and " +
@@ -136,8 +139,10 @@ public class AsyncCommands {
         public void run() {
             try {
                 String text = event.getMessage().getContent().substring(10);
-                File file = new File("C:\\Users\\Arpan\\OneDrive\\Desktop\\Bot Files\\text.txt");
+                File file = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\text.txt");
+                File dir = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\");
                 file.delete();
+                dir.mkdirs();
                 file.createNewFile();
                 FileWriter writer = new FileWriter(file);
                 writer.write(text);
