@@ -2,6 +2,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
+import spark.Spark;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +16,13 @@ public class Main {
     public static DiscordApi api;
     public static void main(String[] args) {
 
+        Spark.get("/", (req, res) -> "Hello World!");
+        Spark.port(6565);
+        System.out.println("Bot listening on http://localhost:6565/");
+
         initData();
         api = new DiscordApiBuilder()
-                .setToken(args[0])
+                .setToken(System.getenv("TOKEN"))
                 .setIntents(Intent.DIRECT_MESSAGES, Intent.GUILD_BANS, Intent.GUILD_MEMBERS, Intent.GUILDS,
                         Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_TYPING, Intent.GUILD_MESSAGES,
                         Intent.GUILD_PRESENCES)
