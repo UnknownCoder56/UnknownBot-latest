@@ -16,8 +16,8 @@ public class Main {
     public static DiscordApi api;
     public static void main(String[] args) {
 
-        Spark.get("/", (req, res) -> "Hello World!");
         Spark.port(6565);
+        Spark.get("/", (req, res) -> "Hello World!");
         System.out.println("Bot listening on http://localhost:6565/");
 
         initData();
