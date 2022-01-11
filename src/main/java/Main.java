@@ -17,7 +17,7 @@ public class Main {
 
         initData();
         api = new DiscordApiBuilder()
-                .setToken(System.getEnv("TOKEN"))
+                .setToken(args[0])
                 .setIntents(Intent.DIRECT_MESSAGES, Intent.GUILD_BANS, Intent.GUILD_MEMBERS, Intent.GUILDS,
                         Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_TYPING, Intent.GUILD_MESSAGES,
                         Intent.GUILD_PRESENCES)
