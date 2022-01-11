@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 
@@ -22,14 +23,14 @@ public class CommandsListener implements MessageCreateListener {
             if (message.getContent().startsWith(">")) {
 
                 if (message.getServer().isPresent()) {
-                    LocalDateTime localDateTime = message.getCreationTimestamp().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    LocalDateTime localDateTime = message.getCreationTimestamp().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
                     DateTimeFormatter dtf = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter();
                     System.out.println("\nBot was asked: " + message.getContent() +
                             "\nAt: " + message.getServer().get().getName() +
                             "\nBy: " + message.getAuthor().getName() +
                             "\nOn: " + dtf.format(localDateTime).toUpperCase(Locale.ROOT));
                 } else {
-                    LocalDateTime localDateTime = message.getCreationTimestamp().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    LocalDateTime localDateTime = message.getCreationTimestamp().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
                     DateTimeFormatter dtf = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter();
                     System.out.println("\nBot was asked: " + message.getContent() +
                             "\nAt: " + "DMs" +
@@ -70,6 +71,7 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">bal")) CurrencyCommands.balance(event);
                 else if (command.startsWith(">work")) CurrencyCommands.work(event);
                 else if (command.startsWith(">lb")) CurrencyCommands.leaderboard(event);
+                else if (command.startsWith(">glb")) CurrencyCommands.globalLeaderboard(event);
                 else if (command.startsWith(">rob")) CurrencyCommands.rob(event);
                 else if (command.startsWith(">give")) CurrencyCommands.give(event);
 

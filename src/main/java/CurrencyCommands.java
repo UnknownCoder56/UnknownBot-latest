@@ -211,14 +211,65 @@ public class CurrencyCommands {
                         .append(user.getDisplayName(event.getServer().get())).append(" (:coin: ").append(balanceMap.get(user.getId())).append(")")
                         .append("\n");
             }
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Top " + arrangedUsers.size() + " richest users in " + event.getServer().get().getName() + ":-")
-                    .setDescription(formattedTopUsers.toString())
-                    .setColor(BasicCommands.getRandomColor()));
+            if (arrangedUsers.size() > 0) {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Top " + arrangedUsers.size() + " richest user(s) in " + event.getServer().get().getName() + ":-")
+                        .setDescription(formattedTopUsers.toString())
+                        .setColor(BasicCommands.getRandomColor()));
+            } else {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("No one has more than :coin: 0 in this server!")
+                        .setColor(BasicCommands.getRandomColor()));
+            }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("This command only works in servers!")
+                    .setColor(BasicCommands.getRandomColor()));
+        }
+    }
+
+    public static void globalLeaderboard(MessageCreateEvent event) {
+        ArrayList<User> users = new ArrayList<>();
+        for (Long id : balanceMap.values()) {
+            try {
+                if (!Main.api.getUserById(id).get().isBot()) {
+                    users.add(Main.api.getUserById(id).get());
+                }
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        ArrayList<User> arrangedUsers = new ArrayList<>();
+        for (User user : users) {
+            if (!user.isBot()) {
+                if (balanceMap.containsKey(user.getId())) {
+                    arrangedUsers.add(arrangedUsers.size(), user);
+                }
+            }
+        }
+        SortByBalance sortByBalance = new SortByBalance(balanceMap);
+        arrangedUsers.sort(Collections.reverseOrder(sortByBalance));
+        arrangedUsers.removeIf(user -> arrangedUsers.indexOf(user) > 5);
+        System.out.println(arrangedUsers);
+        StringBuilder formattedTopUsers = new StringBuilder();
+        int win = 0;
+        for (User user : arrangedUsers) {
+            win++;
+            formattedTopUsers
+                    .append(win)
+                    .append(") ")
+                    .append(user.getDiscriminatedName()).append(" (:coin: ").append(balanceMap.get(user.getId())).append(")")
+                    .append("\n");
+        }
+        if (arrangedUsers.size() > 0) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Top " + arrangedUsers.size() + " richest user(s) of UnknownBot:-")
+                    .setDescription(formattedTopUsers.toString())
+                    .setColor(BasicCommands.getRandomColor()));
+        } else {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("No one has more than :coin: 0 in our database!")
                     .setColor(BasicCommands.getRandomColor()));
         }
     }

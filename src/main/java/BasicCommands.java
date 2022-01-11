@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "3.0.0";
+    public static final String version = "3.1.5";
 
     public static void admes(MessageCreateEvent event) {
         try {
@@ -210,7 +211,6 @@ public class BasicCommands {
 					.setDescription("Latency is " + TimeUnit.NANOSECONDS.toMillis(Main.api.measureRestLatency().get().getNano()) + " ms")
 					.setColor(getRandomColor()));
 		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -219,14 +219,14 @@ public class BasicCommands {
         event.getChannel().sendMessage(new EmbedBuilder()
         		.setTitle("Hello!")
         		.setDescription("Hello There, " + event.getMessageAuthor().getName() + "! UnknownBot"
-        				+ " here at your service. Type '>help for a list of supported commands.")
+        				+ " here at your service. Type '>help' for more information on supported commands.")
         		.setColor(getRandomColor()));
     }
 
     public static void dt(MessageCreateEvent event) {
         event.getChannel().sendMessage(new EmbedBuilder()
-        		.setTitle("Current System Time (IST)")
-        		.setDescription(LocalDateTime.now().format(
+        		.setTitle("Current Time (UTC)")
+        		.setDescription(LocalDateTime.now(ZoneId.of("UTC")).format(
         				new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
         		.setColor(getRandomColor()));
     }
@@ -273,7 +273,8 @@ public class BasicCommands {
                     .addField(">bal", "Shows your current bank balance", true)
                     .addField(">bal (mention)", "Shows others' current bank balance", true)
                     .addField(">work", "You work and gain money!", true)
-                    .addField(">lb", "Compare and check top 5 richest users of your server!", true)
+                    .addField(">lb", "Compare and check out richest users of your server!", true)
+                    .addField(">glb", "Compare and check richest users of our bot (Global)!", true)
                     .addField(">rob (mention)", "Rob others and get money, the dark way.", true)
                     .addField(">give (amount) (mention)", "Transfer money to others' accounts!", true)
                     .setColor(getRandomColor()));
@@ -335,10 +336,17 @@ public class BasicCommands {
         for (String reply : customReplies.keySet()) {
             repl.append(reply).append(": ").append(customReplies.get(reply)).append("\n");
         }
-        event.getChannel().sendMessage(new EmbedBuilder()
-        		.setTitle("Currently set custom replies:-")
-        		.setDescription(repl.toString())
-        		.setColor(getRandomColor()));
+        if (!repl.toString().equals("")) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Currently set custom replies:-")
+                    .setDescription(repl.toString())
+                    .setColor(getRandomColor()));
+        } else {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Currently set custom replies:-")
+                    .setDescription("No custom replies have been set up yet!")
+                    .setColor(getRandomColor()));
+        }
     }
 
     public static void dm(MessageCreateEvent event) {
