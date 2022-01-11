@@ -27,6 +27,44 @@
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.9.3/193b96ef555b2f2573b576887ba9a93e4bf48e8c/jackson-databind-2.9.3.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.9.0/7c10d545325e3a6e72e06381afe469fd40eb701/jackson-annotations-2.9.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.11.0/bede79a3f150711634a3047985517431bf6499f2/log4j-api-2.11.0.jar" path-in-jar="/" />
+      <element id="library" level="project" name="Gradle: com.sparkjava:spark-core:2.9.3" />
+      <element id="library" level="project" name="Gradle: org.jsoup:jsoup:1.14.3" />
+      <element id="library" level="project" name="Gradle: org.apache.commons:commons-lang3:3.12.0" />
+      <element id="library" level="project" name="Gradle: org.slf4j:slf4j-api:1.7.25" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-webapp:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty.websocket:websocket-server:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-server:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty.websocket:websocket-servlet:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.javacord:javacord-api:3.3.2" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-servlet:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-xml:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty.websocket:websocket-client:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-http:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty.websocket:websocket-common:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: javax.servlet:javax.servlet-api:3.1.0" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-io:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty.websocket:websocket-api:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-security:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-util:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.eclipse.jetty:jetty-client:9.4.31.v20200723" />
+      <element id="library" level="project" name="Gradle: org.javacord:javacord-core:3.3.2" />
+      <element id="library" level="project" name="Gradle: com.squareup.okhttp3:logging-interceptor:3.9.1" />
+      <element id="library" level="project" name="Gradle: com.squareup.okhttp3:okhttp:3.9.1" />
+      <element id="library" level="project" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.3" />
+      <element id="library" level="project" name="Gradle: com.neovisionaries:nv-websocket-client:2.6" />
+      <element id="library" level="project" name="Gradle: com.codahale:xsalsa20poly1305:0.10.1" />
+      <element id="library" level="project" name="Gradle: org.apache.logging.log4j:log4j-api:2.11.0" />
+      <element id="library" level="project" name="Gradle: io.vavr:vavr:0.10.1" />
+      <element id="library" level="project" name="Gradle: com.squareup.okio:okio:1.14.0" />
+      <element id="library" level="project" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.0" />
+      <element id="library" level="project" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.3" />
+      <element id="library" level="project" name="Gradle: org.bouncycastle:bcprov-jdk15on:1.59" />
+      <element id="library" level="project" name="Gradle: io.vavr:vavr-match:0.10.1" />
+      <element id="library" level="project" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.8.2" />
+      <element id="library" level="project" name="Gradle: org.junit.platform:junit-platform-commons:1.8.2" />
+      <element id="library" level="project" name="Gradle: org.opentest4j:opentest4j:1.2.0" />
+      <element id="library" level="project" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.8.2" />
+      <element id="library" level="project" name="Gradle: org.junit.platform:junit-platform-engine:1.8.2" />
     </root>
   </artifact>
 </component>
