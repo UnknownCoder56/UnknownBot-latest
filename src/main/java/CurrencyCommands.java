@@ -231,7 +231,7 @@ public class CurrencyCommands {
 
     public static void globalLeaderboard(MessageCreateEvent event) {
         ArrayList<User> users = new ArrayList<>();
-        for (Long id : balanceMap.values()) {
+        for (Long id : balanceMap.keySet()) {
             try {
                 if (!Main.api.getUserById(id).get().isBot()) {
                     users.add(Main.api.getUserById(id).get());
