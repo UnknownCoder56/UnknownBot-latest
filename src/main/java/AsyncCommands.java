@@ -102,10 +102,8 @@ public class AsyncCommands {
                 String searchURL = GOOGLE_SEARCH_URL + "?q=" + search + "&num=" + 10 + "&sourceid=chrome&ie=UTF-8";
                 System.out.println("SEARCH: " + searchURL);
                 Document doc = Jsoup.connect(searchURL).userAgent("Chrome/70.0.3538.77").get();
-                File file = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\draft.html");
-                File dir = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\");
+                File file = new File("draft.html");
                 file.delete();
-                dir.mkdirs();
                 file.createNewFile();
                 FileWriter writer = new FileWriter(file);
                 writer.write(doc.html());
@@ -137,10 +135,8 @@ public class AsyncCommands {
         public void run() {
             try {
                 String text = event.getMessage().getContent().substring(10);
-                File file = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\text.txt");
-                File dir = new File("C:\\Users\\Arpan\\Desktop\\Bot Files\\");
+                File file = new File("text.txt");
                 file.delete();
-                dir.mkdirs();
                 file.createNewFile();
                 FileWriter writer = new FileWriter(file);
                 writer.write(text);
