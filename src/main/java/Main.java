@@ -16,10 +16,6 @@ public class Main {
     public static DiscordApi api;
     public static void main(String[] args) {
 
-        Spark.port(6565);
-        Spark.get("/", (req, res) -> "Hello World!");
-        System.out.println("Bot listening on http://localhost:6565/");
-
         initData();
         api = new DiscordApiBuilder()
                 .setToken(System.getenv("TOKEN"))
@@ -28,9 +24,14 @@ public class Main {
                         Intent.GUILD_PRESENCES)
                 .login().join();
 
+        System.out.print("\033\143");
+        Spark.port(6565);
+        Spark.get("/", (req, res) -> "UnknownBot is online!");
+        System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
+
         api.addListener(new CommandsListener());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
-        System.out.println(api.createBotInvite());
+        System.out.println("Invite link for UnknownBot: " + api.createBotInvite());
     }
 
     @SuppressWarnings("unchecked")
