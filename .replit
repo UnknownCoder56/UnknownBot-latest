@@ -1,2 +1,2 @@
 language = "java10"
-run = "java -jar ./out/artifacts/UnknownBot__Javacord__jar/UnknownBot (Javacord).jar"
+run = "java -jar \"./out/artifacts/UnknownBot__Javacord__jar/UnknownBot (Javacord).jar\""
