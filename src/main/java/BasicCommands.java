@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "3.1.6";
+    public static final String version = "3.2.0";
 
     public static void admes(MessageCreateEvent event) {
         try {

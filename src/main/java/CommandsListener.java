@@ -14,10 +14,33 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 public class CommandsListener implements MessageCreateListener {
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
+        AsyncListener asyncListener = new AsyncListener(event);
+        CompletableFuture<AsyncListener> listenerCompletableFuture = CompletableFuture
+                .supplyAsync(() -> asyncListener);
+
+        listenerCompletableFuture
+                .thenApplyAsync((asyncListener1) -> {
+                    asyncListener1.run();
+                    return asyncListener1;
+                });
+    }
+}
+
+class AsyncListener implements Runnable {
+
+    MessageCreateEvent event;
+
+    public AsyncListener(MessageCreateEvent event) {
+        this.event = event;
+    }
+
+    @Override
+    public void run() {
         Message message = event.getMessage();
         if (!message.getAuthor().isBotUser()) {
             if (message.getContent().startsWith(">")) {
@@ -57,7 +80,7 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">dm")) BasicCommands.dm(event);
                 else if (command.startsWith(">nuke")) BasicCommands.nuke(event);
 
-                // Mod commands
+                    // Mod commands
                 else if (command.startsWith(">warn")) ModCommands.warn(event);
                 else if (command.startsWith(">kick")) ModCommands.kick(event);
                 else if (command.startsWith(">ban")) ModCommands.ban(event);
@@ -67,7 +90,7 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">unmute")) ModCommands.unMute(event);
                 else if (command.startsWith(">getwarns")) ModCommands.getWarns(event);
 
-                // Currency commands
+                    // Currency commands
                 else if (command.startsWith(">bal")) CurrencyCommands.balance(event);
                 else if (command.startsWith(">work")) CurrencyCommands.work(event);
                 else if (command.startsWith(">lb")) CurrencyCommands.leaderboard(event);
@@ -75,7 +98,7 @@ public class CommandsListener implements MessageCreateListener {
                 else if (command.startsWith(">rob")) CurrencyCommands.rob(event);
                 else if (command.startsWith(">give")) CurrencyCommands.give(event);
 
-                // Error handler
+                    // Error handler
                 else event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("No such command was found! Type '>help' to view available commands."));
@@ -105,7 +128,7 @@ public class CommandsListener implements MessageCreateListener {
         }
     }
 
-    public static String getReply(String text) {
+    public String getReply(String text) {
         for (String reply : BasicCommands.customReplies.keySet()) {
             if (text.contains(reply)) return BasicCommands.customReplies.get(reply);
         }
