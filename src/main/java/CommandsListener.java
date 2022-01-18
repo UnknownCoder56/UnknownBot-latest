@@ -80,7 +80,7 @@ class AsyncListener implements Runnable {
                 else if (command.startsWith(">dm")) BasicCommands.dm(event);
                 else if (command.startsWith(">nuke")) BasicCommands.nuke(event);
 
-                    // Mod commands
+                // Mod commands
                 else if (command.startsWith(">warn")) ModCommands.warn(event);
                 else if (command.startsWith(">kick")) ModCommands.kick(event);
                 else if (command.startsWith(">ban")) ModCommands.ban(event);
@@ -90,7 +90,7 @@ class AsyncListener implements Runnable {
                 else if (command.startsWith(">unmute")) ModCommands.unMute(event);
                 else if (command.startsWith(">getwarns")) ModCommands.getWarns(event);
 
-                    // Currency commands
+                // Currency commands
                 else if (command.startsWith(">bal")) CurrencyCommands.balance(event);
                 else if (command.startsWith(">work")) CurrencyCommands.work(event);
                 else if (command.startsWith(">lb")) CurrencyCommands.leaderboard(event);
