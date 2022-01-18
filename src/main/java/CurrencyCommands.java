@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class CurrencyCommands {
@@ -16,6 +17,7 @@ public class CurrencyCommands {
             "found some money on road and got", "sold a modern art picture and earned", "caught a robber and was prized with",
             "fixed neighbour's PC and earned", "checked his car bonnet and found", "won a bet and earned",
             "repaired cars at workshop for a day and earned", "won a lucky draw and earned"};
+    public static Map<Long, Integer> workCounters = new HashMap<>();
 
     public static void balance(MessageCreateEvent event) {
         if (event.getMessage().getMentionedUsers().size() > 0) {
@@ -55,21 +57,40 @@ public class CurrencyCommands {
     }
 
     public static void work(MessageCreateEvent event) {
+        Map<Long, CompletableFuture<AsyncCommands.Work>> works = new HashMap<>();
         if (event.getMessageAuthor().asUser().isPresent()) {
-            String work = getRandomWork();
-            int earn = getRandomInteger(500, 100);
-            if (creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
-                        .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
-                                " :coin: " + earn)
-                        .setColor(BasicCommands.getRandomColor()));
+            Long userId = event.getMessageAuthor().asUser().get().getId();
+            if (works.containsKey(userId)) {
+                if (works.get(userId).isDone()) {
+                    AsyncCommands.Work work = new AsyncCommands.Work(event);
+                    CompletableFuture<AsyncCommands.Work> workCompletableFuture = CompletableFuture
+                            .supplyAsync(() -> work);
+
+                    works.put(userId, workCompletableFuture);
+
+                    workCompletableFuture.
+                            thenApplyAsync(work1 -> {
+                                work1.run();
+                                return work1;
+                            });
+                } else {
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("You are on cooldown! You can work again after " + workCounters.get(userId) + " seconds."));
+                }
+            } else {
+                AsyncCommands.Work work = new AsyncCommands.Work(event);
+                CompletableFuture<AsyncCommands.Work> workCompletableFuture = CompletableFuture
+                        .supplyAsync(() -> work);
+
+                works.put(userId, workCompletableFuture);
+
+                workCompletableFuture.
+                        thenApplyAsync(work1 -> {
+                            work1.run();
+                            return work1;
+                        });
             }
-        } else {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Error!")
-                    .setDescription("You are not a user! Maybe you are a bot.")
-                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 

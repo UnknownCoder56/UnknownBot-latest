@@ -250,6 +250,7 @@ public class BasicCommands {
                     .addField(">reply (text),(reply) _Warning: No spaces after/before/in commas_", "Makes the bot reply when you send a specific text.", true)
                     .addField(">noreply (text)", "Disables custom reply.", true)
                     .addField(">replies", "Displays all custom replies set.", true)
+                    .addField(">dm (mention) \"message\"", "DMs a message to a user.", true)
                     .setColor(getRandomColor()));
         } else if (Objects.equals(category, categories[1])) {
             event.getChannel().sendMessage(new EmbedBuilder()
@@ -265,7 +266,8 @@ public class BasicCommands {
                             " supported yet).", true)
                     .addField(">unban (mention)", "Unbans the mentioned user.", true)
                     .addField(">unmute", "Unmutes the mentioned user (Mute = Enable chat and VC).", true)
-                    .addField(">getwarns (mention)", "Gets all warns for a user.")
+                    .addField(">getwarns (mention)", "Gets all warns for a user.", true)
+                    .addField(">nuke", "Cleans everything in a channel.", true)
                     .setColor(getRandomColor()));
         } else if (Objects.equals(category, categories[2])) {
             event.getChannel().sendMessage(new EmbedBuilder()
