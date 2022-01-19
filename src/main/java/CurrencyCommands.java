@@ -57,40 +57,21 @@ public class CurrencyCommands {
     }
 
     public static void work(MessageCreateEvent event) {
-        Map<Long, CompletableFuture<AsyncCommands.Work>> works = new HashMap<>();
         if (event.getMessageAuthor().asUser().isPresent()) {
-            Long userId = event.getMessageAuthor().asUser().get().getId();
-            if (works.containsKey(userId)) {
-                if (works.get(userId).isDone()) {
-                    AsyncCommands.Work work = new AsyncCommands.Work(event);
-                    CompletableFuture<AsyncCommands.Work> workCompletableFuture = CompletableFuture
-                            .supplyAsync(() -> work);
-
-                    works.put(userId, workCompletableFuture);
-
-                    workCompletableFuture.
-                            thenApplyAsync(work1 -> {
-                                work1.run();
-                                return work1;
-                            });
-                } else {
-                    event.getChannel().sendMessage(new EmbedBuilder()
-                            .setTitle("Error!")
-                            .setDescription("You are on cooldown! You can work again after " + workCounters.get(userId) + " seconds."));
-                }
-            } else {
-                AsyncCommands.Work work = new AsyncCommands.Work(event);
-                CompletableFuture<AsyncCommands.Work> workCompletableFuture = CompletableFuture
-                        .supplyAsync(() -> work);
-
-                works.put(userId, workCompletableFuture);
-
-                workCompletableFuture.
-                        thenApplyAsync(work1 -> {
-                            work1.run();
-                            return work1;
-                        });
+            String work = CurrencyCommands.getRandomWork();
+            int earn = CurrencyCommands.getRandomInteger(500, 100);
+            if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
+                        .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
+                                " :coin: " + earn)
+                        .setColor(BasicCommands.getRandomColor()));
             }
+        } else {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("You are not a user! Maybe you are a bot.")
+                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 

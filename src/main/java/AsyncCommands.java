@@ -192,42 +192,4 @@ public class AsyncCommands {
             }
         }
     }
-
-    public static class Work implements Runnable {
-
-        MessageCreateEvent event;
-        public Work(MessageCreateEvent event) {
-            this.event = event;
-        }
-
-        @Override
-        public void run() {
-            if (event.getMessageAuthor().asUser().isPresent()) {
-                String work = CurrencyCommands.getRandomWork();
-                int earn = CurrencyCommands.getRandomInteger(500, 100);
-                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
-                    event.getChannel().sendMessage(new EmbedBuilder()
-                            .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
-                            .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
-                                    " :coin: " + earn)
-                            .setColor(BasicCommands.getRandomColor()));
-                }
-            } else {
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("Error!")
-                        .setDescription("You are not a user! Maybe you are a bot.")
-                        .setColor(BasicCommands.getRandomColor()));
-            }
-            int counter = 0;
-            CurrencyCommands.workCounters.put(event.getMessageAuthor().asUser().get().getId(), counter);
-            for (int i = 0; i < 30000; i++) {
-                try {
-                    Thread.sleep(1000);
-                    CurrencyCommands.workCounters.replace(event.getMessageAuthor().asUser().get().getId(), i);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 }
