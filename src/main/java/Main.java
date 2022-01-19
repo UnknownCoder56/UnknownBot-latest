@@ -26,7 +26,21 @@ public class Main {
 
         System.out.print("\033\143");
         Spark.port(6565);
-        Spark.get("/", (req, res) -> "UnknownBot is online!");
+        Spark.get("/", (req, res) -> {
+            res.type("text/html");
+            return "<!DOCTYPE html>\n" +
+                    "<html>\n" +
+                    "<head>\n" +
+                    "<title>UnknownBot</title>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "\n" +
+                    "<h1 align=\"center\" style=\"font-family:Montserrat\">UnknownBot is online!</h1>\n" +
+                    "<p style=\"font-family:Montserrat\">Invite it to your server: " + api.createBotInvite() + "</p>\n" +
+                    "\n" +
+                    "</body>\n" +
+                    "</html>";
+        });
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
 
         api.addListener(new CommandsListener());
