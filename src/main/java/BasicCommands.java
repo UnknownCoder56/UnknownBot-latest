@@ -328,7 +328,6 @@ public class BasicCommands {
 			
 			event.getChannel().sendMessage(embed);
 		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
