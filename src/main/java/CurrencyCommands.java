@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class CurrencyCommands {
@@ -18,6 +18,7 @@ public class CurrencyCommands {
             "fixed neighbour's PC and earned", "checked his car bonnet and found", "won a bet and earned",
             "repaired cars at workshop for a day and earned", "won a lucky draw and earned"};
     public static Map<Long, Integer> workCounters = new HashMap<>();
+    static int coolDown = 20;
 
     public static void balance(MessageCreateEvent event) {
         if (event.getMessage().getMentionedUsers().size() > 0) {
@@ -58,14 +59,36 @@ public class CurrencyCommands {
 
     public static void work(MessageCreateEvent event) {
         if (event.getMessageAuthor().asUser().isPresent()) {
-            String work = CurrencyCommands.getRandomWork();
-            int earn = CurrencyCommands.getRandomInteger(500, 100);
-            if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
-                        .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
-                                " :coin: " + earn)
-                        .setColor(BasicCommands.getRandomColor()));
+            Long userId = event.getMessageAuthor().asUser().get().getId();
+            if (Main.userTimes.containsKey(userId)) {
+                if (Duration.between(Main.userTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds() >= coolDown) {
+                    Main.userTimes.put(userId, event.getMessage().getCreationTimestamp());
+                    String work = CurrencyCommands.getRandomWork();
+                    int earn = CurrencyCommands.getRandomInteger(500, 100);
+                    if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
+                                .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
+                                        " :coin: " + earn)
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                } else {
+                    int left = (int) (coolDown - Duration.between(Main.userTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("You are currently on cooldown! You may use this command again after " + left + " seconds."));
+                }
+            } else {
+                Main.userTimes.put(userId, event.getMessage().getCreationTimestamp());
+                String work = CurrencyCommands.getRandomWork();
+                int earn = CurrencyCommands.getRandomInteger(500, 100);
+                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
+                            .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
+                                    " :coin: " + earn)
+                            .setColor(BasicCommands.getRandomColor()));
+                }
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
