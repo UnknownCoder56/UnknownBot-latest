@@ -18,7 +18,7 @@ public class CurrencyCommands {
             "fixed neighbour's PC and earned", "checked his car bonnet and found", "won a bet and earned",
             "repaired cars at workshop for a day and earned", "won a lucky draw and earned"};
     public static Map<Long, Integer> workCounters = new HashMap<>();
-    static int coolDown = 20;
+    static int coolDown = 30;
 
     public static void balance(MessageCreateEvent event) {
         if (event.getMessage().getMentionedUsers().size() > 0) {
