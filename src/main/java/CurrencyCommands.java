@@ -160,7 +160,7 @@ public class CurrencyCommands {
                             .setColor(BasicCommands.getRandomColor()));
                 }
             } else {
-                int left = (int) (coolDown - Duration.between(Main.userWorkedTimes.get(commanderId), event.getMessage().getCreationTimestamp()).toSeconds());
+                int left = (int) (coolDown - Duration.between(Main.userRobbedTimes.get(commanderId), event.getMessage().getCreationTimestamp()).toSeconds());
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("You are currently on cooldown! You may use this command again after " + left + " seconds."));
