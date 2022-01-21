@@ -17,7 +17,6 @@ public class CurrencyCommands {
             "found some money on road and got", "sold a modern art picture and earned", "caught a robber and was prized with",
             "fixed neighbour's PC and earned", "checked his car bonnet and found", "won a bet and earned",
             "repaired cars at workshop for a day and earned", "won a lucky draw and earned"};
-    public static Map<Long, Integer> workCounters = new HashMap<>();
     static int coolDown = 30;
 
     public static void balance(MessageCreateEvent event) {
@@ -60,9 +59,9 @@ public class CurrencyCommands {
     public static void work(MessageCreateEvent event) {
         if (event.getMessageAuthor().asUser().isPresent()) {
             Long userId = event.getMessageAuthor().asUser().get().getId();
-            if (Main.userTimes.containsKey(userId)) {
-                if (Duration.between(Main.userTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds() >= coolDown) {
-                    Main.userTimes.put(userId, event.getMessage().getCreationTimestamp());
+            if (Main.userWorkedTimes.containsKey(userId)) {
+                if (Duration.between(Main.userWorkedTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds() >= coolDown) {
+                    Main.userWorkedTimes.put(userId, event.getMessage().getCreationTimestamp());
                     String work = CurrencyCommands.getRandomWork();
                     int earn = CurrencyCommands.getRandomInteger(500, 100);
                     if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
@@ -73,13 +72,14 @@ public class CurrencyCommands {
                                 .setColor(BasicCommands.getRandomColor()));
                     }
                 } else {
-                    int left = (int) (coolDown - Duration.between(Main.userTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
+                    int left = (int) (coolDown - Duration.between(Main.userWorkedTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("You are currently on cooldown! You may use this command again after " + left + " seconds."));
+                    System.out.println("Cooldown block faced!");
                 }
             } else {
-                Main.userTimes.put(userId, event.getMessage().getCreationTimestamp());
+                Main.userWorkedTimes.put(userId, event.getMessage().getCreationTimestamp());
                 String work = CurrencyCommands.getRandomWork();
                 int earn = CurrencyCommands.getRandomInteger(500, 100);
                 if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
@@ -99,25 +99,41 @@ public class CurrencyCommands {
     }
 
     public static void rob(MessageCreateEvent event) {
-        User robUser = event.getMessage().getMentionedUsers().get(0);
-        if (event.getServer().isPresent()) {
-            if (event.getMessageAuthor().asUser().isPresent()) {
-                if (!robUser.isBot()) {
-                    int robValue = getRandomInteger(5000, 1000);
-                    if (balanceMap.containsKey(robUser.getId())) {
-                        if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
-                            if (balanceMap.get(robUser.getId()) > 1000) {
-                                while (balanceMap.get(robUser.getId()) < robValue) {
-                                    robValue = getRandomInteger(5000, 1000);
-                                }
-                                if (debitBalance(robValue, robUser, event)) {
-                                    if (creditBalance(robValue, event.getMessageAuthor().asUser().get(), event)) {
+        Long commanderId = event.getMessageAuthor().asUser().get().getId();
+        if (Main.userRobbedTimes.containsKey(commanderId)) {
+            if (Duration.between(Main.userRobbedTimes.get(commanderId), event.getMessage().getCreationTimestamp()).toSeconds() >= coolDown) {
+                Main.userRobbedTimes.put(commanderId, event.getMessage().getCreationTimestamp());
+                User robUser = event.getMessage().getMentionedUsers().get(0);
+                if (event.getServer().isPresent()) {
+                    if (event.getMessageAuthor().asUser().isPresent()) {
+                        if (!robUser.isBot()) {
+                            int robValue = getRandomInteger(5000, 1000);
+                            if (balanceMap.containsKey(robUser.getId())) {
+                                if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
+                                    if (balanceMap.get(robUser.getId()) > 1000) {
+                                        while (balanceMap.get(robUser.getId()) < robValue) {
+                                            robValue = getRandomInteger(5000, 1000);
+                                        }
+                                        if (debitBalance(robValue, robUser, event)) {
+                                            if (creditBalance(robValue, event.getMessageAuthor().asUser().get(), event)) {
+                                                event.getChannel().sendMessage(new EmbedBuilder()
+                                                        .setTitle("Success!")
+                                                        .setDescription(event.getMessageAuthor().getDisplayName() + " successfully robbed " + robUser.getDisplayName(event.getServer().get()) + ", and earned :coin: " + robValue + ".")
+                                                        .setColor(BasicCommands.getRandomColor()));
+                                                refreshBalances();
+                                            }
+                                        }
+                                    } else {
                                         event.getChannel().sendMessage(new EmbedBuilder()
-                                                .setTitle("Success!")
-                                                .setDescription(event.getMessageAuthor().getDisplayName() + " successfully robbed " + robUser.getDisplayName(event.getServer().get()) + ", and earned :coin: " + robValue + ".")
+                                                .setTitle("Error!")
+                                                .setDescription("That user does not have enough money to rob!")
                                                 .setColor(BasicCommands.getRandomColor()));
-                                        refreshBalances();
                                     }
+                                } else {
+                                    event.getChannel().sendMessage(new EmbedBuilder()
+                                            .setTitle("Error!")
+                                            .setDescription("You can't rob yourself!")
+                                            .setColor(BasicCommands.getRandomColor()));
                                 }
                             } else {
                                 event.getChannel().sendMessage(new EmbedBuilder()
@@ -128,32 +144,86 @@ public class CurrencyCommands {
                         } else {
                             event.getChannel().sendMessage(new EmbedBuilder()
                                     .setTitle("Error!")
-                                    .setDescription("You can't rob yourself!")
+                                    .setDescription("You can't rob bots!")
                                     .setColor(BasicCommands.getRandomColor()));
                         }
                     } else {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Error!")
-                                .setDescription("That user does not have enough money to rob!")
+                                .setDescription("You are not a user! Maybe you are a bot.")
                                 .setColor(BasicCommands.getRandomColor()));
                     }
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
-                            .setDescription("You can't rob bots!")
+                            .setDescription("This command only works in servers!")
+                            .setColor(BasicCommands.getRandomColor()));
+                }
+            } else {
+                int left = (int) (coolDown - Duration.between(Main.userWorkedTimes.get(commanderId), event.getMessage().getCreationTimestamp()).toSeconds());
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("You are currently on cooldown! You may use this command again after " + left + " seconds."));
+                System.out.println("Cooldown block faced!");
+            }
+        } else {
+            Main.userRobbedTimes.put(commanderId, event.getMessage().getCreationTimestamp());
+            User robUser = event.getMessage().getMentionedUsers().get(0);
+            if (event.getServer().isPresent()) {
+                if (event.getMessageAuthor().asUser().isPresent()) {
+                    if (!robUser.isBot()) {
+                        int robValue = getRandomInteger(5000, 1000);
+                        if (balanceMap.containsKey(robUser.getId())) {
+                            if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
+                                if (balanceMap.get(robUser.getId()) > 1000) {
+                                    while (balanceMap.get(robUser.getId()) < robValue) {
+                                        robValue = getRandomInteger(5000, 1000);
+                                    }
+                                    if (debitBalance(robValue, robUser, event)) {
+                                        if (creditBalance(robValue, event.getMessageAuthor().asUser().get(), event)) {
+                                            event.getChannel().sendMessage(new EmbedBuilder()
+                                                    .setTitle("Success!")
+                                                    .setDescription(event.getMessageAuthor().getDisplayName() + " successfully robbed " + robUser.getDisplayName(event.getServer().get()) + ", and earned :coin: " + robValue + ".")
+                                                    .setColor(BasicCommands.getRandomColor()));
+                                            refreshBalances();
+                                        }
+                                    }
+                                } else {
+                                    event.getChannel().sendMessage(new EmbedBuilder()
+                                            .setTitle("Error!")
+                                            .setDescription("That user does not have enough money to rob!")
+                                            .setColor(BasicCommands.getRandomColor()));
+                                }
+                            } else {
+                                event.getChannel().sendMessage(new EmbedBuilder()
+                                        .setTitle("Error!")
+                                        .setDescription("You can't rob yourself!")
+                                        .setColor(BasicCommands.getRandomColor()));
+                            }
+                        } else {
+                            event.getChannel().sendMessage(new EmbedBuilder()
+                                    .setTitle("Error!")
+                                    .setDescription("That user does not have enough money to rob!")
+                                    .setColor(BasicCommands.getRandomColor()));
+                        }
+                    } else {
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Error!")
+                                .setDescription("You can't rob bots!")
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                } else {
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("You are not a user! Maybe you are a bot.")
                             .setColor(BasicCommands.getRandomColor()));
                 }
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
-                        .setDescription("You are not a user! Maybe you are a bot.")
+                        .setDescription("This command only works in servers!")
                         .setColor(BasicCommands.getRandomColor()));
             }
-        } else {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Error!")
-                    .setDescription("This command only works in servers!")
-                    .setColor(BasicCommands.getRandomColor()));
         }
     }
 

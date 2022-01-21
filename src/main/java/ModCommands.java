@@ -1,13 +1,16 @@
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.permission.*;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class ModCommands {
 
@@ -54,7 +57,7 @@ public class ModCommands {
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
-                            .setDescription("I can't ban that user! Reasons - No kick permission, lower role or" +
+                            .setDescription("I can't ban that user! Reasons - No ban permission, lower role or" +
                                     "lower position.")
                             .setColor(BasicCommands.getRandomColor()));
                 }
@@ -74,6 +77,7 @@ public class ModCommands {
                     User user = event.getMessage().getMentionedUsers().get(0);
                     Server server = event.getServer().get();
                     server.muteUser(user);
+                    server.deafenUser(user);
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
                             .setDescription("Successfully muted user " + user.getDiscriminatedName() + ".")
@@ -81,7 +85,7 @@ public class ModCommands {
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
-                            .setDescription("I can't mute that user! Reasons - No kick permission, lower role or" +
+                            .setDescription("I can't mute that user! Reasons - No mute permission, lower role or" +
                                     "lower position.")
                             .setColor(BasicCommands.getRandomColor()));
                 }
@@ -108,7 +112,7 @@ public class ModCommands {
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
-                            .setDescription("I can't unban that user! Reasons - No kick permission, lower role or" +
+                            .setDescription("I can't unban that user! Reasons - No unban permission, lower role or" +
                                     "lower position.")
                             .setColor(BasicCommands.getRandomColor()));
                 }
@@ -128,6 +132,7 @@ public class ModCommands {
                     User user = event.getMessage().getMentionedUsers().get(0);
                     Server server = event.getServer().get();
                     server.unmuteUser(user);
+                    server.undeafenUser(user);
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
                             .setDescription("Successfully unmuted user " + user.getDiscriminatedName() + ".")
@@ -135,7 +140,7 @@ public class ModCommands {
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
-                            .setDescription("I can't unmute that user! Reasons - No kick permission, lower role or" +
+                            .setDescription("I can't unmute that user! Reasons - No unmute permission, lower role or" +
                                     "lower position.")
                             .setColor(BasicCommands.getRandomColor()));
                 }

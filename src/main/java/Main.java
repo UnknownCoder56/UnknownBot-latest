@@ -15,7 +15,36 @@ import java.util.Map;
 public class Main {
 
     public static DiscordApi api;
-    public static Map<Long, Instant> userTimes = new HashMap<Long, java.time.Instant>();
+    public static Map<Long, Instant> userWorkedTimes = new HashMap<>();
+    public static Map<Long, Instant> userRobbedTimes = new HashMap<>();
+    public static String website = "<!DOCTYPE html>\n" +
+            "<html>\n" +
+            "<head>\n" +
+            "<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>\n" +
+            "<style>\n" +
+            "body {\n" +
+            "    font-family: 'Montserrat';font-size: 20px;\n" +
+            "}\n" +
+            "</style>\n" +
+            "<title>UnknownBot</title>\n" +
+            "</head>\n" +
+            "<body style=\"background-color:powderblue\">\n" +
+            "<h1 align=center style=\"color:red\">Welcome to UnknownBot's site!</h1>\n" +
+            "<p align=center style=\"color:darkgreen\">Bot status: Online (OK)</p>\n" +
+            "<p align=center style=\"color:darkgreen\">Bot version: 3.2.0</p>\n" +
+            "<p align=center style=\"color:darkgreen\">Bot developer: UnknownPro 56</p>\n" +
+            "<p align=center>\n" +
+            "<a href=\"https://discord.com/oauth2/authorize?client_id=891518158790361138&scope=bot&permissions=0\" align=center style=\"color:blue\">Invite it to your server!</a>\n" +
+            "</p>\n" +
+            "<p align=center>\n" +
+            "<a href=\"https://github.com/UnknownCoder56\" align=center style=\"color:blue\">My GitHub profile</a>\n" +
+            "</p>\n" +
+            "<p align=center>\n" +
+            "<a href=\"https://discord.gg/t79ZyuHr5K\" align=center style=\"color:blue\">My Discord Server</a?\n" +
+            "</p>\n" +
+            "</body>\n" +
+            "</html>";
+
 
     public static void main(String[] args) {
 
@@ -31,18 +60,7 @@ public class Main {
         Spark.port(6565);
         Spark.get("/", (req, res) -> {
             res.type("text/html");
-            return "<!DOCTYPE html>\n" +
-                    "<html>\n" +
-                    "<head>\n" +
-                    "<title>UnknownBot</title>\n" +
-                    "</head>\n" +
-                    "<body>\n" +
-                    "\n" +
-                    "<h1 align=\"center\" style=\"font-family:Montserrat\">UnknownBot is online!</h1>\n" +
-                    "<p style=\"font-family:Montserrat\">Invite it to your server: " + api.createBotInvite() + "</p>\n" +
-                    "\n" +
-                    "</body>\n" +
-                    "</html>";
+            return website;
         });
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
 

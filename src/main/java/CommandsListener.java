@@ -44,21 +44,18 @@ class AsyncListener implements Runnable {
         Message message = event.getMessage();
         if (!message.getAuthor().isBotUser()) {
             if (message.getContent().startsWith(">")) {
-
                 if (message.getServer().isPresent()) {
-                    LocalDateTime localDateTime = message.getCreationTimestamp().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
                     DateTimeFormatter dtf = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter();
                     System.out.println("\nBot was asked: " + message.getContent() +
                             "\nAt: " + message.getServer().get().getName() +
                             "\nBy: " + message.getAuthor().getName() +
-                            "\nOn: " + dtf.format(localDateTime).toUpperCase(Locale.ROOT));
+                            "\nOn: " + dtf.format(message.getCreationTimestamp().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()));
                 } else {
-                    LocalDateTime localDateTime = message.getCreationTimestamp().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
                     DateTimeFormatter dtf = new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter();
                     System.out.println("\nBot was asked: " + message.getContent() +
                             "\nAt: " + "DMs" +
                             "\nBy: " + message.getAuthor().getName() +
-                            "\nOn: " + dtf.format(localDateTime).toUpperCase(Locale.ROOT));
+                            "\nOn: " + dtf.format(message.getCreationTimestamp().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()));
                 }
 
                 String command = message.getContent().toLowerCase(Locale.ROOT);
@@ -98,7 +95,7 @@ class AsyncListener implements Runnable {
                 else if (command.startsWith(">rob")) CurrencyCommands.rob(event);
                 else if (command.startsWith(">give")) CurrencyCommands.give(event);
 
-                    // Error handler
+                // Error handler
                 else event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("No such command was found! Type '>help' to view available commands."));
