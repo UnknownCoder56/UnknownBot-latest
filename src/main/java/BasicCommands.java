@@ -25,6 +25,10 @@ public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
     public static final String version = "3.2.0";
+    final static int botWin = 0;
+    final static int userWin = 1;
+    final static int tie = 2;
+    final static int error = 3;
 
     public static void admes(MessageCreateEvent event) {
         try {
@@ -251,6 +255,7 @@ public class BasicCommands {
                     .addField(">noreply (text)", "Disables custom reply.", true)
                     .addField(">replies", "Displays all custom replies set.", true)
                     .addField(">dm (mention) \"message\"", "DMs a message to a user.", true)
+                    .addField(">rps (choice)", "Play \"Rock Paper Scissors\" with the bot. Choices include: ```r, p, s``` or ```rock, paper, scissors```.", true)
                     .setColor(getRandomColor()));
         } else if (Objects.equals(category, categories[1])) {
             event.getChannel().sendMessage(new EmbedBuilder()
@@ -388,6 +393,33 @@ public class BasicCommands {
                 });
     }
 
+    public static void rps(MessageCreateEvent event) {
+        String[] args = event.getMessage().getContent().split("");
+        String actualChoice = args[1];
+        char choice = args[1].toLowerCase().charAt(0);
+        int intChoice = CurrencyCommands.getRandomInteger(2, 0);
+        char[] botChoices = {'r', 'p', 's'};
+        char botChoice = botChoices[intChoice];
+        int winStatus = getWinStatus(botChoice, choice);
+        
+        if (winStatus == userWin) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                .setTitle("You win!")
+                .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + "."));
+        } else if (winStatus == botWin) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+            .setTitle("Bot wins!")
+            .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + "."));
+        } else if (winStatus == tie) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+            .setTitle("Tie!")
+            .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + "."));
+        } else if (winStatus == error) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+            .setTitle("Error!")
+            .setDescription("You chose " + actualChoice + " and bot chose " + getChoiceName(botChoice) + "."));
+        }
+    }
 
     // Helper methods
     public static void refreshReplies() {
@@ -408,6 +440,46 @@ public class BasicCommands {
         		Color.MAGENTA, Color.YELLOW, Color.DARK_GRAY, Color.WHITE, Color.BLACK, Color.LIGHT_GRAY};
         int choice = new Random().nextInt(colors.length);
         return colors[choice];
+    }
+
+    public static int getWinStatus(char choiceBot, char choiceUser) {
+        if (choiceBot == 'r') {
+            if (choiceUser == 'r') {
+                return tie;
+            } else if (choiceUser == 'p') {
+                return userWin;
+            } else if (choiceUser == 's') {
+                return botWin;
+            }
+        } else if (choiceBot == 'p') {
+            if (choiceUser == 'r') {
+                return botWin;
+            } else if (choiceUser == 'p') {
+                return tie;
+            } else if (choiceUser == 's') {
+                return userWin;
+            }
+        } else if (choiceBot == 's') {
+            if (choiceUser == 'r') {
+                return userWin;
+            } else if (choiceUser == 'p') {
+                return botWin;
+            } else if (choiceUser == 's') {
+                return tie;
+            }
+        }
+        return error;
+    }
+
+    public static String getChoiceName(char choice) {
+        if (choice == 'r') {
+            return "Rock";
+        } else if (choice == 'p') {
+            return "Paper";
+        } else if (choice == 's') {
+            return "Scissors";
+        }
+        return null;
     }
 }
 

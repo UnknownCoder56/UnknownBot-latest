@@ -71,6 +71,7 @@ class AsyncListener implements Runnable {
                 else if (command.startsWith(">clear")) BasicCommands.clearMessages(event);
                 else if (command.startsWith(">dm")) BasicCommands.dm(event);
                 else if (command.startsWith(">nuke")) BasicCommands.nuke(event);
+                else if (command.startsWith(">rps")) BasicCommands.rps(event);
 
                 // Mod commands
                 else if (command.startsWith(">warn")) ModCommands.warn(event);
