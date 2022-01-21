@@ -394,7 +394,7 @@ public class BasicCommands {
     }
 
     public static void rps(MessageCreateEvent event) {
-        String[] args = event.getMessage().getContent().split("");
+        String[] args = event.getMessage().getContent().split(" ");
         String actualChoice = args[1];
         char choice = args[1].toLowerCase().charAt(0);
         int intChoice = CurrencyCommands.getRandomInteger(2, 0);
