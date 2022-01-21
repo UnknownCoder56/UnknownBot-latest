@@ -1,0 +1,37 @@
+digraph "mygroupid:myartifactid:jar:0.0-SNAPSHOT" { 
+	"mygroupid:myartifactid:jar:0.0-SNAPSHOT" -> "org.slf4j:slf4j-simple:jar:1.7.33:compile" ; 
+	"mygroupid:myartifactid:jar:0.0-SNAPSHOT" -> "org.javacord:javacord:pom:3.3.2:compile" ; 
+	"mygroupid:myartifactid:jar:0.0-SNAPSHOT" -> "org.jsoup:jsoup:jar:1.14.3:compile" ; 
+	"mygroupid:myartifactid:jar:0.0-SNAPSHOT" -> "org.apache.commons:commons-lang3:jar:3.12.0:compile" ; 
+	"mygroupid:myartifactid:jar:0.0-SNAPSHOT" -> "com.sparkjava:spark-core:jar:2.9.3:compile" ; 
+	"org.slf4j:slf4j-simple:jar:1.7.33:compile" -> "org.slf4j:slf4j-api:jar:1.7.33:compile" ; 
+	"org.javacord:javacord:pom:3.3.2:compile" -> "org.javacord:javacord-api:jar:3.3.2:compile" ; 
+	"org.javacord:javacord:pom:3.3.2:compile" -> "org.javacord:javacord-core:jar:3.3.2:runtime" ; 
+	"org.javacord:javacord-core:jar:3.3.2:runtime" -> "com.squareup.okhttp3:okhttp:jar:3.9.1:runtime" ; 
+	"org.javacord:javacord-core:jar:3.3.2:runtime" -> "com.squareup.okhttp3:logging-interceptor:jar:3.9.1:runtime" ; 
+	"org.javacord:javacord-core:jar:3.3.2:runtime" -> "com.fasterxml.jackson.core:jackson-databind:jar:2.9.3:runtime" ; 
+	"org.javacord:javacord-core:jar:3.3.2:runtime" -> "com.neovisionaries:nv-websocket-client:jar:2.6:runtime" ; 
+	"org.javacord:javacord-core:jar:3.3.2:runtime" -> "com.codahale:xsalsa20poly1305:jar:0.10.1:runtime" ; 
+	"org.javacord:javacord-core:jar:3.3.2:runtime" -> "org.apache.logging.log4j:log4j-api:jar:2.11.0:runtime" ; 
+	"org.javacord:javacord-core:jar:3.3.2:runtime" -> "io.vavr:vavr:jar:0.10.1:runtime" ; 
+	"com.squareup.okhttp3:okhttp:jar:3.9.1:runtime" -> "com.squareup.okio:okio:jar:1.13.0:runtime" ; 
+	"com.fasterxml.jackson.core:jackson-databind:jar:2.9.3:runtime" -> "com.fasterxml.jackson.core:jackson-annotations:jar:2.9.0:runtime" ; 
+	"com.fasterxml.jackson.core:jackson-databind:jar:2.9.3:runtime" -> "com.fasterxml.jackson.core:jackson-core:jar:2.9.3:runtime" ; 
+	"com.codahale:xsalsa20poly1305:jar:0.10.1:runtime" -> "org.bouncycastle:bcprov-jdk15on:jar:1.59:runtime" ; 
+	"io.vavr:vavr:jar:0.10.1:runtime" -> "io.vavr:vavr-match:jar:0.10.1:runtime" ; 
+	"com.sparkjava:spark-core:jar:2.9.3:compile" -> "org.eclipse.jetty:jetty-server:jar:9.4.31.v20200723:compile" ; 
+	"com.sparkjava:spark-core:jar:2.9.3:compile" -> "org.eclipse.jetty:jetty-webapp:jar:9.4.31.v20200723:compile" ; 
+	"com.sparkjava:spark-core:jar:2.9.3:compile" -> "org.eclipse.jetty.websocket:websocket-server:jar:9.4.31.v20200723:compile" ; 
+	"com.sparkjava:spark-core:jar:2.9.3:compile" -> "org.eclipse.jetty.websocket:websocket-servlet:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty:jetty-server:jar:9.4.31.v20200723:compile" -> "javax.servlet:javax.servlet-api:jar:3.1.0:compile" ; 
+	"org.eclipse.jetty:jetty-server:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty:jetty-http:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty:jetty-server:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty:jetty-io:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty:jetty-http:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty:jetty-util:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty:jetty-webapp:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty:jetty-xml:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty:jetty-webapp:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty:jetty-servlet:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty:jetty-servlet:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty:jetty-security:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty.websocket:websocket-server:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty.websocket:websocket-common:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty.websocket:websocket-server:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty.websocket:websocket-client:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty.websocket:websocket-client:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty:jetty-client:jar:9.4.31.v20200723:compile" ; 
+	"org.eclipse.jetty.websocket:websocket-servlet:jar:9.4.31.v20200723:compile" -> "org.eclipse.jetty.websocket:websocket-api:jar:9.4.31.v20200723:compile" ; 
+ } 
