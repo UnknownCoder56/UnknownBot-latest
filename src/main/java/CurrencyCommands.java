@@ -593,7 +593,7 @@ class Shop {
                 for (ShopItem item : items) {
                     if (itemChoice.equalsIgnoreCase(item.itemName.split(" ")[0]) || itemChoice.equalsIgnoreCase(item.itemName.split(" ")[1])) {
                         item.buyItem(event);
-                        break;
+                        return;
                     }
                 }
                 event.getChannel().sendMessage(new EmbedBuilder()
@@ -623,7 +623,7 @@ class Shop {
                 for (ShopItem item : items) {
                     if (itemChoice.equalsIgnoreCase(item.itemName.split(" ")[0]) || itemChoice.equalsIgnoreCase(item.itemName.split(" ")[1])) {
                         item.useItem(event);
-                        break;
+                        return;
                     }
                 }
                 event.getChannel().sendMessage(new EmbedBuilder()
