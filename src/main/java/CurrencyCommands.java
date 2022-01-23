@@ -613,8 +613,8 @@ class Shop {
                         "Command to get: ```" + ">shop " + item.command + "```" + "\n" +
                         "Command to use: ```" + ">use " + item.command + "```");
                     embed.setColor(BasicCommands.getRandomColor());
-                    event.getChannel().sendMessage(embed);
                 }
+                event.getChannel().sendMessage(embed);
             }
         } else if (command.startsWith(">use")) {
             String[] args = command.split(" ");
