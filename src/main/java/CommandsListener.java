@@ -90,6 +90,10 @@ class AsyncListener implements Runnable {
                 else if (command.startsWith(">glb")) CurrencyCommands.globalLeaderboard(event);
                 else if (command.startsWith(">rob")) CurrencyCommands.rob(event);
                 else if (command.startsWith(">give")) CurrencyCommands.give(event);
+                else if (command.startsWith(">shop")) Shop.handleCommands(event);
+                else if (command.startsWith(">buy")) Shop.handleCommands(event);
+                else if (command.startsWith(">use")) Shop.handleCommands(event);
+                else if (command.startsWith(">inv")) Shop.handleCommands(event);
 
                 // Error handler
                 else event.getChannel().sendMessage(new EmbedBuilder()

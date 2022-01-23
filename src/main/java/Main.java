@@ -1,9 +1,3 @@
-import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.activity.ActivityType;
-import org.javacord.api.entity.intent.Intent;
-import spark.Spark;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,11 +6,19 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.javacord.api.DiscordApi;
+import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.intent.Intent;
+
+import spark.Spark;
+
 public class Main {
 
     public static DiscordApi api;
     public static Map<Long, Instant> userWorkedTimes = new HashMap<>();
     public static Map<Long, Instant> userRobbedTimes = new HashMap<>();
+    public static Map<Long, Instant> userDailyTimes = new HashMap<>();
     public static String website = "<!DOCTYPE html>\n" +
             "<html>\n" +
             "<head>\n" +
@@ -34,7 +36,8 @@ public class Main {
             "<p align=center style=\"color:darkgreen\">Bot version: 3.2.0</p>\n" +
             "<p align=center style=\"color:darkgreen\">Bot developer: UnknownPro 56</p>\n" +
             "<p align=center>\n" +
-            "<a href=\"https://discord.com/oauth2/authorize?client_id=891518158790361138&scope=bot&permissions=0\" align=center style=\"color:blue\">Invite it to your server!</a>\n" +
+            "<a href=\"https://discord.com/oauth2/authorize?client_id=891518158790361138&scope=bot&permissions=0\" align=center style=\"color:blue\">Invite it to your server!</a>\n"
+            +
             "</p>\n" +
             "<p align=center>\n" +
             "<a href=\"https://github.com/UnknownCoder56\" align=center style=\"color:blue\">My GitHub profile</a>\n" +
@@ -45,10 +48,10 @@ public class Main {
             "</body>\n" +
             "</html>";
 
-
     public static void main(String[] args) {
 
         initData();
+        Shop.initShop();
         api = new DiscordApiBuilder()
                 .setToken(System.getenv("TOKEN"))
                 .setIntents(Intent.DIRECT_MESSAGES, Intent.GUILD_BANS, Intent.GUILD_MEMBERS, Intent.GUILDS,
@@ -74,11 +77,13 @@ public class Main {
         File replyArrayFile = new File("replyArray.data");
         File warnsMapFile = new File("warnsMap.data");
         File balanceMapFile = new File("balanceMap.data");
+        File shopFile = new File("shopFile.data");
 
         try {
             replyArrayFile.createNewFile();
             warnsMapFile.createNewFile();
             balanceMapFile.createNewFile();
+            shopFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -91,18 +96,28 @@ public class Main {
 
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(warnsMapFile))) {
             ModCommands.warnMap = (Map<Long, Map<Long, Warn>>) objectInputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
 
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(balanceMapFile))) {
             CurrencyCommands.balanceMap = (Map<Long, Long>) objectInputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(shopFile))) {
+            Shop.ownedItems = (Map<Long, Map<String, Integer>>) objectInputStream.readObject();
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
 
-        if (BasicCommands.customReplies == null) BasicCommands.customReplies = new HashMap<>();
-        if (ModCommands.warnMap == null) ModCommands.warnMap = new HashMap<>();
-        if (CurrencyCommands.balanceMap == null) CurrencyCommands.balanceMap = new HashMap<>();
+        if (BasicCommands.customReplies == null)
+            BasicCommands.customReplies = new HashMap<>();
+        if (ModCommands.warnMap == null)
+            ModCommands.warnMap = new HashMap<>();
+        if (CurrencyCommands.balanceMap == null)
+            CurrencyCommands.balanceMap = new HashMap<>();
+        if (Shop.ownedItems == null)
+            Shop.ownedItems = new HashMap<>();
     }
 }
