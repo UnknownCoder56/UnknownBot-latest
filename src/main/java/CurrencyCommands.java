@@ -591,7 +591,7 @@ class Shop {
             if (args.length > 1) {
                 String itemChoice = args[1];
                 for (ShopItem item : items) {
-                    if (itemChoice.equalsIgnoreCase(item.itemName.split(" ")[0]) || itemChoice.equalsIgnoreCase(item.itemName.split(" ")[1])) {
+                    if (itemChoice.equalsIgnoreCase(item.command)) {
                         item.buyItem(event);
                         return;
                     }
@@ -621,7 +621,7 @@ class Shop {
             if (args.length > 1) {
                 String itemChoice = args[1];
                 for (ShopItem item : items) {
-                    if (itemChoice.equalsIgnoreCase(item.itemName.split(" ")[0]) || itemChoice.equalsIgnoreCase(item.itemName.split(" ")[1])) {
+                    if (itemChoice.equalsIgnoreCase(item.command)) {
                         item.useItem(event);
                         return;
                     }
@@ -636,6 +636,25 @@ class Shop {
                     .setDescription("No item was specified! Type '>shop' to buy stuff, or type '>help' to get help about the commands.")
                     .setColor(BasicCommands.getRandomColor()));
             } 
+        } else if (command.startsWith(">buy")) {
+            String[] args = command.split(" ");
+            if (args.length > 1) {
+                String itemChoice = args[1];
+                for (ShopItem item : items) {
+                    if (itemChoice.equalsIgnoreCase(item.command)) {
+                        item.buyItem(event);
+                        return;
+                    }
+                }
+                event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("No item named " + itemChoice + " was found! Type '>shop' to see the available items.")
+                    .setColor(BasicCommands.getRandomColor()));
+            } else {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("No argument was supplied! Type '>shop' to get the commands for items, or type '>help' to get help on commands."));
+            }
         }
     }
 
