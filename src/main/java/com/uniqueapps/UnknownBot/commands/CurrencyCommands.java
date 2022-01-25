@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -18,6 +17,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.UnknownBot.objects.SortByBalance;
 
 public class CurrencyCommands {
 
@@ -36,6 +36,7 @@ public class CurrencyCommands {
                 User balUser = event.getMessage().getMentionedUsers().get(0);
                 if (!balanceMap.containsKey(balUser.getId())) {
                     balanceMap.put(balUser.getId(), 0L);
+                    refreshBalances();
                 }
                 long bal = balanceMap.get(balUser.getId());
                 event.getChannel().sendMessage(new EmbedBuilder()
@@ -52,6 +53,7 @@ public class CurrencyCommands {
             if (event.getMessageAuthor().asUser().isPresent()) {
                 if (!balanceMap.containsKey(event.getMessageAuthor().asUser().get().getId())) {
                     balanceMap.put(event.getMessageAuthor().asUser().get().getId(), 0L);
+                    refreshBalances();
                 }
                 long bal = balanceMap.get(event.getMessageAuthor().asUser().get().getId());
                 event.getChannel().sendMessage(new EmbedBuilder()
@@ -82,6 +84,7 @@ public class CurrencyCommands {
                                         + " got their daily earnings: :coin: " + earn)
                                 .setColor(BasicCommands.getRandomColor()));
                     }
+                    refreshDailies();
                 } else {
                     int leftSeconds = (int) (dailyCoolDown - Duration
                             .between(Main.userWorkedTimes.get(userId), event.getMessage().getCreationTimestamp())
@@ -107,6 +110,7 @@ public class CurrencyCommands {
                                     + " got their daily earnings: :coin: " + earn)
                             .setColor(BasicCommands.getRandomColor()));
                 }
+                refreshDailies();
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
@@ -132,6 +136,7 @@ public class CurrencyCommands {
                                         " :coin: " + earn)
                                 .setColor(BasicCommands.getRandomColor()));
                     }
+                    refreshWorks();
                 } else {
                     int left = (int) (coolDown - Duration
                             .between(Main.userWorkedTimes.get(userId), event.getMessage().getCreationTimestamp())
@@ -153,6 +158,7 @@ public class CurrencyCommands {
                                     " :coin: " + earn)
                             .setColor(BasicCommands.getRandomColor()));
                 }
+                refreshWorks();
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
@@ -168,6 +174,7 @@ public class CurrencyCommands {
             if (Duration.between(Main.userRobbedTimes.get(commanderId), event.getMessage().getCreationTimestamp())
                     .toSeconds() >= coolDown) {
                 Main.userRobbedTimes.put(commanderId, event.getMessage().getCreationTimestamp());
+                refreshRobs();
                 User robUser = event.getMessage().getMentionedUsers().get(0);
                 if (event.getServer().isPresent()) {
                     if (event.getMessageAuthor().asUser().isPresent()) {
@@ -240,6 +247,7 @@ public class CurrencyCommands {
             }
         } else {
             Main.userRobbedTimes.put(commanderId, event.getMessage().getCreationTimestamp());
+            refreshRobs();
             User robUser = event.getMessage().getMentionedUsers().get(0);
             if (event.getServer().isPresent()) {
                 if (event.getMessageAuthor().asUser().isPresent()) {
@@ -313,6 +321,7 @@ public class CurrencyCommands {
                         if (giveUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
                             if (!balanceMap.containsKey(giveUser.getId())) {
                                 balanceMap.put(giveUser.getId(), 0L);
+                                refreshBalances();
                             }
                             if (debitBalance(giveValue, event.getMessageAuthor().asUser().get(), event)) {
                                 if (creditBalance(giveValue, giveUser, event)) {
@@ -453,6 +462,7 @@ public class CurrencyCommands {
     public static boolean creditBalance(int creditAmount, User user, MessageCreateEvent event) {
         if (!balanceMap.containsKey(user.getId())) {
             balanceMap.put(user.getId(), 0L);
+            refreshBalances();
         }
         long oldBal = balanceMap.get(user.getId());
         if (creditAmount > 0) {
@@ -484,6 +494,7 @@ public class CurrencyCommands {
     public static boolean debitBalance(int debitAmount, User user, MessageCreateEvent event) {
         if (!balanceMap.containsKey(user.getId())) {
             balanceMap.put(user.getId(), 0L);
+            refreshBalances();
         }
         long oldBal = balanceMap.get(user.getId());
         if (debitAmount > 0) {
@@ -538,6 +549,48 @@ public class CurrencyCommands {
         }
     }
 
+    public static void refreshWorks() {
+        File balanceFile = new File("work.data");
+        try {
+            balanceFile.delete();
+            balanceFile.createNewFile();
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(balanceFile))) {
+                objectOutputStream.writeObject(Main.userWorkedTimes);
+                System.out.println("Work file updated!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void refreshRobs() {
+        File balanceFile = new File("rob.data");
+        try {
+            balanceFile.delete();
+            balanceFile.createNewFile();
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(balanceFile))) {
+                objectOutputStream.writeObject(Main.userRobbedTimes);
+                System.out.println("Rob file updated!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void refreshDailies() {
+        File balanceFile = new File("daily.data");
+        try {
+            balanceFile.delete();
+            balanceFile.createNewFile();
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(balanceFile))) {
+                objectOutputStream.writeObject(Main.userDailyTimes);
+                System.out.println("Daily file updated!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static int getRandomInteger(int max, int min) {
         int val = (int) (Math.random() * (max + 1));
         while (val < min) {
@@ -548,19 +601,5 @@ public class CurrencyCommands {
 
     public static String getRandomWork() {
         return works[(int) (Math.random() * works.length)];
-    }
-}
-
-class SortByBalance implements Comparator<User> {
-
-    Map<Long, Long> bals;
-
-    public SortByBalance(Map<Long, Long> bals) {
-        this.bals = bals;
-    }
-
-    @Override
-    public int compare(User o1, User o2) {
-        return (int) (bals.get(o1.getId()) - bals.get(o2.getId()));
     }
 }

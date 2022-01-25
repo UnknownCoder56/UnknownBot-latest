@@ -62,11 +62,19 @@ public class Main {
         File balanceMapFile = new File("balanceMap.data");
         File shopFile = new File("shopFile.data");
 
+        File work = new File("work.data");
+        File rob = new File("rob.data");
+        File daily = new File("daily.data");
+
         try {
             replyArrayFile.createNewFile();
             warnsMapFile.createNewFile();
             balanceMapFile.createNewFile();
             shopFile.createNewFile();
+            
+            work.createNewFile();
+            rob.createNewFile();
+            daily.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,11 +96,32 @@ public class Main {
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
+
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(shopFile))) {
             Shop.ownedItems = (Map<Long, Map<String, Integer>>) objectInputStream.readObject();
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
+
+        //
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(work))) {
+            userWorkedTimes = (Map<Long, Instant>) objectInputStream.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(rob))) {
+            userRobbedTimes = (Map<Long, Instant>) objectInputStream.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(daily))) {
+            userDailyTimes = (Map<Long, Instant>) objectInputStream.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        //
 
         if (BasicCommands.customReplies == null)
             BasicCommands.customReplies = new HashMap<>();
@@ -102,6 +131,13 @@ public class Main {
             CurrencyCommands.balanceMap = new HashMap<>();
         if (Shop.ownedItems == null)
             Shop.ownedItems = new HashMap<>();
+        
+        if (userWorkedTimes == null)
+            userWorkedTimes = new HashMap<>();
+        if (userRobbedTimes == null)
+            userRobbedTimes = new HashMap<>();
+        if (userDailyTimes == null)
+            userDailyTimes = new HashMap<>();
     }
 
     private String getResourceContents(String resourceName) {
