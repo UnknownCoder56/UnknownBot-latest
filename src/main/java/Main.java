@@ -1,11 +1,12 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
@@ -19,34 +20,6 @@ public class Main {
     public static Map<Long, Instant> userWorkedTimes = new HashMap<>();
     public static Map<Long, Instant> userRobbedTimes = new HashMap<>();
     public static Map<Long, Instant> userDailyTimes = new HashMap<>();
-    public static String website = "<!DOCTYPE html>\n" +
-            "<html>\n" +
-            "<head>\n" +
-            "<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>\n" +
-            "<style>\n" +
-            "body {\n" +
-            "    font-family: 'Montserrat';font-size: 20px;\n" +
-            "}\n" +
-            "</style>\n" +
-            "<title>UnknownBot</title>\n" +
-            "</head>\n" +
-            "<body style=\"background-color:powderblue\">\n" +
-            "<h1 align=center style=\"color:red\">Welcome to UnknownBot's site!</h1>\n" +
-            "<p align=center style=\"color:darkgreen\">Bot status: Online (OK)</p>\n" +
-            "<p align=center style=\"color:darkgreen\">Bot version: 3.2.0</p>\n" +
-            "<p align=center style=\"color:darkgreen\">Bot developer: UnknownPro 56</p>\n" +
-            "<p align=center>\n" +
-            "<a href=\"https://discord.com/oauth2/authorize?client_id=891518158790361138&scope=bot&permissions=0\" align=center style=\"color:blue\">Invite it to your server!</a>\n"
-            +
-            "</p>\n" +
-            "<p align=center>\n" +
-            "<a href=\"https://github.com/UnknownCoder56\" align=center style=\"color:blue\">My GitHub profile</a>\n" +
-            "</p>\n" +
-            "<p align=center>\n" +
-            "<a href=\"https://discord.gg/t79ZyuHr5K\" align=center style=\"color:blue\">My Discord Server</a?\n" +
-            "</p>\n" +
-            "</body>\n" +
-            "</html>";
 
     public static void main(String[] args) {
 
@@ -63,7 +36,7 @@ public class Main {
         Spark.port(6565);
         Spark.get("/", (req, res) -> {
             res.type("text/html");
-            return website;
+            return getResourceContents("index.html");
         });
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
 
@@ -119,5 +92,20 @@ public class Main {
             CurrencyCommands.balanceMap = new HashMap<>();
         if (Shop.ownedItems == null)
             Shop.ownedItems = new HashMap<>();
+    }
+
+    private static String getResourceContents(String resourceName) {
+        StringBuilder content = new StringBuilder();
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Main.class.getClass().getClassLoader().getResourceAsStream(resourceName)));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line + "\n");
+            }
+            bufferedReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return content.toString();
     }
 }
