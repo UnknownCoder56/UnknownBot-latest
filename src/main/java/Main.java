@@ -32,11 +32,12 @@ public class Main {
                         Intent.GUILD_PRESENCES)
                 .login().join();
 
+        Main app = new Main();
         System.out.print("\033\143");
         Spark.port(6565);
         Spark.get("/", (req, res) -> {
             res.type("text/html");
-            return getResourceContents("index.html");
+            return app.getResourceContents("index.html");
         });
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
 
@@ -94,10 +95,10 @@ public class Main {
             Shop.ownedItems = new HashMap<>();
     }
 
-    private static String getResourceContents(String resourceName) {
+    private String getResourceContents(String resourceName) {
         StringBuilder content = new StringBuilder();
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Main.class.getClass().getClassLoader().getResourceAsStream(resourceName)));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourceName)));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line + "\n");
