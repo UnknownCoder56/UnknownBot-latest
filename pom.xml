@@ -87,7 +87,7 @@
               <archive>
                 <manifest>
                   <mainClass>
-                        Main
+                        com.uniqueapps.UnknownBot.Main
                     </mainClass>
                 </manifest>
               </archive>
