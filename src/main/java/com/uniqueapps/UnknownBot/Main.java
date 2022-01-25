@@ -1,3 +1,5 @@
+package com.uniqueapps.UnknownBot;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +9,13 @@ import java.io.ObjectInputStream;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.uniqueapps.UnknownBot.commands.BasicCommands;
+import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
+import com.uniqueapps.UnknownBot.commands.ModCommands;
+import com.uniqueapps.UnknownBot.objects.Shop;
+import com.uniqueapps.UnknownBot.objects.Warn;
+
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;

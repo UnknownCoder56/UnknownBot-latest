@@ -1,3 +1,5 @@
+package com.uniqueapps.UnknownBot.commands;
+
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;

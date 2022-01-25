@@ -1,3 +1,5 @@
+package com.uniqueapps.UnknownBot.commands;
+
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.Message;
@@ -20,6 +22,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import com.uniqueapps.UnknownBot.Main;
 
 public class BasicCommands {
 

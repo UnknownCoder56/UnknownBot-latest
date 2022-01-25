@@ -1,13 +1,22 @@
+package com.uniqueapps.UnknownBot.commands;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.UnknownBot.objects.Warn;
 
 public class ModCommands {
 
@@ -295,27 +304,5 @@ public class ModCommands {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-}
-
-class Warn implements Serializable {
-
-    ArrayList<String> warnCauses = new ArrayList<>();
-    int warns;
-    long userId;
-
-    public Warn(String cause, long userId) {
-        warns++;
-        warnCauses.add(cause);
-        this.userId = userId;
-    }
-
-    public void newWarn(String cause) {
-        warns++;
-        warnCauses.add(cause);
-    }
-
-    public long getUserId() {
-        return userId;
     }
 }
