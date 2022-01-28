@@ -17,6 +17,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.UnknownBot.objects.Shop;
 import com.uniqueapps.UnknownBot.objects.SortByBalance;
 
 public class CurrencyCommands {
@@ -87,7 +88,7 @@ public class CurrencyCommands {
                     refreshDailies();
                 } else {
                     int leftSeconds = (int) (dailyCoolDown - Duration
-                            .between(Main.userWorkedTimes.get(userId), event.getMessage().getCreationTimestamp())
+                            .between(Main.userDailyTimes.get(userId), event.getMessage().getCreationTimestamp())
                             .toSeconds());
                     int seconds = leftSeconds;
                     int p1 = seconds % 60;
@@ -456,6 +457,37 @@ public class CurrencyCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("No one has more than :coin: 0 in our database!")
                     .setColor(BasicCommands.getRandomColor()));
+        }
+    }
+
+    public static void inv(MessageCreateEvent event) {
+        if (event.getMessageAuthor().asUser().isPresent()) {
+            Long userId = event.getMessageAuthor().asUser().get().getId();
+            StringBuilder itemText = new StringBuilder();
+            if (Shop.ownedItems.containsKey(userId)) {
+                Map<String, Integer> userItems = Shop.ownedItems.get(userId);
+                int index = 0;
+                for (String name : userItems.keySet()) {
+                    if (userItems.get(name) != 0) {
+                        itemText.append(index + ") " + name + " (Count: " + userItems.get(name) + ")\n");
+                    }
+                }
+                if (itemText.isEmpty()) {
+                    itemText.append("There are no items in your inventory!");
+                }
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Items in your inventory:-")
+                        .setDescription(itemText.toString()));
+            } else {
+                itemText.append("There are no items in your inventory!");
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Items in your inventory:-")
+                        .setDescription(itemText.toString()));
+            }
+        } else {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("You are not a user! Maybe you are a bot."));
         }
     }
 

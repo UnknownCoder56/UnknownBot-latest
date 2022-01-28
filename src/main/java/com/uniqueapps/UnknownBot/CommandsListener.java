@@ -99,6 +99,8 @@ class AsyncListener implements Runnable {
                     BasicCommands.nuke(event);
                 else if (command.startsWith(">rps"))
                     BasicCommands.rps(event);
+                else if (command.startsWith(">tti"))
+                    BasicCommands.texttoimg(event);
 
                 // Mod commands
                 else if (command.startsWith(">warn"))
@@ -140,7 +142,7 @@ class AsyncListener implements Runnable {
                 else if (command.startsWith(">use"))
                     Shop.handleCommands(event);
                 else if (command.startsWith(">inv"))
-                    Shop.handleCommands(event);
+                    CurrencyCommands.inv(event);
 
                 // Error handler
                 else

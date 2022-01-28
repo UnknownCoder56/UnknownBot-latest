@@ -11,6 +11,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
+import java.awt.image.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,7 +29,7 @@ import com.uniqueapps.UnknownBot.Main;
 public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "3.2.0";
+    public static final String version = "3.3.0";
     final static int botWin = 0;
     final static int userWin = 1;
     final static int tie = 2;
@@ -260,6 +261,7 @@ public class BasicCommands {
                     .addField(">replies", "Displays all custom replies set.", true)
                     .addField(">dm (mention) \"message\"", "DMs a message to a user.", true)
                     .addField(">rps (choice)", "Play \"Rock Paper Scissors\" with the bot. Choices include: ```r, p, s``` or ```rock, paper, scissors```.", true)
+                    .addField(">tti (text)", "Converts given text to image.", true)
                     .setColor(getRandomColor()));
         } else if (Objects.equals(category, categories[1])) {
             event.getChannel().sendMessage(new EmbedBuilder()
@@ -288,6 +290,11 @@ public class BasicCommands {
                     .addField(">glb", "Compare and check richest users of our bot (Global)!", true)
                     .addField(">rob (mention)", "Rob others and get money, the dark way.", true)
                     .addField(">give (amount) (mention)", "Transfer money to others' accounts!", true)
+                    .addField(">daily", "Get your daily earnings!", true)
+                    .addField(">shop", "Shows a list of all items in the shop, and their details.", true)
+                    .addField(">buy (item codename)", "Buy an item from the shop. Codename with command is available when you type 'shop', under the 'Command for buying' section.", true)
+                    .addField(">use (item codename)", "Use an item in your inventory. Codename with command is available when you type 'shop', under the 'Command for using' section", true)
+                    .addField(">inv", "Displays a list of all items in your inventory.", true)
                     .setColor(getRandomColor()));
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
@@ -423,6 +430,54 @@ public class BasicCommands {
             .setTitle("Error!")
             .setDescription("You chose " + actualChoice + " and bot chose " + getChoiceName(botChoice) + "."));
         }
+    }
+
+    public static void texttoimg(MessageCreateEvent event) {
+        String text = "";
+        try {
+            text = event.getMessageContent().substring(5);
+        } catch (IndexOutOfBoundsException e) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                .setTitle("Error!")
+                .setDescription("No arguments were supplied! To get help about this command, type '>help'.")
+                .setColor(getRandomColor()));
+            return;
+        }
+        if (!(text.charAt(0) == ' ')) text = " " + text;
+        if (!(text.charAt(text.length() - 1) == ' ')) text += " ";
+        
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
+        Font font = new Font("Arial", Font.PLAIN, 48);
+        g2d.setFont(font);
+        FontMetrics fm = g2d.getFontMetrics();
+        int width = fm.stringWidth(text);
+        int height = fm.getHeight();
+        g2d.dispose();
+
+        img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        g2d = img.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        g2d.setFont(font);
+        fm = g2d.getFontMetrics();
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(text, 0, fm.getAscent());
+        g2d.dispose();
+
+        event.getChannel().sendMessage(new EmbedBuilder()
+            .setTitle("Success!")
+            .setDescription("Here is your image.")
+            .setImage(img)
+            .setColor(getRandomColor()));
     }
 
     // Helper methods
