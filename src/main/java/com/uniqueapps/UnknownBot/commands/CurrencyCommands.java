@@ -472,7 +472,7 @@ public class CurrencyCommands {
                         itemText.append(index + ") " + name + " (Count: " + userItems.get(name) + ")\n");
                     }
                 }
-                if (itemText.isEmpty()) {
+                if (itemText.toString().isEmpty()) {
                     itemText.append("There are no items in your inventory!");
                 }
                 event.getChannel().sendMessage(new EmbedBuilder()
