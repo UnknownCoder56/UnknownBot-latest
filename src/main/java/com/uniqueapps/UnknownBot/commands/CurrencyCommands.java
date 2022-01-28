@@ -29,7 +29,7 @@ public class CurrencyCommands {
             "fixed neighbour's PC and earned", "checked his car bonnet and found", "won a bet and earned",
             "repaired cars at workshop for a day and earned", "won a lucky draw and earned" };
     static int coolDown = 30;
-    static int dailyCoolDown = 24;
+    static int dailyCoolDown = 86400;
 
     public static void balance(MessageCreateEvent event) {
         if (event.getMessage().getMentionedUsers().size() > 0) {
@@ -75,7 +75,7 @@ public class CurrencyCommands {
             Long userId = event.getMessageAuthor().asUser().get().getId();
             if (Main.userDailyTimes.containsKey(userId)) {
                 if (Duration.between(Main.userDailyTimes.get(userId), event.getMessage().getCreationTimestamp())
-                        .toSeconds() >= (dailyCoolDown * 3600)) {
+                        .toSeconds() >= (dailyCoolDown)) {
                     Main.userDailyTimes.put(userId, event.getMessage().getCreationTimestamp());
                     int earn = 5000;
                     if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
@@ -469,6 +469,7 @@ public class CurrencyCommands {
                 int index = 0;
                 for (String name : userItems.keySet()) {
                     if (userItems.get(name) != 0) {
+                        index++;
                         itemText.append(index + ") " + name + " (Count: " + userItems.get(name) + ")\n");
                     }
                 }
