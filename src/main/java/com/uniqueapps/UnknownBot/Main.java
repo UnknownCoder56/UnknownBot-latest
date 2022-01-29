@@ -3,6 +3,7 @@ package com.uniqueapps.UnknownBot;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -21,6 +22,7 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 
+import spark.Route;
 import spark.Spark;
 
 public class Main {
@@ -44,9 +46,13 @@ public class Main {
         Main app = new Main();
         System.out.print("\033\143");
         Spark.port(6565);
+        Spark.get("/favicon.png", (req, res) -> {
+            res.type("image/x-icon");
+            return app.getResourceFile("favicon.png");
+        });
         Spark.get("/", (req, res) -> {
             res.type("text/html");
-            return app.getResourceContents("index.html");
+            return app.getResourceText("index.html");
         });
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
 
@@ -140,7 +146,7 @@ public class Main {
             userDailyTimes = new HashMap<>();
     }
 
-    private String getResourceContents(String resourceName) {
+    private String getResourceText(String resourceName) {
         StringBuilder content = new StringBuilder();
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourceName)));
@@ -153,5 +159,24 @@ public class Main {
             e.printStackTrace();
         }
         return content.toString();
+    }
+
+    private File getResourceFile(String resourceName) {
+        StringBuilder content = new StringBuilder();
+        try (
+            FileWriter writer = new FileWriter(new File("favicon.png")); 
+            BufferedReader bufferedReader = new BufferedReader(
+            new InputStreamReader(
+                getClass().getClassLoader().getResourceAsStream(resourceName)))) {
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line + "\n");
+            }
+            writer.write(content.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new File("favicon.png");
     }
 }
