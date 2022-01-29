@@ -1,15 +1,17 @@
 package com.uniqueapps.UnknownBot;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
@@ -22,7 +24,6 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 
-import spark.Route;
 import spark.Spark;
 
 public class Main {
@@ -46,14 +47,20 @@ public class Main {
         Main app = new Main();
         System.out.print("\033\143");
         Spark.port(6565);
+        
+        /*
         Spark.get("/favicon.png", (req, res) -> {
             res.type("image/x-icon");
-            return app.getResourceFile("favicon.png");
+            return app.getResourceImage("favicon.png");
         });
+        */
+        Spark.staticFileLocation("/public");
+
         Spark.get("/", (req, res) -> {
             res.type("text/html");
             return app.getResourceText("index.html");
         });
+
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
 
         api.addListener(new CommandsListener());
@@ -77,7 +84,7 @@ public class Main {
             warnsMapFile.createNewFile();
             balanceMapFile.createNewFile();
             shopFile.createNewFile();
-            
+
             work.createNewFile();
             rob.createNewFile();
             daily.createNewFile();
@@ -137,7 +144,7 @@ public class Main {
             CurrencyCommands.balanceMap = new HashMap<>();
         if (Shop.ownedItems == null)
             Shop.ownedItems = new HashMap<>();
-        
+
         if (userWorkedTimes == null)
             userWorkedTimes = new HashMap<>();
         if (userRobbedTimes == null)
@@ -149,7 +156,8 @@ public class Main {
     private String getResourceText(String resourceName) {
         StringBuilder content = new StringBuilder();
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourceName)));
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourceName)));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line + "\n");
@@ -161,22 +169,16 @@ public class Main {
         return content.toString();
     }
 
-    private File getResourceFile(String resourceName) {
-        StringBuilder content = new StringBuilder();
-        try (
-            FileWriter writer = new FileWriter(new File("favicon.png")); 
-            BufferedReader bufferedReader = new BufferedReader(
-            new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream(resourceName)))) {
-
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                content.append(line + "\n");
-            }
-            writer.write(content.toString());
-        } catch (Exception e) {
+    /*
+    private File getResourceImage(String resourceName) {
+        try {
+            BufferedImage img = ImageIO.read(getClass().getClassLoader().getResourceAsStream(resourceName));
+            ImageIO.write(img, "png", new File("favicon.pg"));
+            return new File("favicon.png");
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return new File("favicon.png");
+        return null;
     }
+    */
 }
