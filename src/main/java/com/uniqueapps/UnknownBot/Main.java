@@ -46,7 +46,7 @@ public class Main {
 
         Main app = new Main();
         System.out.print("\033\143");
-        Spark.port(System.getenv("PORT"));
+        Spark.port(Integer.parseInt(System.getenv("PORT")));
         
         /*
         Spark.get("/favicon.png", (req, res) -> {
