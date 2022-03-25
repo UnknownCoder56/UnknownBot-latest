@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.UnknownBot.objects.Help;
 
 public class BasicCommands {
 
@@ -241,61 +242,40 @@ public class BasicCommands {
     }
 
     public static void help(MessageCreateEvent event) {
+        Help help = new Help();
         String[] args = event.getMessage().getContent().split(" ");
         String category = args.length > 1 ? args[1].toLowerCase(Locale.ROOT) : "";
         String[] categories = {"utility", "moderation", "economy"};
         if (Objects.equals(category, categories[0])) {
-            event.getChannel().sendMessage(new EmbedBuilder()
+            EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTitle("UnknownBot's Utility commands:-")
-                    .addField(">help (category)", "Displays this help message.", true)
-                    .addField(">botinfo", "Shows information about UnknownBot.", true)
-                    .addField(">hello", "Says hello to you.", true)
-                    .addField(">ping", "Displays bot latency.", true)
-                    .addField(">admes (query)", "Ask anything to the bot.", true)
-                    .addField(">dt", "Shows the current date and time (AM/PM).", true)
-                    .addField(">gsearch (search text)", "Searches google and returns results as html.", true)
-                    .addField(">makefile (text)", "Creates file from text.", true)
-                    .addField(">calc (num1),(sign),(num2) _Warning: No spaces after/before/in commas_", "Does calculation. Supported signs -> +, -, *, /", true)
-                    .addField(">reply (text),(reply) _Warning: No spaces after/before/in commas_", "Makes the bot reply when you send a specific text.", true)
-                    .addField(">noreply (text)", "Disables custom reply.", true)
-                    .addField(">replies", "Displays all custom replies set.", true)
-                    .addField(">dm (mention) \"message\"", "DMs a message to a user.", true)
-                    .addField(">rps (choice)", "Play \"Rock Paper Scissors\" with the bot. Choices include: ```r, p, s``` or ```rock, paper, scissors```.", true)
-                    .addField(">tti (text)", "Converts given text to image.", true)
-                    .setColor(getRandomColor()));
+                    .setColor(getRandomColor());
+
+            for (String key : help.utilityCommands.keySet()) {
+                embedBuilder.addField(key, help.utilityCommands.get(key), true);
+            }
+
+            event.getChannel().sendMessage(embedBuilder);
         } else if (Objects.equals(category, categories[1])) {
-            event.getChannel().sendMessage(new EmbedBuilder()
+            EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTitle("UnknownBot's Moderation commands:-")
-                    .addField(">clear (amount)", "Clears specified number of messages.", true)
-                    .addField(">warn (mention) \"cause\"", "Warns a user. _Usage: Type >warn, then mention" +
-                            " user, then put reason within quotation marks (\") (no reason supported too). Put space between each" +
-                            " argument. Multiple warns supported. Warns are isolated for each server._", true)
-                    .addField(">kick (mention)", "Kicks the mentioned user.", true)
-                    .addField(">ban (mention)", "Bans the mentioned user.", true)
-                    .addField(">mute", "Mutes the mentioned user (Mute = Disable chat and VC).", true)
-                    .addField(">nowarns (mention)", "Clear all warns for a user (Individual removal not" +
-                            " supported yet).", true)
-                    .addField(">unban (mention)", "Unbans the mentioned user.", true)
-                    .addField(">unmute", "Unmutes the mentioned user (Mute = Enable chat and VC).", true)
-                    .addField(">getwarns (mention)", "Gets all warns for a user.", true)
-                    .addField(">nuke", "Cleans everything in a channel.", true)
-                    .setColor(getRandomColor()));
+                    .setColor(getRandomColor());
+    
+            for (String key : help.moderationCommands.keySet()) {
+                embedBuilder.addField(key, help.moderationCommands.get(key), true);
+            }
+    
+            event.getChannel().sendMessage(embedBuilder);
         } else if (Objects.equals(category, categories[2])) {
-            event.getChannel().sendMessage(new EmbedBuilder()
+            EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTitle("UnknownBot's Economy commands:-")
-                    .addField(">bal", "Shows your current bank balance", true)
-                    .addField(">bal (mention)", "Shows others' current bank balance", true)
-                    .addField(">work", "You work and gain money!", true)
-                    .addField(">lb", "Compare and check out richest users of your server!", true)
-                    .addField(">glb", "Compare and check richest users of our bot (Global)!", true)
-                    .addField(">rob (mention)", "Rob others and get money, the dark way.", true)
-                    .addField(">give (amount) (mention)", "Transfer money to others' accounts!", true)
-                    .addField(">daily", "Get your daily earnings!", true)
-                    .addField(">shop", "Shows a list of all items in the shop, and their details.", true)
-                    .addField(">buy (item codename)", "Buy an item from the shop. Codename with command is available when you type 'shop', under the 'Command for buying' section.", true)
-                    .addField(">use (item codename)", "Use an item in your inventory. Codename with command is available when you type 'shop', under the 'Command for using' section", true)
-                    .addField(">inv", "Displays a list of all items in your inventory.", true)
-                    .setColor(getRandomColor()));
+                    .setColor(getRandomColor());
+    
+            for (String key : help.economyCommands.keySet()) {
+                embedBuilder.addField(key, help.economyCommands.get(key), true);
+            }
+    
+            event.getChannel().sendMessage(embedBuilder);
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("UnknownBot's Help docs")
