@@ -1,12 +1,10 @@
 package com.uniqueapps.UnknownBot.objects;
 
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
 
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
 
-import org.eclipse.jetty.server.session.Session.IdState;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -54,6 +52,11 @@ public class ShopItem {
                                 .setColor(BasicCommands.getRandomColor()));
                         Shop.refreshOwnerships();
                         return;
+                    } else {
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Error!")
+                                .setDescription("You don't have this item! Buy it from the shop to use it.")
+                                .setColor(BasicCommands.getRandomColor()));
                     }
                 } else {
                     if (funcName.equals("nitro")) {
@@ -67,6 +70,11 @@ public class ShopItem {
                                 .setColor(BasicCommands.getRandomColor()));
                             Shop.refreshOwnerships();
                         }
+                    } else {
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Error!")
+                                .setDescription("You don't have this item! Buy it from the shop to use it.")
+                                .setColor(BasicCommands.getRandomColor()));
                     }
                     return;
                 }

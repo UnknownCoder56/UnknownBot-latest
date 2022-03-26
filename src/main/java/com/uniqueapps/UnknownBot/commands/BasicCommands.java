@@ -30,7 +30,7 @@ import com.uniqueapps.UnknownBot.objects.Help;
 public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "3.4.0";
+    public static final String version = "3.4.5";
     final static int botWin = 0;
     final static int userWin = 1;
     final static int tie = 2;
