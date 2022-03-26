@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -20,7 +24,7 @@ public class Shop {
 
     public static void initShop() {
         ShopItem juice = new ShopItem("Juice", "Refresh yourself with a cool an of juice.", "You drink some juice, and get refreshed.", "juice", 10000);
-        ShopItem nitro = new ShopItem("Nitro", "Speed up your work. Work cooldown will be halved.", "You use nitro and gain speed, resulting in your work being done faster.", "nitro", 20000);
+        ShopItem nitro = new ShopItem("Nitro", "Speed up your work. Work cooldown will be halved.", "You use nitro and gain speed, resulting in your work being done faster.", "nitro", 20000, "nitro");
         ShopItem laptop = new ShopItem("Hacker Laptop", "Write code anytime, anywhere. Pen testing utilities pre-installed.", "HACKED EVERYTHING", "laptop", 30000);
         ShopItem code = new ShopItem("Hacker Code", "Very special bruteforce attack code. Tested upon top targets.", "HACKED PENTAGON", "code", 50000);
         ShopItem cat = new ShopItem("Pet Cat", "A pet cat, stays with you as a companion when you code.", "MEW!!! CODE!!!", "cat", 50000);
@@ -131,5 +135,29 @@ public class Shop {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+}
+
+class NitroExec implements Runnable {
+
+    MessageCreateEvent event;
+
+    public NitroExec(MessageCreateEvent event) {
+        this.event = event;
+    }
+
+    @Override
+    public void run() {
+        event.getMessageAuthor().asUser().ifPresentOrElse((user) -> {
+            if (Main.userWorkedTimes.containsKey(user.getId())) {
+                long reduce = (30 - Duration.between(Main.userWorkedTimes.get(user.getId()), event.getMessage().getCreationTimestamp()).toSeconds()) / 2;
+                Main.userWorkedTimes.replace(user.getId(), Main.userWorkedTimes.get(user.getId()), Main.userWorkedTimes.get(user.getId()).minus(reduce, ChronoUnit.SECONDS));
+            }
+        }, () -> {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("You are not a user! Maybe you are a bot.")
+                    .setColor(BasicCommands.getRandomColor()));
+        });
     }
 }
