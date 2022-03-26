@@ -69,12 +69,12 @@ public class ShopItem {
                                 .setDescription(useMessage + "\nYou now have " + (owned - 1) + " " + itemName + "(s).")
                                 .setColor(BasicCommands.getRandomColor()));
                             Shop.refreshOwnerships();
+                        } else {
+                            event.getChannel().sendMessage(new EmbedBuilder()
+                                    .setTitle("Error!")
+                                    .setDescription("You don't have this item! Buy it from the shop to use it.")
+                                    .setColor(BasicCommands.getRandomColor()));
                         }
-                    } else {
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("Error!")
-                                .setDescription("You don't have this item! Buy it from the shop to use it.")
-                                .setColor(BasicCommands.getRandomColor()));
                     }
                     return;
                 }
