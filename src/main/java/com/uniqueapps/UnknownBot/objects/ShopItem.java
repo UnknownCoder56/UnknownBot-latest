@@ -58,6 +58,7 @@ public class ShopItem {
                                 .setDescription("You don't have this item! Buy it from the shop to use it.")
                                 .setColor(BasicCommands.getRandomColor()));
                     }
+                    return;
                 } else {
                     if (funcName.equals("nitro")) {
                         if (Shop.ownedItems.get(userId).get(itemName) > 0) {
@@ -82,7 +83,7 @@ public class ShopItem {
         }
         event.getChannel().sendMessage(new EmbedBuilder()
                 .setTitle("Error!")
-                .setDescription("You don't have this item, so you can't use it!")
+                .setDescription("You don't have this item! Buy it from the shop to use it.")
                 .setColor(BasicCommands.getRandomColor()));
     }
 
