@@ -296,10 +296,14 @@ public class BasicCommands {
 		try {
             EmbedBuilder embed;
             StringBuilder stringBuilder = new StringBuilder();
+            boolean isBotServerAdmin = false;
 
             if (event.getServer().isPresent()) {
                 if (!event.getServer().get().getRoles(Main.api.getYourself()).isEmpty()) {
                     for (Role role : event.getServer().get().getRoles(Main.api.getYourself())) {
+                        if (role.getAllowedPermissions().contains(PermissionType.ADMINISTRATOR)) {
+                            isBotServerAdmin = true;
+                        }
                         stringBuilder.append(role.getMentionTag()).append("\n");
                     }
                 } else {
@@ -316,12 +320,13 @@ public class BasicCommands {
 			        .addField("Ping", "\nRest ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.measureRestLatency().get().getNano()) + " ms" +
 			                "\nGateway ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.getLatestGatewayLatency().getNano()) + " ms", true)
                     .addField("Roles", stringBuilder.toString(), true)
+                    .addField("Is bot admin?", isBotServerAdmin ? "Yes" : "No", true)
 			        .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
 			        .addField("Version", version, true)
 			        .addField("Bot type", "Utility, Moderation and Economy Bot", true)
 			        .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
 			        .setColor(getRandomColor());
-			
+
 			event.getChannel().sendMessage(embed);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -355,20 +360,24 @@ public class BasicCommands {
                 channel.sendMessage(new EmbedBuilder()
                         .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + " at " +
                                 event.getServer().get().getName() + " :-")
-                        .setDescription(message));
+                        .setDescription(message)
+                        .setColor(getRandomColor()));
             } else {
                 channel.sendMessage(new EmbedBuilder()
                         .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + ":-")
-                        .setDescription(message));
+                        .setDescription(message)
+                        .setColor(getRandomColor()));
             }
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Success!")
-                    .setDescription("Successfully DM-ed message to user."));
+                    .setDescription("Successfully DM-ed message to user.")
+                    .setColor(getRandomColor()));
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("DM to user failed (Main reason: User's DMs are closed)."));
+                    .setDescription("DM to user failed (Possible reason: User's DMs are closed).")
+                    .setColor(getRandomColor()));
         }
     }
 
