@@ -176,8 +176,12 @@ class AsyncListener implements Runnable {
     }
 
     public String getReply(String text) {
+        text.strip();
+        String[] words = text.split(" ");
+        for (int i = 0; i < words.length; i++) {
+            words[i] = words[i].strip();
+        }
         for (String reply : BasicCommands.customReplies.keySet()) {
-            String[] words = text.split(" ");
             for (String word : words) {
                 if (word == reply) {
                     return BasicCommands.customReplies.get(reply);
