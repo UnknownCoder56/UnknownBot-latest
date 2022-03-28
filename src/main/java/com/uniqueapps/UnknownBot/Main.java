@@ -44,13 +44,6 @@ public class Main {
         Main app = new Main();
         System.out.print("\033\143");
         Spark.port(Integer.parseInt(System.getenv("PORT")));
-        
-        /*
-        Spark.get("/favicon.png", (req, res) -> {
-            res.type("image/x-icon");
-            return app.getResourceImage("favicon.png");
-        });
-        */
         Spark.staticFileLocation("/public");
 
         Spark.get("/", (req, res) -> {
@@ -157,7 +150,7 @@ public class Main {
                     new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourceName)));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                content.append(line + "\n");
+                content.append(line).append("\n");
             }
             bufferedReader.close();
         } catch (Exception e) {
@@ -165,17 +158,4 @@ public class Main {
         }
         return content.toString();
     }
-
-    /*
-    private File getResourceImage(String resourceName) {
-        try {
-            BufferedImage img = ImageIO.read(getClass().getClassLoader().getResourceAsStream(resourceName));
-            ImageIO.write(img, "png", new File("favicon.pg"));
-            return new File("favicon.png");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    */
 }
