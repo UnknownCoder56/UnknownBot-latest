@@ -13,6 +13,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.TransactionBody;
+import com.mongodb.client.model.Filters;
 import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.objects.Shop;
 import com.uniqueapps.UnknownBot.objects.SortByBalance;
@@ -579,7 +580,7 @@ public class CurrencyCommands {
                             .append("name", "balance")
                             .append("key", balanceMap.keySet())
                             .append("val", balanceMap.values());
-                    collection.insertOne(doc);
+                    collection.replaceOne(Filters.eq("name", "balance"), doc);
                     return "Updated replies!";
                 };
     
@@ -597,7 +598,7 @@ public class CurrencyCommands {
                             .append("name", "work")
                             .append("key", Main.userWorkedTimes.keySet())
                             .append("val", Main.userWorkedTimes.values());
-                    collection.insertOne(doc);
+                    collection.replaceOne(Filters.eq("name", "work"), doc);
                     return "Updated work times!";
                 };
     
@@ -615,7 +616,7 @@ public class CurrencyCommands {
                             .append("name", "rob")
                             .append("key", Main.userRobbedTimes.keySet())
                             .append("val", Main.userRobbedTimes.values());
-                    collection.insertOne(doc);
+                    collection.replaceOne(Filters.eq("name", "rob"), doc);
                     return "Updated rob times!";
                 };
     
@@ -633,7 +634,7 @@ public class CurrencyCommands {
                             .append("name", "daily")
                             .append("key", Main.userDailyTimes.keySet())
                             .append("val", Main.userDailyTimes.values());
-                    collection.insertOne(doc);
+                    collection.replaceOne(Filters.eq("name", "daily"), doc);
                     return "Updated work times!";
                 };
     

@@ -1,5 +1,7 @@
 package com.uniqueapps.UnknownBot.commands;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -491,7 +493,7 @@ public class BasicCommands {
                             .append("name", "reply")
                             .append("key", customReplies.keySet())
                             .append("val", customReplies.values());
-                    collection.insertOne(doc);
+                    collection.replaceOne(eq("name", "reply"), doc);
                     return "Updated replies!";
                 };
     

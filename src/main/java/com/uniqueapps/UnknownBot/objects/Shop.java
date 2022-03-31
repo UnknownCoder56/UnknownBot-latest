@@ -16,6 +16,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.TransactionBody;
+import com.mongodb.client.model.Filters;
 import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 
@@ -142,7 +143,7 @@ public class Shop {
                             .append("name", "item")
                             .append("key", ownedItems.keySet())
                             .append("val", docs);
-                    collection.insertOne(doc);
+                    collection.replaceOne(Filters.eq("name", "item"), doc);
                     return "Updated replies!";
                 };
     
