@@ -8,11 +8,18 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.TransactionBody;
 import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 
+import org.bson.Document;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -123,17 +130,25 @@ public class Shop {
     }
 
     public static void refreshOwnerships() {
-        File shopFile = new File("shopFile.data");
-        try {
-            shopFile.delete();
-            shopFile.createNewFile();
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(shopFile))) {
-                objectOutputStream.writeObject(ownedItems);
-                System.out.println("Shop file updated!");
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Document> docs = new ArrayList<>();
+                    for (Map<String, Integer> map : ownedItems.values()) {
+                        docs.add(new Document().append("key", map.keySet()).append("val", map.values()));
+                    }
+                    Document doc = new Document()
+                            .append("name", "item")
+                            .append("key", ownedItems.keySet())
+                            .append("val", docs);
+                    collection.insertOne(doc);
+                    return "Updated replies!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 }
 

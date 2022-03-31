@@ -1,6 +1,35 @@
 package com.uniqueapps.UnknownBot.commands;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.TransactionBody;
+import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.UnknownBot.objects.Help;
+
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -9,23 +38,6 @@ import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
-
-import java.awt.*;
-import java.awt.image.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
-import com.uniqueapps.UnknownBot.Main;
-import com.uniqueapps.UnknownBot.objects.Help;
 
 public class BasicCommands {
 
@@ -462,16 +474,21 @@ public class BasicCommands {
 
     // Helper methods
     public static void refreshReplies() {
-        File arrayFile = new File("replyArray.data");
-        try {
-            arrayFile.delete();
-            arrayFile.createNewFile();
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(arrayFile))) {
-                objectOutputStream.writeObject(customReplies);
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    Document doc = new Document()
+                            .append("name", "reply")
+                            .append("key", customReplies.keySet())
+                            .append("val", customReplies.values());
+                    collection.insertOne(doc);
+                    return "Updated replies!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
     
     public static Color getRandomColor() {

@@ -12,13 +12,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.user.User;
-import org.javacord.api.event.message.MessageCreateEvent;
-
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.TransactionBody;
 import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.objects.Shop;
 import com.uniqueapps.UnknownBot.objects.SortByBalance;
+
+import org.bson.Document;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
+import org.javacord.api.event.message.MessageCreateEvent;
 
 public class CurrencyCommands {
 
@@ -569,59 +575,75 @@ public class CurrencyCommands {
     }
 
     public static void refreshBalances() {
-        File balanceFile = new File("balanceMap.data");
-        try {
-            balanceFile.delete();
-            balanceFile.createNewFile();
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(balanceFile))) {
-                objectOutputStream.writeObject(balanceMap);
-                System.out.println("Balance file updated!");
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    Document doc = new Document()
+                            .append("name", "balance")
+                            .append("key", balanceMap.keySet())
+                            .append("val", balanceMap.values());
+                    collection.insertOne(doc);
+                    return "Updated replies!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     public static void refreshWorks() {
-        File balanceFile = new File("work.data");
-        try {
-            balanceFile.delete();
-            balanceFile.createNewFile();
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(balanceFile))) {
-                objectOutputStream.writeObject(Main.userWorkedTimes);
-                System.out.println("Work file updated!");
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    Document doc = new Document()
+                            .append("name", "work")
+                            .append("key", Main.userWorkedTimes.keySet())
+                            .append("val", Main.userWorkedTimes.values());
+                    collection.insertOne(doc);
+                    return "Updated work times!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     public static void refreshRobs() {
-        File balanceFile = new File("rob.data");
-        try {
-            balanceFile.delete();
-            balanceFile.createNewFile();
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(balanceFile))) {
-                objectOutputStream.writeObject(Main.userRobbedTimes);
-                System.out.println("Rob file updated!");
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    Document doc = new Document()
+                            .append("name", "rob")
+                            .append("key", Main.userRobbedTimes.keySet())
+                            .append("val", Main.userRobbedTimes.values());
+                    collection.insertOne(doc);
+                    return "Updated rob times!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     public static void refreshDailies() {
-        File balanceFile = new File("daily.data");
-        try {
-            balanceFile.delete();
-            balanceFile.createNewFile();
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(balanceFile))) {
-                objectOutputStream.writeObject(Main.userDailyTimes);
-                System.out.println("Daily file updated!");
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    Document doc = new Document()
+                            .append("name", "daily")
+                            .append("key", Main.userDailyTimes.keySet())
+                            .append("val", Main.userDailyTimes.values());
+                    collection.insertOne(doc);
+                    return "Updated work times!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     public static int getRandomInteger(int max, int min) {

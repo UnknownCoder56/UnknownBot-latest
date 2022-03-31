@@ -1,21 +1,25 @@
 package com.uniqueapps.UnknownBot;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerApi;
+import com.mongodb.ServerApiVersion;
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.TransactionBody;
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
-import com.uniqueapps.UnknownBot.commands.ModCommands;
 import com.uniqueapps.UnknownBot.objects.Shop;
-import com.uniqueapps.UnknownBot.objects.Warn;
 
+import org.bson.Document;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
@@ -29,9 +33,18 @@ public class Main {
     public static Map<Long, Instant> userWorkedTimes = new HashMap<>();
     public static Map<Long, Instant> userRobbedTimes = new HashMap<>();
     public static Map<Long, Instant> userDailyTimes = new HashMap<>();
+    public static MongoClientSettings settings;
 
     public static void main(String[] args) {
-
+        
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://arpan:" + new Main().getResourceText("dbpass.txt").strip() + "@unknowncluster.uoshw.mongodb.net/UnknownDatabase?retryWrites=true&w=majority");
+        settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .serverApi(ServerApi.builder()
+                        .version(ServerApiVersion.V1)
+                        .build())
+                .build();
+            
         initData();
         Shop.initShop();
         api = new DiscordApiBuilder()
@@ -44,13 +57,6 @@ public class Main {
         Main app = new Main();
         System.out.print("\033\143");
         Spark.port(Integer.parseInt(System.getenv("PORT")));
-        
-        /*
-        Spark.get("/favicon.png", (req, res) -> {
-            res.type("image/x-icon");
-            return app.getResourceImage("favicon.png");
-        });
-        */
         Spark.staticFileLocation("/public");
 
         Spark.get("/", (req, res) -> {
@@ -65,89 +71,71 @@ public class Main {
         System.out.println("Invite link for UnknownBot: " + api.createBotInvite());
     }
 
-    @SuppressWarnings("unchecked")
     public static void initData() {
-        File replyArrayFile = new File("replyArray.data");
-        File warnsMapFile = new File("warnsMap.data");
-        File balanceMapFile = new File("balanceMap.data");
-        File shopFile = new File("shopFile.data");
+        try (MongoClient client = MongoClients.create(settings); ClientSession session = client.startSession()) {
+            TransactionBody<String> txnBody = () -> {
+                MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                for (Document doc : collection.find()) {
+                    if (doc.get("name").equals("reply")) {
+                        BasicCommands.customReplies = new HashMap<>();
+                        var keys = doc.getList("key", String.class);
+                        var vals = doc.getList("val", String.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            BasicCommands.customReplies.put(keys.get(i), vals.get(i));
+                        }
+                    } else if (doc.get("name").equals("warn")) {
+                        //TODO implement warn retrieval system
+                    } else if (doc.get("name").equals("balance")) {
+                        CurrencyCommands.balanceMap = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Long.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            CurrencyCommands.balanceMap.put(keys.get(i), vals.get(i));
+                        }
+                    } else if (doc.get("name").equals("item")) {
+                        Shop.ownedItems = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Document.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            var doc1 = vals.get(i);
+                            var keys1 = doc1.getList("key", String.class);
+                            var vals1 = doc1.getList("val", Integer.class);
+                            Map<String, Integer> map = new HashMap<>();
+                            for (int x = 0; x < keys.size(); x++) {
+                                map.put(keys1.get(x), vals1.get(x));
+                            }
+                            Shop.ownedItems.put(keys.get(i), map);
+                        }
+                    } else if (doc.get("name").equals("work")) {
+                        userWorkedTimes = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Instant.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            userWorkedTimes.put(keys.get(i), vals.get(i));
+                        }
+                    } else if (doc.get("name").equals("rob")) {
+                        userRobbedTimes = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Instant.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            userRobbedTimes.put(keys.get(i), vals.get(i));
+                        }
+                    } else if (doc.get("name").equals("daily")) {
+                        userDailyTimes = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Instant.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            userDailyTimes.put(keys.get(i), vals.get(i));
+                        }
+                    } else {
+                        System.out.println("Unknown document found! Skipping");
+                    }
+                }
+                return "Retrieved all data.";
+            };
 
-        File work = new File("work.data");
-        File rob = new File("rob.data");
-        File daily = new File("daily.data");
-
-        try {
-            replyArrayFile.createNewFile();
-            warnsMapFile.createNewFile();
-            balanceMapFile.createNewFile();
-            shopFile.createNewFile();
-
-            work.createNewFile();
-            rob.createNewFile();
-            daily.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(session.withTransaction(txnBody));
         }
-
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(replyArrayFile))) {
-            BasicCommands.customReplies = (Map<String, String>) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(warnsMapFile))) {
-            ModCommands.warnMap = (Map<Long, Map<Long, Warn>>) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(balanceMapFile))) {
-            CurrencyCommands.balanceMap = (Map<Long, Long>) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(shopFile))) {
-            Shop.ownedItems = (Map<Long, Map<String, Integer>>) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-
-        //
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(work))) {
-            userWorkedTimes = (Map<Long, Instant>) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(rob))) {
-            userRobbedTimes = (Map<Long, Instant>) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(daily))) {
-            userDailyTimes = (Map<Long, Instant>) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-        //
-
-        if (BasicCommands.customReplies == null)
-            BasicCommands.customReplies = new HashMap<>();
-        if (ModCommands.warnMap == null)
-            ModCommands.warnMap = new HashMap<>();
-        if (CurrencyCommands.balanceMap == null)
-            CurrencyCommands.balanceMap = new HashMap<>();
-        if (Shop.ownedItems == null)
-            Shop.ownedItems = new HashMap<>();
-
-        if (userWorkedTimes == null)
-            userWorkedTimes = new HashMap<>();
-        if (userRobbedTimes == null)
-            userRobbedTimes = new HashMap<>();
-        if (userDailyTimes == null)
-            userDailyTimes = new HashMap<>();
     }
 
     private String getResourceText(String resourceName) {
@@ -165,17 +153,4 @@ public class Main {
         }
         return content.toString();
     }
-
-    /*
-    private File getResourceImage(String resourceName) {
-        try {
-            BufferedImage img = ImageIO.read(getClass().getClassLoader().getResourceAsStream(resourceName));
-            ImageIO.write(img, "png", new File("favicon.pg"));
-            return new File("favicon.png");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    */
 }
