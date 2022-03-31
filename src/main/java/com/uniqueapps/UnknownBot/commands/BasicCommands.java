@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
@@ -247,9 +248,11 @@ public class BasicCommands {
 
     public static void dt(MessageCreateEvent event) {
         event.getChannel().sendMessage(new EmbedBuilder()
-        		.setTitle("Current Time (UTC)")
-        		.setDescription(LocalDateTime.now(ZoneId.of("UTC")).format(
+        		.setTitle("Current Time:-")
+        		.addField("UTC", LocalDateTime.now(ZoneId.of("UTC")).format(
         				new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
+                .addField("GMT", LocalDateTime.now(ZoneId.of("GMT")).format(
+                        new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
         		.setColor(getRandomColor()));
     }
 
@@ -308,18 +311,20 @@ public class BasicCommands {
 		try {
             EmbedBuilder embed;
             StringBuilder stringBuilder = new StringBuilder();
+            AtomicBoolean isBotServerAdmin = new AtomicBoolean(false);
 
-            if (event.getServer().isPresent()) {
-                if (!event.getServer().get().getRoles(Main.api.getYourself()).isEmpty()) {
-                    for (Role role : event.getServer().get().getRoles(Main.api.getYourself())) {
+            event.getServer().ifPresentOrElse((server) -> {
+                if (!server.getRoles(Main.api.getYourself()).isEmpty()) {
+                    for (Role role : server.getRoles(Main.api.getYourself())) {
+                        if (role.getAllowedPermissions().contains(PermissionType.ADMINISTRATOR)) {
+                            isBotServerAdmin.set(true);
+                        }
                         stringBuilder.append(role.getMentionTag()).append("\n");
                     }
                 } else {
                     stringBuilder.append("None");
                 }
-            } else {
-                stringBuilder.append("None");
-            }
+            }, () -> stringBuilder.append("None"));
 
 			embed = new EmbedBuilder()
 			        .setTitle("UnknownBot Status:-")
@@ -328,12 +333,13 @@ public class BasicCommands {
 			        .addField("Ping", "\nRest ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.measureRestLatency().get().getNano()) + " ms" +
 			                "\nGateway ping: " + TimeUnit.NANOSECONDS.toMillis(Main.api.getLatestGatewayLatency().getNano()) + " ms", true)
                     .addField("Roles", stringBuilder.toString(), true)
+                    .addField("Is bot admin?", isBotServerAdmin.get() ? "Yes" : "No", true)
 			        .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
 			        .addField("Version", version, true)
 			        .addField("Bot type", "Utility, Moderation and Economy Bot", true)
 			        .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
 			        .setColor(getRandomColor());
-			
+
 			event.getChannel().sendMessage(embed);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -363,24 +369,27 @@ public class BasicCommands {
         String message = StringUtils.substringBetween(event.getMessage().getContent(), "\"", "\"");
         try {
             PrivateChannel channel = user.openPrivateChannel().get();
-            if (event.getServer().isPresent()) {
-                channel.sendMessage(new EmbedBuilder()
-                        .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + " at " +
-                                event.getServer().get().getName() + " :-")
-                        .setDescription(message));
-            } else {
-                channel.sendMessage(new EmbedBuilder()
-                        .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + ":-")
-                        .setDescription(message));
-            }
+
+            event.getServer().ifPresentOrElse((server) -> channel.sendMessage(new EmbedBuilder()
+                            .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + " at " +
+                                    server.getName() + " :-")
+                            .setDescription(message)
+                            .setColor(getRandomColor())),
+                    () -> channel.sendMessage(new EmbedBuilder()
+                            .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + ":-")
+                            .setDescription(message)
+                            .setColor(getRandomColor())));
+
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Success!")
-                    .setDescription("Successfully DM-ed message to user."));
+                    .setDescription("Successfully DM-ed message to user.")
+                    .setColor(getRandomColor()));
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
-                    .setDescription("DM to user failed (Main reason: User's DMs are closed)."));
+                    .setDescription("DM to user failed (Possible reason: User's DMs are closed).")
+                    .setColor(getRandomColor()));
         }
     }
 
@@ -425,7 +434,7 @@ public class BasicCommands {
     }
 
     public static void texttoimg(MessageCreateEvent event) {
-        String text = "";
+        String text;
         try {
             text = event.getMessageContent().substring(5);
         } catch (IndexOutOfBoundsException e) {
