@@ -1,10 +1,13 @@
 package com.uniqueapps.UnknownBot.commands;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -598,10 +601,14 @@ public class CurrencyCommands {
             try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
                 TransactionBody<String> txnBody = () -> {
                     MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Date> dates = new ArrayList<>();
+                    for (Instant i : Main.userWorkedTimes.values()) {
+                        dates.add(Date.from(i));
+                    }
                     Document doc = new Document()
                             .append("name", "work")
                             .append("key", Main.userWorkedTimes.keySet())
-                            .append("val", Main.userWorkedTimes.values());
+                            .append("val", dates);
                     if (collection.countDocuments(Filters.eq("name", "work")) > 0) {
                         collection.replaceOne(Filters.eq("name", "work"), doc);
                     } else {
@@ -620,10 +627,14 @@ public class CurrencyCommands {
             try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
                 TransactionBody<String> txnBody = () -> {
                     MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Date> dates = new ArrayList<>();
+                    for (Instant i : Main.userRobbedTimes.values()) {
+                        dates.add(Date.from(i));
+                    }
                     Document doc = new Document()
                             .append("name", "rob")
                             .append("key", Main.userRobbedTimes.keySet())
-                            .append("val", Main.userRobbedTimes.values());
+                            .append("val", dates);
                     if (collection.countDocuments(Filters.eq("name", "rob")) > 0) {
                         collection.replaceOne(Filters.eq("name", "rob"), doc);
                     } else {
@@ -642,10 +653,14 @@ public class CurrencyCommands {
             try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
                 TransactionBody<String> txnBody = () -> {
                     MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Date> dates = new ArrayList<>();
+                    for (Instant i : Main.userDailyTimes.values()) {
+                        dates.add(Date.from(i));
+                    }
                     Document doc = new Document()
                             .append("name", "daily")
                             .append("key", Main.userDailyTimes.keySet())
-                            .append("val", Main.userDailyTimes.values());
+                            .append("val", dates);
                     if (collection.countDocuments(Filters.eq("name", "daily")) > 0) {
                         collection.replaceOne(Filters.eq("name", "daily"), doc);
                     } else {

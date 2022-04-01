@@ -3,8 +3,13 @@ package com.uniqueapps.UnknownBot;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.xml.crypto.Data;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -109,23 +114,23 @@ public class Main {
                     } else if (doc.get("name").equals("work")) {
                         userWorkedTimes = new HashMap<>();
                         var keys = doc.getList("key", Long.class);
-                        var vals = doc.getList("val", Instant.class);
+                        var vals = doc.getList("val", Date.class);
                         for (int i = 0; i < keys.size(); i++) {
-                            userWorkedTimes.put(keys.get(i), vals.get(i));
+                            userWorkedTimes.put(keys.get(i), vals.get(i).toInstant());
                         }
                     } else if (doc.get("name").equals("rob")) {
                         userRobbedTimes = new HashMap<>();
                         var keys = doc.getList("key", Long.class);
-                        var vals = doc.getList("val", Instant.class);
+                        var vals = doc.getList("val", Date.class);
                         for (int i = 0; i < keys.size(); i++) {
-                            userRobbedTimes.put(keys.get(i), vals.get(i));
+                            userRobbedTimes.put(keys.get(i), vals.get(i).toInstant());
                         }
                     } else if (doc.get("name").equals("daily")) {
                         userDailyTimes = new HashMap<>();
                         var keys = doc.getList("key", Long.class);
-                        var vals = doc.getList("val", Instant.class);
+                        var vals = doc.getList("val", Date.class);
                         for (int i = 0; i < keys.size(); i++) {
-                            userDailyTimes.put(keys.get(i), vals.get(i));
+                            userDailyTimes.put(keys.get(i), vals.get(i).toInstant());
                         }
                     } else {
                         System.out.println("Unknown document found! Skipping");
