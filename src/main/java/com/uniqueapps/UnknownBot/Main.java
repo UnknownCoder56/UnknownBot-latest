@@ -3,13 +3,9 @@ package com.uniqueapps.UnknownBot;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.xml.crypto.Data;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -42,7 +38,7 @@ public class Main {
 
     public static void main(String[] args) {
         
-        ConnectionString connectionString = new ConnectionString("mongodb+srv://arpan:" + new Main().getResourceText("dbpass.txt").strip() + "@unknowncluster.uoshw.mongodb.net/UnknownDatabase?retryWrites=true&w=majority");
+        ConnectionString connectionString = new ConnectionString(System.getenv("CONNSTR"));
         settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .serverApi(ServerApi.builder()
