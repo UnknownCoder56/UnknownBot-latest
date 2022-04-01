@@ -580,7 +580,11 @@ public class CurrencyCommands {
                             .append("name", "balance")
                             .append("key", balanceMap.keySet())
                             .append("val", balanceMap.values());
-                    collection.replaceOne(Filters.eq("name", "balance"), doc);
+                    if (collection.countDocuments(Filters.eq("name", "balance")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "balance"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
                     return "Updated replies!";
                 };
     
@@ -598,7 +602,11 @@ public class CurrencyCommands {
                             .append("name", "work")
                             .append("key", Main.userWorkedTimes.keySet())
                             .append("val", Main.userWorkedTimes.values());
-                    collection.replaceOne(Filters.eq("name", "work"), doc);
+                    if (collection.countDocuments(Filters.eq("name", "work")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "work"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
                     return "Updated work times!";
                 };
     
@@ -616,7 +624,11 @@ public class CurrencyCommands {
                             .append("name", "rob")
                             .append("key", Main.userRobbedTimes.keySet())
                             .append("val", Main.userRobbedTimes.values());
-                    collection.replaceOne(Filters.eq("name", "rob"), doc);
+                    if (collection.countDocuments(Filters.eq("name", "rob")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "rob"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
                     return "Updated rob times!";
                 };
     
@@ -634,7 +646,11 @@ public class CurrencyCommands {
                             .append("name", "daily")
                             .append("key", Main.userDailyTimes.keySet())
                             .append("val", Main.userDailyTimes.values());
-                    collection.replaceOne(Filters.eq("name", "daily"), doc);
+                    if (collection.countDocuments(Filters.eq("name", "daily")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "daily"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
                     return "Updated work times!";
                 };
     

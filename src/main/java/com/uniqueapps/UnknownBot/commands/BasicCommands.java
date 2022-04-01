@@ -493,7 +493,11 @@ public class BasicCommands {
                             .append("name", "reply")
                             .append("key", customReplies.keySet())
                             .append("val", customReplies.values());
-                    collection.replaceOne(eq("name", "reply"), doc);
+                    if (collection.countDocuments(eq("name", "reply")) > 0) {
+                        collection.replaceOne(eq("name", "reply"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
                     return "Updated replies!";
                 };
     

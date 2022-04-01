@@ -143,7 +143,11 @@ public class Shop {
                             .append("name", "item")
                             .append("key", ownedItems.keySet())
                             .append("val", docs);
-                    collection.replaceOne(Filters.eq("name", "item"), doc);
+                    if (collection.countDocuments(Filters.eq("name", "item")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "item"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
                     return "Updated replies!";
                 };
     
