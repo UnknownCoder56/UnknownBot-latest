@@ -251,10 +251,8 @@ public class BasicCommands {
     public static void dt(MessageCreateEvent event) {
         event.getChannel().sendMessage(new EmbedBuilder()
         		.setTitle("Current Time:-")
-        		.addField("UTC", LocalDateTime.now(ZoneId.of("UTC")).format(
+        		.addField("UTC or GMT", LocalDateTime.now(ZoneId.of("UTC")).format(
         				new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
-                .addField("GMT", LocalDateTime.now(ZoneId.of("GMT")).format(
-                        new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
         		.setColor(getRandomColor()));
     }
 
