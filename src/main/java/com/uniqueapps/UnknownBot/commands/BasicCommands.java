@@ -302,7 +302,9 @@ public class BasicCommands {
                                     "3) Economy ```>help economy```\n" +
                                     "\n" +
                                     "For more information on the bot, how to use it, or queries about, contact us on our official discord server:-\n" +
-                                    "https://discord.gg/t79ZyuHr5K")
+                                    "https://discord.gg/t79ZyuHr5K/" + "\n" +
+                                    "or visit unknownbot's website:-" + "\n" +
+                                    "https://unknownbot-latest.herokuapp.com/")
                     .setColor(getRandomColor()));
         }
     }
@@ -336,6 +338,7 @@ public class BasicCommands {
                     .addField("Is bot admin?", isBotServerAdmin.get() ? "Yes" : "No", true)
 			        .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
 			        .addField("Version", version, true)
+                    .addField("Bot website", "https://unknownbot-latest.herokuapp.com/", true)
 			        .addField("Bot type", "Utility, Moderation and Economy Bot", true)
 			        .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
 			        .setColor(getRandomColor());
