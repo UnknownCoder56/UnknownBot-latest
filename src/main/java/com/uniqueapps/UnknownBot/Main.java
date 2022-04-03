@@ -104,12 +104,12 @@ public class Main {
                             var vals1 = doc1.getList("val", Document.class);
                             ArrayList<Warn> warns = new ArrayList<>();
                             for (int z = 0; z < keys1.size(); z++) {
-                                int warnsN = vals1.get(z).getInteger("warns");
-                                long id = vals.get(z).getLong("id");
-                                var causes = vals.get(z).getList("causes", String.class);
+                                int warnsInt = vals1.get(z).getInteger("warns");
+                                long id = vals1.get(z).getLong("id");
+                                var causes = vals1.get(z).getList("causes", String.class);
                                 Warn warn = new Warn();
                                 warn.setUserId(id);
-                                warn.setWarns(warnsN);
+                                warn.setWarns(warnsInt);
                                 warn.setWarnCauses(causes);
                                 warns.add(warn);
                             }
