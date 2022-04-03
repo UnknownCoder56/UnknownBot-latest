@@ -1,9 +1,8 @@
 package com.uniqueapps.UnknownBot.objects;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Warn implements Serializable {
+public class Warn {
 
     public ArrayList<String> warnCauses = new ArrayList<>();
     public int warns;
@@ -22,5 +21,9 @@ public class Warn implements Serializable {
 
     public long getUserId() {
         return userId;
+    }
+
+    public void setUserId(long id) {
+        userId = id;
     }
 }

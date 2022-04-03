@@ -1,22 +1,25 @@
 package com.uniqueapps.UnknownBot.commands;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.TransactionBody;
+import com.mongodb.client.model.Filters;
+import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.UnknownBot.objects.Warn;
+
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
-
-import com.uniqueapps.UnknownBot.Main;
-import com.uniqueapps.UnknownBot.objects.Warn;
 
 public class ModCommands {
 
@@ -284,25 +287,28 @@ public class ModCommands {
     }
 
     public static void refreshWarns() {
-        File warnMapFile = new File("warnsMap.data");
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(warnMapFile))) {
-            System.out.println("Old file: " + objectInputStream.readObject());
-            objectInputStream.close();
-            warnMapFile.delete();
-            warnMapFile.createNewFile();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(warnMapFile))) {
-            System.out.println("New data: " + warnMap);
-            objectOutputStream.writeObject(warnMap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(warnMapFile))) {
-            System.out.println("New file: " + objectInputStream.readObject());
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Document> docs = new ArrayList<>();
+                    for (Map<Long, Warn> map : warnMap.values()) {
+                        docs.add(new Document().append("key", map.keySet()).append("val", map.values()));
+                    }
+                    Document doc = new Document()
+                            .append("name", "warn")
+                            .append("key", warnMap.keySet())
+                            .append("val", docs);
+                    if (collection.countDocuments(Filters.eq("name", "warn")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "warn"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
+                    return "Updated warns!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
+            }
+        }).start();
     }
 }

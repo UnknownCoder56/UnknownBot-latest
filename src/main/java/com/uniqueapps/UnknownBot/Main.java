@@ -1,5 +1,9 @@
 package com.uniqueapps.UnknownBot;
 
+import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.Instant;
@@ -18,9 +22,14 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.TransactionBody;
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
+import com.uniqueapps.UnknownBot.commands.ModCommands;
 import com.uniqueapps.UnknownBot.objects.Shop;
+import com.uniqueapps.UnknownBot.objects.Warn;
 
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecProvider;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
@@ -38,12 +47,15 @@ public class Main {
 
     public static void main(String[] args) {
         
+        CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
+        CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
         ConnectionString connectionString = new ConnectionString(System.getenv("CONNSTR"));
         settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .serverApi(ServerApi.builder()
                         .version(ServerApiVersion.V1)
                         .build())
+                .codecRegistry(pojoCodecRegistry)
                 .build();
             
         initData();
@@ -85,7 +97,19 @@ public class Main {
                             BasicCommands.customReplies.put(keys.get(i), vals.get(i));
                         }
                     } else if (doc.get("name").equals("warn")) {
-                        //TODO implement warn retrieval system
+                        ModCommands.warnMap = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Document.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            var doc1 = vals.get(i);
+                            var keys1 = doc1.getList("key", Long.class);
+                            var vals1 = doc1.getList("val", Warn.class);
+                            Map<Long, Warn> map = new HashMap<>();
+                            for (int x = 0; x < keys.size(); x++) {
+                                map.put(keys1.get(x), vals1.get(x));
+                            }
+                            ModCommands.warnMap.put(keys.get(i), map);
+                        }
                     } else if (doc.get("name").equals("balance")) {
                         CurrencyCommands.balanceMap = new HashMap<>();
                         var keys = doc.getList("key", Long.class);
