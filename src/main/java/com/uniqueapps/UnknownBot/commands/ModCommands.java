@@ -293,7 +293,15 @@ public class ModCommands {
                     MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
                     List<Document> docs = new ArrayList<>();
                     for (Map<Long, Warn> map : warnMap.values()) {
-                        docs.add(new Document().append("key", map.keySet()).append("val", map.values()));
+                        List<Document> warns = new ArrayList<>();
+                        for (Warn warn : map.values()) {
+                            Document document = new Document()
+                                    .append("id", warn.getUserId())
+                                    .append("warns", warn.getWarns())
+                                    .append("causes", warn.getWarnCauses());
+                            warns.add(document);
+                        }
+                        docs.add(new Document().append("key", map.keySet()).append("val", warns));
                     }
                     Document doc = new Document()
                             .append("name", "warn")

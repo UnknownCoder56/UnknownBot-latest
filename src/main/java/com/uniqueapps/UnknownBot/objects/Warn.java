@@ -1,10 +1,11 @@
 package com.uniqueapps.UnknownBot.objects;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Warn {
 
-    public ArrayList<String> warnCauses = new ArrayList<>();
+    public List<String> warnCauses = new ArrayList<>();
     public int warns;
     long userId;
 
@@ -13,6 +14,8 @@ public class Warn {
         warnCauses.add(cause);
         this.userId = userId;
     }
+
+    public Warn() {}
 
     public void newWarn(String cause) {
         warns++;
@@ -25,5 +28,21 @@ public class Warn {
 
     public void setUserId(long id) {
         userId = id;
+    }
+
+    public int getWarns() {
+        return warns;
+    }
+
+    public void setWarns(int warns) {
+        this.warns = warns;
+    }
+
+    public List<String> getWarnCauses() {
+        return warnCauses;
+    }
+
+    public void setWarnCauses(List<String> warnCauses) {
+        this.warnCauses = warnCauses;
     }
 }

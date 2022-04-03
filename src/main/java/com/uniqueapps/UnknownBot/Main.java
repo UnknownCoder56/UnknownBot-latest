@@ -7,6 +7,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,15 +48,12 @@ public class Main {
 
     public static void main(String[] args) {
         
-        CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
-        CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
         ConnectionString connectionString = new ConnectionString(System.getenv("CONNSTR"));
         settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .serverApi(ServerApi.builder()
                         .version(ServerApiVersion.V1)
                         .build())
-                .codecRegistry(pojoCodecRegistry)
                 .build();
             
         initData();
@@ -103,10 +101,21 @@ public class Main {
                         for (int i = 0; i < keys.size(); i++) {
                             var doc1 = vals.get(i);
                             var keys1 = doc1.getList("key", Long.class);
-                            var vals1 = doc1.getList("val", Warn.class);
+                            var vals1 = doc1.getList("val", Document.class);
+                            ArrayList<Warn> warns = new ArrayList<>();
+                            for (int z = 0; z < keys1.size(); z++) {
+                                int warnsN = vals1.get(z).getInteger("warns");
+                                long id = vals.get(z).getLong("id");
+                                var causes = vals.get(z).getList("causes", String.class);
+                                Warn warn = new Warn();
+                                warn.setUserId(id);
+                                warn.setWarns(warnsN);
+                                warn.setWarnCauses(causes);
+                                warns.add(warn);
+                            }
                             Map<Long, Warn> map = new HashMap<>();
                             for (int x = 0; x < keys.size(); x++) {
-                                map.put(keys1.get(x), vals1.get(x));
+                                map.put(keys1.get(x), warns.get(x));
                             }
                             ModCommands.warnMap.put(keys.get(i), map);
                         }
