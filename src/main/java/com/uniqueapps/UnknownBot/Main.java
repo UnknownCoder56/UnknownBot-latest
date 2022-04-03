@@ -58,7 +58,7 @@ public class Main {
         Main app = new Main();
         System.out.print("\033\143");
         Spark.port(Integer.parseInt(System.getenv("PORT")));
-        Spark.staticFileLocation("/public");
+        Spark.staticFileLocation("/");
 
         Spark.get("/", (req, res) -> {
             res.type("text/html");
