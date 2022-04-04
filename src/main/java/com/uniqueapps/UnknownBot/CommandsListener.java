@@ -28,19 +28,16 @@ public class CommandsListener implements MessageCreateListener {
     public void onMessageCreate(MessageCreateEvent event) {
         if (runningListeners.size() < 10) {
             AsyncListener asyncListener = new AsyncListener(event);
-            CompletableFuture<AsyncListener> listenerCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            CompletableFuture.supplyAsync(() -> {
                 runningListeners.add(asyncListener);
                 System.out.println("New listener started.\n" +
                         "Currently running listeners: " + runningListeners.size());
                 asyncListener.run();
                 return asyncListener;
-            });
-
-            listenerCompletableFuture.thenApplyAsync(asyncListener1 -> {
-                runningListeners.remove(asyncListener);
+            }).thenAccept(listener -> {
+                runningListeners.remove(listener);
                 System.out.println("A listener ended.\n" +
                         "Currently running listeners: " + runningListeners.size());
-                return asyncListener1;
             });
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
