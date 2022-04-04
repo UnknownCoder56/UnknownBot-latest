@@ -3,8 +3,6 @@ package com.uniqueapps.UnknownBot;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,30 +19,17 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
 public class CommandsListener implements MessageCreateListener {
-
-    List<AsyncListener> runningListeners = new ArrayList<>();
-
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        if (runningListeners.size() < 10) {
-            AsyncListener asyncListener = new AsyncListener(event);
-            CompletableFuture.supplyAsync(() -> {
-                runningListeners.add(asyncListener);
-                System.out.println("New listener started.\n" +
-                        "Currently running listeners: " + runningListeners.size());
-                asyncListener.run();
-                return asyncListener;
-            }).thenAccept(listener -> {
-                runningListeners.remove(listener);
-                System.out.println("A listener ended.\n" +
-                        "Currently running listeners: " + runningListeners.size());
-            });
-        } else {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Error!")
-                    .setDescription("Limit of concurrently running commands (10) reached! Please wait and try again later.")
-                    .setColor(BasicCommands.getRandomColor()));   
-        }
+        AsyncListener asyncListener = new AsyncListener(event);
+        CompletableFuture<AsyncListener> listenerCompletableFuture = CompletableFuture
+                .supplyAsync(() -> asyncListener);
+
+        listenerCompletableFuture
+                .thenApplyAsync((asyncListener1) -> {
+                    asyncListener1.run();
+                    return asyncListener1;
+                });
     }
 }
 
@@ -173,8 +158,7 @@ class AsyncListener implements Runnable {
                     if (message.getServer().get().getRoles(Main.api.getYourself()).contains(role)) {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Info!")
-                                .setDescription("My prefix is \">\"!")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setDescription("My prefix is \">\"!"));
                         break;
                     }
                 }
@@ -183,8 +167,7 @@ class AsyncListener implements Runnable {
                     if (Main.api.getYourself().getId() == user.getId()) {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Info!")
-                                .setDescription("My prefix is \">\"!")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setDescription("My prefix is \">\"!"));
                         break;
                     }
                 }
