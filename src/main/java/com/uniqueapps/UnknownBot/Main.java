@@ -1,12 +1,9 @@
 package com.uniqueapps.UnknownBot;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -57,6 +54,16 @@ public class Main {
                         Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_TYPING, Intent.GUILD_MESSAGES,
                         Intent.GUILD_PRESENCES)
                 .login().join();
+
+        String path = Objects.requireNonNull(Main.class.getResource("/")).getFile();
+        try (
+                OutputStream out = new FileOutputStream(path + "/link.txt");
+                final PrintStream printStream = new PrintStream(out)
+        ) {
+            printStream.println(api.createBotInvite());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Main app = new Main();
         System.out.print("\033\143");

@@ -6,6 +6,17 @@
     <title>UnknownBot's site!</title>
     <link rel="icon" href="favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
+    <script type=""text/javascript>
+        function init() {
+            const fs = require('fs')
+
+            fs.readFile('link.txt', (err, data) -> {
+                if (err) throw err;
+                document.getElementById("invite").setAttribute("href", data.toString());
+            })
+        }
+        window.onload = init;
+    </script>
 </head>
 
 <body style=background-color:#272727>
@@ -14,8 +25,7 @@
     <p align=center style=color:#6d6bff>Bot version: 3.4.5</p>
     <p align=center style=color:#6d6bff>Bot developer: UnknownPro 56</p>
     <p align=center>
-        <a href=https://discord.com/oauth2/authorize?client_id=891518158790361138&scope=bot&permissions=0
-            class="button">
+        <a id="invite" href=# class="button">
             Invite it to your server!</a>
     </p>
     <p align=center>
