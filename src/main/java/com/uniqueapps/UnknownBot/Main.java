@@ -27,6 +27,7 @@ import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import spark.Spark;
 
 public class Main {
@@ -57,8 +58,14 @@ public class Main {
                 .login().join();
 
         Main app = new Main();
+
         org.jsoup.nodes.Document doc = Jsoup.parse(app.getResourceText("index.html"));
-        Objects.requireNonNull(doc.body().getElementById("invite")).attr("href", api.createBotInvite());
+        Element inviteLinkElement = doc.select("a").first();
+        if (inviteLinkElement != null) {
+            inviteLinkElement.attr("href", api.createBotInvite());
+        } else {
+            throw new NoSuchElementException("Element \"a\" not found!");
+        }
 
         System.out.print("\033\143");
         String portEnv = System.getenv("PORT");
