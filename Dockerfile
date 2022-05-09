@@ -1,5 +1,5 @@
 FROM java:8
-WORKDIR /target/
-ADD unknownbot-1.0-jar-with-dependencies.jar unknownbot-1.0-jar-with-dependencies.jar
+WORKDIR /
+ADD /target/unknownbot-1.0-jar-with-dependencies.jar /target/unknownbot-1.0-jar-with-dependencies.jar
 EXPOSE 8080
-CMD java -jar unknownbot-1.0-jar-with-dependencies.jar
+CMD java -jar /target/unknownbot-1.0-jar-with-dependencies.jar
