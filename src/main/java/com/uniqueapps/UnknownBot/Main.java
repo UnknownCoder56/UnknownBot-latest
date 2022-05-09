@@ -71,7 +71,7 @@ public class Main {
 
         Spark.get("/", (req, res) -> {
             res.type("text/html");
-            return app.getResourceText("index.html");
+            return doc.html();
         });
 
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
