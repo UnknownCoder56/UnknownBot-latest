@@ -26,6 +26,8 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 
+import org.javacord.api.entity.permission.PermissionType;
+import org.javacord.api.entity.permission.Permissions;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import spark.Spark;
@@ -62,7 +64,7 @@ public class Main {
         org.jsoup.nodes.Document doc = Jsoup.parse(app.getResourceText("index.html"));
         Element inviteLinkElement = doc.select("a").first();
         if (inviteLinkElement != null) {
-            inviteLinkElement.attr("href", api.createBotInvite());
+            inviteLinkElement.attr("href", api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
         } else {
             throw new NoSuchElementException("Element \"a\" not found!");
         }
@@ -85,7 +87,7 @@ public class Main {
 
         api.addListener(new CommandsListener());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
-        System.out.println("Invite link for UnknownBot: " + api.createBotInvite());
+        System.out.println("Invite link for UnknownBot: " + api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
     }
 
     public static void initData() {
