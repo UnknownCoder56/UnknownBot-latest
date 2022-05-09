@@ -67,7 +67,12 @@ public class Main {
 
         Main app = new Main();
         System.out.print("\033\143");
-        Spark.port(Integer.parseInt(System.getenv("PORT")));
+        String portEnv = System.getenv("PORT");
+        if (portEnv != null && !Objects.equals(portEnv, "")) {
+            Spark.port(Integer.parseInt(portEnv));
+        } else {
+            Spark.port(8080);
+        }
         Spark.staticFileLocation("/");
 
         Spark.get("/", (req, res) -> {
