@@ -1,4 +1,4 @@
-FROM java:8
+FROM openjdk:11
 WORKDIR /
 ADD /target/unknownbot-1.0-jar-with-dependencies.jar /target/unknownbot-1.0-jar-with-dependencies.jar
 EXPOSE 8080
