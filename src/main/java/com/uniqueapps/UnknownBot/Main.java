@@ -26,6 +26,7 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 
+import org.jsoup.Jsoup;
 import spark.Spark;
 
 public class Main {
@@ -55,17 +56,10 @@ public class Main {
                         Intent.GUILD_PRESENCES)
                 .login().join();
 
-        String path = Objects.requireNonNull(Main.class.getResource("/")).getFile();
-        try (
-                OutputStream out = new FileOutputStream(path + "/link.txt");
-                final PrintStream printStream = new PrintStream(out)
-        ) {
-            printStream.println(api.createBotInvite());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         Main app = new Main();
+        org.jsoup.nodes.Document doc = Jsoup.parse(app.getResourceText("index.html"));
+        Objects.requireNonNull(doc.body().getElementById("invite")).attr("href", api.createBotInvite());
+
         System.out.print("\033\143");
         String portEnv = System.getenv("PORT");
         if (portEnv != null && !Objects.equals(portEnv, "")) {
