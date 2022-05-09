@@ -6,17 +6,6 @@
     <title>UnknownBot's site!</title>
     <link rel="icon" href="favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
-    <script type="text/javascript">
-        function init() {
-            const fs = require('fs')
-
-            fs.readFile('link.txt', (err, data) -> {
-                if (err) throw err;
-                document.getElementById("invite").setAttribute("href", data.toString());
-            })
-        }
-        window.onload = init;
-    </script>
 </head>
 
 <body style=background-color:#272727>
