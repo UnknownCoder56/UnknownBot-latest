@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
@@ -176,14 +177,10 @@ class AsyncListener implements Runnable {
     }
 
     public String getReply(String text) {
-        text.strip();
         String[] words = text.split(" ");
-        for (int i = 0; i < words.length; i++) {
-            words[i] = words[i].strip();
-        }
         for (String reply : BasicCommands.customReplies.keySet()) {
             for (String word : words) {
-                if (word == reply) {
+                if (Objects.equals(word, reply)) {
                     return BasicCommands.customReplies.get(reply);
                 }
             }

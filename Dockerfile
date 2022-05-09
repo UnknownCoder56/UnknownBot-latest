@@ -1,4 +1,4 @@
-FROM java:11
+FROM java:8
 WORKDIR /target/
 ADD unknownbot-1.0-jar-with-dependencies.jar unknownbot-1.0-jar-with-dependencies.jar
 EXPOSE 8080
