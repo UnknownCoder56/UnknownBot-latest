@@ -207,8 +207,10 @@ public class Main {
                 }
                 for (Server server : api.getServers()) {
                     for (User user : server.getMembers()) {
-                        if (!userSettingsMap.containsKey(user.getId())) {
-                            userSettingsMap.put(user.getId(), new UserSettings());
+                        if (!user.isBot()) {
+                            if (!userSettingsMap.containsKey(user.getId())) {
+                                userSettingsMap.put(user.getId(), new UserSettings());
+                            }
                         }
                     }
                 }
