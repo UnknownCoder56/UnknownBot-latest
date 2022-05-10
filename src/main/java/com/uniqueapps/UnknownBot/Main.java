@@ -66,8 +66,6 @@ public class Main {
                         Intent.GUILD_PRESENCES)
                 .login().join();
 
-        initUserSettings();
-
         Main app = new Main();
 
         org.jsoup.nodes.Document doc = Jsoup.parse(app.getResourceText("index.html"));
@@ -93,6 +91,8 @@ public class Main {
         });
 
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
+
+        initUserSettings();
 
         api.addListener(new CommandsListener());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
