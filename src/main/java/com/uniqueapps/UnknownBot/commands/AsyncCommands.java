@@ -72,7 +72,6 @@ public class AsyncCommands {
                 System.out.println("'" + event.getMessageAuthor().getName() + "'" + " asked in " + "'" + event.getServer().get().getName()
                         + "'" + ": " + asked);
             }
-            @SuppressWarnings("resource")
             Scanner scn = new Scanner(System.in);
             System.out.println("Reply: ");
             if (scn.hasNextLine()) {

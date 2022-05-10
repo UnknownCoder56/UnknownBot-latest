@@ -96,9 +96,8 @@ public class CurrencyCommands {
                     int leftSeconds = (int) (dailyCoolDown - Duration
                             .between(Main.userDailyTimes.get(userId), event.getMessage().getCreationTimestamp())
                             .toSeconds());
-                    int seconds = leftSeconds;
-                    int p1 = seconds % 60;
-                    int p2 = seconds / 60;
+                    int p1 = leftSeconds % 60;
+                    int p2 = leftSeconds / 60;
                     int p3 = p2 % 60;
                     p2 = p2 / 60;
                     event.getChannel().sendMessage(new EmbedBuilder()
@@ -186,25 +185,39 @@ public class CurrencyCommands {
                 if (event.getServer().isPresent()) {
                     if (event.getMessageAuthor().asUser().isPresent()) {
                         if (!robUser.isBot()) {
-                            int robValue = getRandomInteger(5000, 1000);
-                            if (balanceMap.containsKey(robUser.getId())) {
-                                if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
-                                    if (balanceMap.get(robUser.getId()) > 1000) {
-                                        while (balanceMap.get(robUser.getId()) < robValue) {
-                                            robValue = getRandomInteger(5000, 1000);
-                                        }
-                                        if (debitBalance(robValue, robUser, event)) {
-                                            if (creditBalance(robValue, event.getMessageAuthor().asUser().get(),
-                                                    event)) {
+                            if (!Main.userSettingsMap.get(commanderId).isBankPassiveEnabled()) {
+                                if (!Main.userSettingsMap.get(robUser.getId()).isBankPassiveEnabled()) {
+                                    int robValue = getRandomInteger(5000, 1000);
+                                    if (balanceMap.containsKey(robUser.getId())) {
+                                        if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
+                                            if (balanceMap.get(robUser.getId()) > 1000) {
+                                                while (balanceMap.get(robUser.getId()) < robValue) {
+                                                    robValue = getRandomInteger(5000, 1000);
+                                                }
+                                                if (debitBalance(robValue, robUser, event)) {
+                                                    if (creditBalance(robValue, event.getMessageAuthor().asUser().get(),
+                                                            event)) {
+                                                        event.getChannel().sendMessage(new EmbedBuilder()
+                                                                .setTitle("Success!")
+                                                                .setDescription(event.getMessageAuthor().getDisplayName()
+                                                                        + " successfully robbed "
+                                                                        + robUser.getDisplayName(event.getServer().get())
+                                                                        + ", and earned :coin: " + robValue + ".")
+                                                                .setColor(BasicCommands.getRandomColor()));
+                                                        refreshBalances();
+                                                    }
+                                                }
+                                            } else {
                                                 event.getChannel().sendMessage(new EmbedBuilder()
-                                                        .setTitle("Success!")
-                                                        .setDescription(event.getMessageAuthor().getDisplayName()
-                                                                + " successfully robbed "
-                                                                + robUser.getDisplayName(event.getServer().get())
-                                                                + ", and earned :coin: " + robValue + ".")
+                                                        .setTitle("Error!")
+                                                        .setDescription("That user does not have enough money to rob!")
                                                         .setColor(BasicCommands.getRandomColor()));
-                                                refreshBalances();
                                             }
+                                        } else {
+                                            event.getChannel().sendMessage(new EmbedBuilder()
+                                                    .setTitle("Error!")
+                                                    .setDescription("You can't rob yourself!")
+                                                    .setColor(BasicCommands.getRandomColor()));
                                         }
                                     } else {
                                         event.getChannel().sendMessage(new EmbedBuilder()
@@ -215,13 +228,13 @@ public class CurrencyCommands {
                                 } else {
                                     event.getChannel().sendMessage(new EmbedBuilder()
                                             .setTitle("Error!")
-                                            .setDescription("You can't rob yourself!")
+                                            .setDescription("That user is in passive mode! Try someone else.")
                                             .setColor(BasicCommands.getRandomColor()));
                                 }
                             } else {
                                 event.getChannel().sendMessage(new EmbedBuilder()
                                         .setTitle("Error!")
-                                        .setDescription("That user does not have enough money to rob!")
+                                        .setDescription("You are in passive mode! You can't rob anyone.")
                                         .setColor(BasicCommands.getRandomColor()));
                             }
                         } else {
@@ -259,24 +272,38 @@ public class CurrencyCommands {
             if (event.getServer().isPresent()) {
                 if (event.getMessageAuthor().asUser().isPresent()) {
                     if (!robUser.isBot()) {
-                        int robValue = getRandomInteger(5000, 1000);
-                        if (balanceMap.containsKey(robUser.getId())) {
-                            if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
-                                if (balanceMap.get(robUser.getId()) > 1000) {
-                                    while (balanceMap.get(robUser.getId()) < robValue) {
-                                        robValue = getRandomInteger(5000, 1000);
-                                    }
-                                    if (debitBalance(robValue, robUser, event)) {
-                                        if (creditBalance(robValue, event.getMessageAuthor().asUser().get(), event)) {
+                        if (!Main.userSettingsMap.get(robUser.getId()).isBankPassiveEnabled()) {
+                            if (!Main.userSettingsMap.get(robUser.getId()).isBankPassiveEnabled()) {
+                                int robValue = getRandomInteger(5000, 1000);
+                                if (balanceMap.containsKey(robUser.getId())) {
+                                    if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
+                                        if (balanceMap.get(robUser.getId()) > 1000) {
+                                            while (balanceMap.get(robUser.getId()) < robValue) {
+                                                robValue = getRandomInteger(5000, 1000);
+                                            }
+                                            if (debitBalance(robValue, robUser, event)) {
+                                                if (creditBalance(robValue, event.getMessageAuthor().asUser().get(), event)) {
+                                                    event.getChannel().sendMessage(new EmbedBuilder()
+                                                            .setTitle("Success!")
+                                                            .setDescription(event.getMessageAuthor().getDisplayName()
+                                                                    + " successfully robbed "
+                                                                    + robUser.getDisplayName(event.getServer().get())
+                                                                    + ", and earned :coin: " + robValue + ".")
+                                                            .setColor(BasicCommands.getRandomColor()));
+                                                    refreshBalances();
+                                                }
+                                            }
+                                        } else {
                                             event.getChannel().sendMessage(new EmbedBuilder()
-                                                    .setTitle("Success!")
-                                                    .setDescription(event.getMessageAuthor().getDisplayName()
-                                                            + " successfully robbed "
-                                                            + robUser.getDisplayName(event.getServer().get())
-                                                            + ", and earned :coin: " + robValue + ".")
+                                                    .setTitle("Error!")
+                                                    .setDescription("That user does not have enough money to rob!")
                                                     .setColor(BasicCommands.getRandomColor()));
-                                            refreshBalances();
                                         }
+                                    } else {
+                                        event.getChannel().sendMessage(new EmbedBuilder()
+                                                .setTitle("Error!")
+                                                .setDescription("You can't rob yourself!")
+                                                .setColor(BasicCommands.getRandomColor()));
                                     }
                                 } else {
                                     event.getChannel().sendMessage(new EmbedBuilder()
@@ -287,13 +314,13 @@ public class CurrencyCommands {
                             } else {
                                 event.getChannel().sendMessage(new EmbedBuilder()
                                         .setTitle("Error!")
-                                        .setDescription("You can't rob yourself!")
+                                        .setDescription("That user is in passive mode! Try someone else.")
                                         .setColor(BasicCommands.getRandomColor()));
                             }
                         } else {
                             event.getChannel().sendMessage(new EmbedBuilder()
                                     .setTitle("Error!")
-                                    .setDescription("That user does not have enough money to rob!")
+                                    .setDescription("You are in passive mode! You can't rob anyone.")
                                     .setColor(BasicCommands.getRandomColor()));
                         }
                     } else {
@@ -323,35 +350,50 @@ public class CurrencyCommands {
         int giveValue = Integer.parseInt(args[1]);
         if (event.getServer().isPresent()) {
             if (event.getMessageAuthor().asUser().isPresent()) {
+                long id = event.getMessageAuthor().asUser().get().getId();
                 if (!giveUser.isBot()) {
-                    if (!(giveValue > balanceMap.get(event.getMessageAuthor().asUser().get().getId()))) {
-                        if (giveUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
-                            if (!balanceMap.containsKey(giveUser.getId())) {
-                                balanceMap.put(giveUser.getId(), 0L);
-                                refreshBalances();
-                            }
-                            if (debitBalance(giveValue, event.getMessageAuthor().asUser().get(), event)) {
-                                if (creditBalance(giveValue, giveUser, event)) {
+                    if (!Main.userSettingsMap.get(id).isBankPassiveEnabled()) {
+                        if (!Main.userSettingsMap.get(giveUser.getId()).isBankPassiveEnabled()) {
+                            if (!(giveValue > balanceMap.get(event.getMessageAuthor().asUser().get().getId()))) {
+                                if (giveUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
+                                    if (!balanceMap.containsKey(giveUser.getId())) {
+                                        balanceMap.put(giveUser.getId(), 0L);
+                                        refreshBalances();
+                                    }
+                                    if (debitBalance(giveValue, event.getMessageAuthor().asUser().get(), event)) {
+                                        if (creditBalance(giveValue, giveUser, event)) {
+                                            event.getChannel().sendMessage(new EmbedBuilder()
+                                                    .setTitle("Success!")
+                                                    .setDescription(
+                                                            event.getMessageAuthor().getDisplayName() + " successfully gave "
+                                                                    + giveUser.getDisplayName(event.getServer().get())
+                                                                    + " :coin: " + giveValue + ".")
+                                                    .setColor(BasicCommands.getRandomColor()));
+                                            refreshBalances();
+                                        }
+                                    }
+                                } else {
                                     event.getChannel().sendMessage(new EmbedBuilder()
-                                            .setTitle("Success!")
-                                            .setDescription(
-                                                    event.getMessageAuthor().getDisplayName() + " successfully gave "
-                                                            + giveUser.getDisplayName(event.getServer().get())
-                                                            + " :coin: " + giveValue + ".")
+                                            .setTitle("Error!")
+                                            .setDescription("You can't give money to yourself!")
                                             .setColor(BasicCommands.getRandomColor()));
-                                    refreshBalances();
                                 }
+                            } else {
+                                event.getChannel().sendMessage(new EmbedBuilder()
+                                        .setTitle("Error!")
+                                        .setDescription("You can't give more money than you have in your account!")
+                                        .setColor(BasicCommands.getRandomColor()));
                             }
                         } else {
                             event.getChannel().sendMessage(new EmbedBuilder()
                                     .setTitle("Error!")
-                                    .setDescription("You can't give money to yourself!")
+                                    .setDescription("That user is in passive mode. You can't give money to them.")
                                     .setColor(BasicCommands.getRandomColor()));
                         }
                     } else {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Error!")
-                                .setDescription("You can't give more money than you have in your account!")
+                                .setDescription("You are in passive mode! You can't give money to anyone.")
                                 .setColor(BasicCommands.getRandomColor()));
                     }
                 } else {
@@ -476,7 +518,7 @@ public class CurrencyCommands {
                 for (String name : userItems.keySet()) {
                     if (userItems.get(name) != 0) {
                         index++;
-                        itemText.append(index + ") " + name + " (Count: " + userItems.get(name) + ")\n");
+                        itemText.append(index).append(") ").append(name).append(" (Count: ").append(userItems.get(name)).append(")\n");
                     }
                 }
                 if (itemText.toString().isEmpty()) {
@@ -507,17 +549,19 @@ public class CurrencyCommands {
         if (creditAmount > 0) {
             long newBal = oldBal + creditAmount;
             balanceMap.replace(user.getId(), oldBal, newBal);
-            try {
-                user.openPrivateChannel().get().sendMessage(new EmbedBuilder()
-                        .setTitle("Successfully updated account! Details:-")
-                        .addField("Opening Balance", ":coin: " + oldBal)
-                        .addField("Deposited", ":coin: " + creditAmount)
-                        .addField("Closing Balance", ":coin: " + newBal)
-                        .setColor(BasicCommands.getRandomColor()));
-                System.out.println("User " + user.getDiscriminatedName() + " A/C updated:-\n" +
-                        "Before: " + oldBal + ", Credited: " + creditAmount + ", After: " + newBal);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+            if (Main.userSettingsMap.get(user.getId()).isBankDmEnabled()) {
+                try {
+                    user.openPrivateChannel().get().sendMessage(new EmbedBuilder()
+                            .setTitle("Successfully updated account! Details:-")
+                            .addField("Opening Balance", ":coin: " + oldBal)
+                            .addField("Deposited", ":coin: " + creditAmount)
+                            .addField("Closing Balance", ":coin: " + newBal)
+                            .setColor(BasicCommands.getRandomColor()));
+                    System.out.println("User " + user.getDiscriminatedName() + " A/C updated:-\n" +
+                            "Before: " + oldBal + ", Credited: " + creditAmount + ", After: " + newBal);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
             refreshBalances();
             return true;
@@ -540,17 +584,19 @@ public class CurrencyCommands {
             if (debitAmount <= oldBal) {
                 long newBal = oldBal - debitAmount;
                 balanceMap.replace(user.getId(), oldBal, newBal);
-                try {
-                    user.openPrivateChannel().get().sendMessage(new EmbedBuilder()
-                            .setTitle("Successfully updated account! Details:-")
-                            .addField("Opening Balance", ":coin: " + oldBal)
-                            .addField("Withdrawn", ":coin: " + debitAmount)
-                            .addField("Closing Balance", ":coin: " + newBal)
-                            .setColor(BasicCommands.getRandomColor()));
-                    System.out.println("User " + event.getMessageAuthor().getDisplayName() + " A/C updated:-\n" +
-                            "Before: " + oldBal + ", Debited: " + debitAmount + ", After: " + newBal);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                if (Main.userSettingsMap.get(user.getId()).isBankDmEnabled()) {
+                    try {
+                        user.openPrivateChannel().get().sendMessage(new EmbedBuilder()
+                                .setTitle("Successfully updated account! Details:-")
+                                .addField("Opening Balance", ":coin: " + oldBal)
+                                .addField("Withdrawn", ":coin: " + debitAmount)
+                                .addField("Closing Balance", ":coin: " + newBal)
+                                .setColor(BasicCommands.getRandomColor()));
+                        System.out.println("User " + event.getMessageAuthor().getDisplayName() + " A/C updated:-\n" +
+                                "Before: " + oldBal + ", Debited: " + debitAmount + ", After: " + newBal);
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
                 refreshBalances();
                 return true;

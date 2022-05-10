@@ -31,6 +31,7 @@ public class Help {
         utilityCommands.put(">dm (mention) \"message\"", "DMs a message to a user.");
         utilityCommands.put(">rps (choice)", "Play \"Rock Paper Scissors\" with the bot. Choices include: ```r, p, s``` or ```rock, paper, scissors```.");
         utilityCommands.put(">tti (text)", "Converts given text to image.");
+        utilityCommands.put(">setting (type) (true or false)", "Changes your user settings, where type include - 'bankdm', 'passive'. Example: \">setting bankdm false\"");
     }
 
     private void initModeration() {

@@ -18,6 +18,7 @@ import com.uniqueapps.UnknownBot.commands.BasicCommands;
 import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
 import com.uniqueapps.UnknownBot.commands.ModCommands;
 import com.uniqueapps.UnknownBot.objects.Shop;
+import com.uniqueapps.UnknownBot.objects.UserSettings;
 import com.uniqueapps.UnknownBot.objects.Warn;
 
 import org.bson.Document;
@@ -28,9 +29,13 @@ import org.javacord.api.entity.intent.Intent;
 
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import spark.Spark;
+
+import javax.print.Doc;
 
 public class Main {
 
@@ -38,6 +43,7 @@ public class Main {
     public static Map<Long, Instant> userWorkedTimes = new HashMap<>();
     public static Map<Long, Instant> userRobbedTimes = new HashMap<>();
     public static Map<Long, Instant> userDailyTimes = new HashMap<>();
+    public static Map<Long, UserSettings> userSettingsMap = new HashMap<>();
     public static MongoClientSettings settings;
 
     public static void main(String[] args) {
@@ -49,9 +55,11 @@ public class Main {
                         .version(ServerApiVersion.V1)
                         .build())
                 .build();
-            
+
         initData();
+        initUserSettings();
         Shop.initShop();
+
         api = new DiscordApiBuilder()
                 .setToken(System.getenv("TOKEN"))
                 .setIntents(Intent.DIRECT_MESSAGES, Intent.GUILD_BANS, Intent.GUILD_MEMBERS, Intent.GUILDS,
@@ -174,6 +182,37 @@ public class Main {
                     }
                 }
                 return "Retrieved all data.";
+            };
+
+            System.out.println(session.withTransaction(txnBody));
+        }
+    }
+
+    public static void initUserSettings() {
+        try (MongoClient client = MongoClients.create(settings); ClientSession session = client.startSession()) {
+            TransactionBody<String> txnBody = () -> {
+                MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                for (Document doc : collection.find()) {
+                    if (doc.get("name").equals("usersettings")) {
+                        userSettingsMap = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Document.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            var dm = vals.get(i).getBoolean("dm");
+                            var passive = vals.get(i).getBoolean("passive");
+                            UserSettings userSettings = new UserSettings(dm, passive);
+                            userSettingsMap.put(keys.get(i), userSettings);
+                        }
+                    }
+                }
+                for (Server server : api.getServers()) {
+                    for (User user : server.getMembers()) {
+                        if (!userSettingsMap.containsKey(user.getId())) {
+                            userSettingsMap.put(user.getId(), new UserSettings());
+                        }
+                    }
+                }
+                return "Retrieved all user settings.";
             };
 
             System.out.println(session.withTransaction(txnBody));

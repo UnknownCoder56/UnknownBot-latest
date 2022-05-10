@@ -1,36 +1,9 @@
 package com.uniqueapps.UnknownBot.commands;
 
-import static com.mongodb.client.model.Filters.eq;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.mongodb.client.ClientSession;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.TransactionBody;
+import com.mongodb.client.*;
 import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.objects.Help;
-
+import com.uniqueapps.UnknownBot.objects.UserSettings;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.javacord.api.entity.channel.PrivateChannel;
@@ -42,10 +15,24 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.mongodb.client.model.Filters.eq;
+
 public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "3.4.5";
+    public static final String version = "3.5.0";
     final static int botWin = 0;
     final static int userWin = 1;
     final static int tie = 2;
@@ -419,20 +406,24 @@ public class BasicCommands {
         
         if (winStatus == userWin) {
             event.getChannel().sendMessage(new EmbedBuilder()
-                .setTitle("You win!")
-                .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + "."));
+                    .setTitle("You win!")
+                    .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + ".")
+                    .setColor(getRandomColor()));
         } else if (winStatus == botWin) {
             event.getChannel().sendMessage(new EmbedBuilder()
-            .setTitle("Bot wins!")
-            .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + "."));
+                    .setTitle("Bot wins!")
+                    .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + ".")
+                    .setColor(getRandomColor()));
         } else if (winStatus == tie) {
             event.getChannel().sendMessage(new EmbedBuilder()
-            .setTitle("Tie!")
-            .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + "."));
+                    .setTitle("Tie!")
+                    .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + ".")
+                    .setColor(getRandomColor()));
         } else if (winStatus == error) {
             event.getChannel().sendMessage(new EmbedBuilder()
-            .setTitle("Error!")
-            .setDescription("You chose " + actualChoice + " and bot chose " + getChoiceName(botChoice) + "."));
+                    .setTitle("Error!")
+                    .setDescription("You chose " + actualChoice + " and bot chose " + getChoiceName(botChoice) + ".")
+                    .setColor(getRandomColor()));
         }
     }
 
@@ -484,6 +475,79 @@ public class BasicCommands {
             .setColor(getRandomColor()));
     }
 
+    public static void changeUserSettings(MessageCreateEvent event) {
+        String[] args = event.getMessage().getContent().split(" ");
+        String setting = args[1].toLowerCase(Locale.ROOT);
+        String settingValue = args[2].toLowerCase(Locale.ROOT);
+        event.getMessageAuthor().asUser().ifPresentOrElse(user -> {
+            long id = user.getId();
+            if (Objects.equals(settingValue, "true")) {
+                UserSettings settings = Main.userSettingsMap.get(id);
+                switch (setting) {
+                    case "bankdm":
+                        settings.setBankDmEnabled(true);
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Enabled bank transaction DMs! Now you WILL be DMed about all your bank transactions.")
+                                .setColor(getRandomColor()));
+                        break;
+                    case "passive":
+                        settings.setBankPassiveEnabled(true);
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Enabled passive mode! Now NEITHER anyone can rob you, NOR you can rob anyone else.\n" +
+                                        "You also CANNOT give money to someone else.")
+                                .setColor(getRandomColor()));
+                        break;
+                    default:
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Error!")
+                                .setDescription("Setting type " + args[1] + " not found!")
+                                .setColor(getRandomColor()));
+                        return;
+                }
+                Main.userSettingsMap.replace(id, settings);
+                refreshUserSettings();
+            } else if (Objects.equals(settingValue, "false")) {
+                UserSettings settings = Main.userSettingsMap.get(id);
+                switch (setting) {
+                    case "bankdm":
+                        settings.setBankDmEnabled(false);
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Disabled bank transaction DMs! Now you WON'T be DMed about any of your bank transactions.")
+                                .setColor(getRandomColor()));
+                        break;
+                    case "passive":
+                        settings.setBankPassiveEnabled(false);
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Disabled passive mode! Now anyone CAN rob you, and you CAN rob anyone else.\n" +
+                                        "You also CAN give money to someone else.")
+                                .setColor(getRandomColor()));
+                        break;
+                    default:
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle("Error!")
+                                .setDescription("Setting type " + args[1] + " not found!")
+                                .setColor(getRandomColor()));
+                        return;
+                }
+                Main.userSettingsMap.replace(id, settings);
+                refreshUserSettings();
+            } else {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("Incorrect arguments given! Correct syntax: '>setting (type) (true or false)'.\n" +
+                                "Example: >setting bankdm false")
+                        .setColor(getRandomColor()));
+            }
+        }, () -> event.getChannel().sendMessage(new EmbedBuilder()
+                .setTitle("Error!")
+                .setDescription("You are not a user! Maybe you are a bot.")
+                .setColor(getRandomColor())));
+    }
+
     // Helper methods
     public static void refreshReplies() {
         new Thread(() -> {
@@ -506,12 +570,42 @@ public class BasicCommands {
             }
         }).start();
     }
+
+    public static void refreshUserSettings() {
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Document> settings = new ArrayList<>();
+                    for (int i = 0; i < Main.userSettingsMap.size(); i++) {
+                        UserSettings userSettings = (UserSettings) Main.userSettingsMap.values().toArray()[i];
+                        Document setting = new Document()
+                                .append("dm", userSettings.isBankDmEnabled())
+                                .append("passive", userSettings.isBankPassiveEnabled());
+                        settings.add(setting);
+                    }
+                    Document doc = new Document()
+                            .append("name", "usersettings")
+                            .append("key", Main.userSettingsMap.keySet())
+                            .append("val", settings);
+                    if (collection.countDocuments(eq("name", "usersettings")) > 0) {
+                        collection.replaceOne(eq("name", "usersettings"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
+                    return "Updated all user settings!";
+                };
+
+                System.out.println(session.withTransaction(txnBody));
+            }
+        }).start();
+    }
     
     public static Color getRandomColor() {
-    	Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.CYAN, Color.ORANGE, Color.PINK, Color.GRAY,
-        		Color.MAGENTA, Color.YELLOW, Color.DARK_GRAY, Color.WHITE, Color.BLACK, Color.LIGHT_GRAY};
-        int choice = new Random().nextInt(colors.length);
-        return colors[choice];
+        int red = new Random().nextInt(256);
+        int green = new Random().nextInt(256);
+        int blue = new Random().nextInt(256);
+        return new Color(red, green, blue);
     }
 
     public static int getWinStatus(char choiceBot, char choiceUser) {

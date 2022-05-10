@@ -1,23 +1,21 @@
 package com.uniqueapps.UnknownBot;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
 import com.uniqueapps.UnknownBot.commands.ModCommands;
 import com.uniqueapps.UnknownBot.objects.Shop;
-
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
+
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 public class CommandsListener implements MessageCreateListener {
     @Override
@@ -102,6 +100,8 @@ class AsyncListener implements Runnable {
                     BasicCommands.rps(event);
                 else if (command.startsWith(">tti"))
                     BasicCommands.texttoimg(event);
+                else if (command.startsWith(">setting"))
+                    BasicCommands.changeUserSettings(event);
 
                 // Mod commands
                 else if (command.startsWith(">warn"))
@@ -177,12 +177,9 @@ class AsyncListener implements Runnable {
     }
 
     public String getReply(String text) {
-        String[] words = text.split(" ");
         for (String reply : BasicCommands.customReplies.keySet()) {
-            for (String word : words) {
-                if (Objects.equals(word, reply)) {
-                    return BasicCommands.customReplies.get(reply);
-                }
+            if (text.contains(reply)) {
+                return BasicCommands.customReplies.get(reply);
             }
         }
         return null;
