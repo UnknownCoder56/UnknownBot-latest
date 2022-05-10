@@ -57,7 +57,6 @@ public class Main {
                 .build();
 
         initData();
-        initUserSettings();
         Shop.initShop();
 
         api = new DiscordApiBuilder()
@@ -66,6 +65,8 @@ public class Main {
                         Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_TYPING, Intent.GUILD_MESSAGES,
                         Intent.GUILD_PRESENCES)
                 .login().join();
+
+        initUserSettings();
 
         Main app = new Main();
 
