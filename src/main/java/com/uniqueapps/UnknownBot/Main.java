@@ -92,7 +92,7 @@ public class Main {
 
         System.out.println("UnknownBot listening on http://localhost:" + Spark.port() + "/");
 
-        initUserSettings();
+        initUserSettings(api.getServers());
 
         api.addListener(new CommandsListener());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
@@ -189,7 +189,7 @@ public class Main {
         }
     }
 
-    public static void initUserSettings() {
+    public static void initUserSettings(Collection<Server> servers) {
         try (MongoClient client = MongoClients.create(settings); ClientSession session = client.startSession()) {
             TransactionBody<String> txnBody = () -> {
                 MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
@@ -206,7 +206,7 @@ public class Main {
                         }
                     }
                 }
-                for (Server server : api.getServers()) {
+                for (Server server : servers) {
                     for (User user : server.getMembers()) {
                         if (!user.isBot()) {
                             if (!userSettingsMap.containsKey(user.getId())) {
