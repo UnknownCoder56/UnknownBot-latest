@@ -634,7 +634,7 @@ public class CurrencyCommands {
                     } else {
                         collection.insertOne(doc);
                     }
-                    return "Updated replies!";
+                    return "Updated balances!";
                 };
     
                 System.out.println(session.withTransaction(txnBody));
@@ -712,7 +712,7 @@ public class CurrencyCommands {
                     } else {
                         collection.insertOne(doc);
                     }
-                    return "Updated work times!";
+                    return "Updated daily times!";
                 };
     
                 System.out.println(session.withTransaction(txnBody));
