@@ -32,7 +32,7 @@ import static com.mongodb.client.model.Filters.eq;
 public class BasicCommands {
 
     public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "3.5.0";
+    public static final String version = "3.8.0";
     final static int botWin = 0;
     final static int userWin = 1;
     final static int tie = 2;
@@ -98,25 +98,23 @@ public class BasicCommands {
                 float num2 = Float.parseFloat(argsList.get(2));
                 float result;
                 switch (argsList.get(1)) {
-                    case ("+"):
+                    case ("+") -> {
                         result = num1 + num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                        break;
-                    case ("-"):
+                    }
+                    case ("-") -> {
                         result = num1 - num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                        break;
-                    case ("*"):
+                    }
+                    case ("*") -> {
                         result = num1 * num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                        break;
-                    case ("/"):
+                    }
+                    case ("/") -> {
                         result = num1 / num2;
                         reply = num1 + " " + argsList.get(1) + " " + num2 + " = " + result;
-                        break;
-                    default:
-                        reply = "Not a valid operation symbol. Valid ones are +, -, * and /.";
-                        break;
+                    }
+                    default -> reply = "Not a valid operation symbol. Valid ones are +, -, * and /.";
                 }
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle(reply)
@@ -280,18 +278,21 @@ public class BasicCommands {
             event.getChannel().sendMessage(embedBuilder);
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("UnknownBot's Help docs")
-                    .setDescription("UnknownBot is a multipurpose bot, currently under active development.\n" +
-                                    "To get help about commands, type \">help (category)\", where categories include:-\n" +
-                                    "\n" +
-                                    "1) Utility ```>help utility```\n" +
-                                    "2) Moderation ```>help moderation```\n" +
-                                    "3) Economy ```>help economy```\n" +
-                                    "\n" +
-                                    "For more information on the bot, how to use it, or queries about, contact us on our official discord server:-\n" +
-                                    "https://discord.gg/t79ZyuHr5K/" + "\n" +
-                                    "or visit unknownbot's website:-" + "\n" +
-                                    "https://unknownbot.onrender.com/")
+                    .setTitle("UnknownBot's help docs")
+                    .setDescription("""
+                            UnknownBot is a multipurpose bot, currently under active development.
+                            To get help about commands, type ">help (category)", where categories include:-
+
+                            1) Utility ```>help utility```
+                            2) Moderation ```>help moderation```
+                            3) Economy ```>help economy```
+
+                            UnknownBot also includes slash commands, type / and select UnknownBot's logo to get a list of them.
+
+                            For more information on the bot, how to use it, or queries about, contact us on our official discord server:-
+                            https://discord.gg/t79ZyuHr5K/
+                            Or visit UnknownBot's website:-
+                            https://user783667580106702848.pepich.de/""")
                     .setColor(getRandomColor()));
         }
     }
@@ -325,7 +326,7 @@ public class BasicCommands {
                     .addField("Is bot admin?", isBotServerAdmin.get() ? "Yes" : "No", true)
 			        .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
 			        .addField("Version", version, true)
-                    .addField("Bot website", "https://unknownbot.onrender.com/", true)
+                    .addField("Bot website", "https://user783667580106702848.pepich.de/", true)
 			        .addField("Bot type", "Utility, Moderation and Economy Bot", true)
 			        .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
 			        .setColor(getRandomColor());
@@ -484,54 +485,56 @@ public class BasicCommands {
             if (Objects.equals(settingValue, "true")) {
                 UserSettings settings = Main.userSettingsMap.get(id);
                 switch (setting) {
-                    case "bankdm":
+                    case "bankdm" -> {
                         settings.setBankDmEnabled(true);
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Success!")
                                 .setDescription("Enabled bank transaction DMs! Now you WILL be DMed about all your bank transactions.")
                                 .setColor(getRandomColor()));
-                        break;
-                    case "passive":
+                    }
+                    case "passive" -> {
                         settings.setBankPassiveEnabled(true);
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Success!")
                                 .setDescription("Enabled passive mode! Now NEITHER anyone can rob you, NOR you can rob anyone else.\n" +
                                         "You also CANNOT give money to someone else.")
                                 .setColor(getRandomColor()));
-                        break;
-                    default:
+                    }
+                    default -> {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Error!")
                                 .setDescription("Setting type " + args[1] + " not found!")
                                 .setColor(getRandomColor()));
                         return;
+                    }
                 }
                 Main.userSettingsMap.replace(id, settings);
                 refreshUserSettings();
             } else if (Objects.equals(settingValue, "false")) {
                 UserSettings settings = Main.userSettingsMap.get(id);
                 switch (setting) {
-                    case "bankdm":
+                    case "bankdm" -> {
                         settings.setBankDmEnabled(false);
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Success!")
                                 .setDescription("Disabled bank transaction DMs! Now you WON'T be DMed about any of your bank transactions.")
                                 .setColor(getRandomColor()));
-                        break;
-                    case "passive":
+                    }
+                    case "passive" -> {
                         settings.setBankPassiveEnabled(false);
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Success!")
                                 .setDescription("Disabled passive mode! Now anyone CAN rob you, and you CAN rob anyone else.\n" +
                                         "You also CAN give money to someone else.")
                                 .setColor(getRandomColor()));
-                        break;
-                    default:
+                    }
+                    default -> {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Error!")
                                 .setDescription("Setting type " + args[1] + " not found!")
                                 .setColor(getRandomColor()));
                         return;
+                    }
                 }
                 Main.userSettingsMap.replace(id, settings);
                 refreshUserSettings();
@@ -544,8 +547,92 @@ public class BasicCommands {
             }
         }, () -> event.getChannel().sendMessage(new EmbedBuilder()
                 .setTitle("Error!")
-                .setDescription("You are not a user! Maybe you are a bot.")
+                .setDescription("You are not a user! You can't use this command.")
                 .setColor(getRandomColor())));
+    }
+
+    public static void userInfo(MessageCreateEvent event) {
+        event.getMessageAuthor().asUser().ifPresentOrElse(author -> {
+            User user;
+            user = event.getMessage().getMentionedUsers().size() > 0 ? event.getMessage().getMentionedUsers().get(0) : author;
+            StringBuilder stringBuilder = new StringBuilder();
+            AtomicBoolean isUserServerAdmin = new AtomicBoolean(false);
+
+            event.getServer().ifPresentOrElse((server) -> {
+                if (!server.getRoles(user).isEmpty()) {
+                    var roles = server.getRoles(user);
+                    Collections.reverse(roles);
+                    for (Role role : roles) {
+                        if (role.getAllowedPermissions().contains(PermissionType.ADMINISTRATOR)) {
+                            isUserServerAdmin.set(true);
+                        }
+                        stringBuilder.append(role.getMentionTag()).append("\n");
+                    }
+                } else {
+                    stringBuilder.append("None");
+                }
+            }, () -> stringBuilder.append("None"));
+
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setTitle("Information about " + (event.getServer().isPresent() ? user.getDisplayName(event.getServer().get()) : user.getDiscriminatedName()) + ":-")
+                    .setImage(event.getServer().isPresent() ? user.getEffectiveAvatar(event.getServer().get()) : user.getAvatar())
+                    .addField("Discriminated name: ", user.getDiscriminatedName(), true)
+                    .addField("Account id: ", user.getIdAsString(), true)
+                    .addField("Is bot?: ", user.isBot() ? "Yes" : "No", true)
+                    .addField("Account created: ", user.getCreationTimestamp().atZone(ZoneId.of("UTC")).toLocalDateTime().format(
+                            new DateTimeFormatterBuilder()
+                                    .appendPattern("dd MMMM yyyy hh:mm:ss")
+                                    .toFormatter()) + " (UTC)", true);
+
+            event.getServer().flatMap(user::getJoinedAtTimestamp).ifPresent(instant ->
+                    embed.addField("Joined server: ", instant.atZone(ZoneId.of("UTC")).toLocalDateTime().format(
+                            new DateTimeFormatterBuilder()
+                                    .appendPattern("dd MMMM yyyy hh:mm:ss")
+                                    .toFormatter()) + " (UTC)", true));
+
+            embed.addField("Roles: ", stringBuilder.toString(), true)
+                    .addField("Is server admin?: ", isUserServerAdmin.get() ? "Yes" : "No", true);
+
+            if (user.isBotOwner()) embed.addField("Is bot owner?: ", "Yes", true);
+
+            embed.setColor(getRandomColor());
+
+            event.getChannel().sendMessage(embed);
+        }, () -> event.getChannel().sendMessage(new EmbedBuilder()
+                .setTitle("Error!")
+                .setDescription("You are not a user! You can't use this command.")
+                .setColor(getRandomColor())));
+    }
+
+    public static void serverInfo(MessageCreateEvent event) {
+        event.getServer().ifPresentOrElse(server -> {
+
+            var bots = server.getMembers();
+            bots.removeIf(user -> !user.isBot());
+            var humans = server.getMembers();
+            humans.removeIf(User::isBot);
+
+            EmbedBuilder embedBuilder = new EmbedBuilder()
+                    .setTitle("Information about " + server.getName() + ":-")
+                    .setImage(server.getIcon().isPresent() ? server.getIcon().get() : null)
+                    .addField("Server Id: ", server.getIdAsString(), true)
+                    .addField("Server owner: ", server.getOwner().isPresent() ? server.getOwner().get().getDisplayName(server) : "Not found!", true)
+                    .addField("Created on: ", server.getCreationTimestamp().atZone(ZoneId.of("UTC")).toLocalDateTime().format(new DateTimeFormatterBuilder()
+                            .appendPattern("dd MMMM yyyy hh:mm:ss")
+                            .toFormatter()), true)
+                    .addField("Member count: ", String.valueOf(server.getMemberCount()), true)
+                    .addField("Humans / Bots count: ", humans.size() + " / " + bots.size(), true)
+                    .addField("Roles count: ", String.valueOf(server.getRoles().size()))
+                    .addField("Total channels count: ", String.valueOf(server.getChannels().size()), true)
+                    .addField("Text / Voice channels count: ", server.getTextChannels().size() + " / " + server.getVoiceChannels().size(), true)
+                    .addField("Boosts count:", String.valueOf(server.getBoostCount()), true)
+                    .addField("Boost level: ", String.valueOf(server.getBoostLevel()), true)
+                    .setColor(getRandomColor());
+
+            event.getChannel().sendMessage(embedBuilder);
+        }, () -> event.getChannel().sendMessage(new EmbedBuilder()
+                .setTitle("Error!")
+                .setDescription("This command only works in servers!")));
     }
 
     // Helper methods

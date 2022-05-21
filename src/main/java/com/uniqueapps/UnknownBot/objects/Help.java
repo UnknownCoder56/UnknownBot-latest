@@ -18,6 +18,8 @@ public class Help {
     private void initUtility() {
         utilityCommands.put(">help (category)", "Displays this help message.");
         utilityCommands.put(">botinfo", "Shows information about UnknownBot.");
+        utilityCommands.put(">userinfo (user)", "Shows mentioned user's info, or yours if not specified");
+        utilityCommands.put(">serverinfo", "Shows the server's info on which command is run.");
         utilityCommands.put(">hello", "Says hello to you.");
         utilityCommands.put(">ping", "Displays bot latency.");
         utilityCommands.put(">admes (query)", "Ask anything to the bot.");

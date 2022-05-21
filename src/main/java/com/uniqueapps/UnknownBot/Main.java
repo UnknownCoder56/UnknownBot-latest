@@ -1,41 +1,28 @@
 package com.uniqueapps.UnknownBot;
 
-import java.io.*;
-import java.net.URL;
-import java.time.Instant;
-import java.util.*;
-
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.ServerApi;
-import com.mongodb.ServerApiVersion;
-import com.mongodb.client.ClientSession;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.TransactionBody;
-import com.uniqueapps.UnknownBot.commands.BasicCommands;
-import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
-import com.uniqueapps.UnknownBot.commands.ModCommands;
+import com.mongodb.client.*;
+import com.uniqueapps.UnknownBot.commands.*;
 import com.uniqueapps.UnknownBot.objects.Shop;
 import com.uniqueapps.UnknownBot.objects.UserSettings;
 import com.uniqueapps.UnknownBot.objects.Warn;
-
 import org.bson.Document;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
-
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import spark.Spark;
 
-import javax.print.Doc;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.time.Instant;
+import java.util.*;
 
 public class Main {
 
@@ -44,20 +31,14 @@ public class Main {
     public static Map<Long, Instant> userRobbedTimes = new HashMap<>();
     public static Map<Long, Instant> userDailyTimes = new HashMap<>();
     public static Map<Long, UserSettings> userSettingsMap = new HashMap<>();
-    public static MongoClientSettings settings;
+    public static String settings = System.getenv("CONNSTR");
 
     public static void main(String[] args) {
-        
-        ConnectionString connectionString = new ConnectionString(System.getenv("CONNSTR"));
-        settings = MongoClientSettings.builder()
-                .applyConnectionString(connectionString)
-                .serverApi(ServerApi.builder()
-                        .version(ServerApiVersion.V1)
-                        .build())
-                .build();
+        FallbackLoggerConfiguration.setDebug(true);
 
         initData();
         Shop.initShop();
+        AsyncCommands.Admes.initServer();
 
         api = new DiscordApiBuilder()
                 .setToken(System.getenv("TOKEN"))
@@ -68,7 +49,7 @@ public class Main {
 
         Main app = new Main();
 
-        org.jsoup.nodes.Document doc = Jsoup.parse(app.getResourceText("index.html"));
+        org.jsoup.nodes.Document doc = Jsoup.parse(app.getBotSiteHtmlCode());
         Element inviteLinkElement = doc.select("a").first();
         if (inviteLinkElement != null) {
             inviteLinkElement.attr("href", api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
@@ -95,6 +76,7 @@ public class Main {
         initUserSettings(api.getServers());
 
         api.addListener(new CommandsListener());
+        new SlashCommands(api);
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
         System.out.println("Invite link for UnknownBot: " + api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
     }
@@ -152,7 +134,7 @@ public class Main {
                             var keys1 = doc1.getList("key", String.class);
                             var vals1 = doc1.getList("val", Integer.class);
                             Map<String, Integer> map = new HashMap<>();
-                            for (int x = 0; x < keys.size(); x++) {
+                            for (int x = 0; x < keys1.size(); x++) {
                                 map.put(keys1.get(x), vals1.get(x));
                             }
                             Shop.ownedItems.put(keys.get(i), map);
@@ -222,11 +204,11 @@ public class Main {
         }
     }
 
-    private String getResourceText(String resourceName) {
+    private String getBotSiteHtmlCode() {
         StringBuilder content = new StringBuilder();
         try {
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(getClass().getClassLoader().getResourceAsStream(resourceName)));
+                    new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("index.html"))));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line).append("\n");

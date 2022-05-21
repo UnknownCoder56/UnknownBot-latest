@@ -8,12 +8,11 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 public class AsyncCommands {
@@ -58,10 +57,37 @@ public class AsyncCommands {
 
         MessageCreateEvent event;
         Message message;
+        static DataInputStream socketIn;
+        static DataOutputStream socketOut;
 
         public Admes(MessageCreateEvent event, Message message) {
             this.event = event;
             this.message = message;
+        }
+
+        public static void initServer() {
+            new Thread(() -> {
+                try (ServerSocket serverSocket = new ServerSocket(12102)) {
+                    System.out.println("Admes server started at port " + serverSocket.getLocalPort() + "!");
+                    while (true) {
+                        Socket client = serverSocket.accept();
+                        System.out.println("New client joined at " + client.getInetAddress() + ", port " + client.getPort());
+                        socketIn = new DataInputStream(client.getInputStream());
+                        socketOut = new DataOutputStream(client.getOutputStream());
+                        new Thread(() -> {
+                            while (true) {
+                                if (client.isClosed()) {
+                                    System.out.println("A client left!");
+                                    socketIn = null;
+                                    socketOut = null;
+                                }
+                            }
+                        });
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
         }
 
         @Override
@@ -72,13 +98,37 @@ public class AsyncCommands {
                 System.out.println("'" + event.getMessageAuthor().getName() + "'" + " asked in " + "'" + event.getServer().get().getName()
                         + "'" + ": " + asked);
             }
-            Scanner scn = new Scanner(System.in);
-            System.out.println("Reply: ");
-            if (scn.hasNextLine()) {
-                String text2 = scn.nextLine();
-                event.getMessage().reply(new EmbedBuilder()
-                        .setTitle("Reply: " + text2)
-                        .setColor(BasicCommands.getRandomColor()));
+            if (socketOut != null) {
+                try {
+                    socketOut.writeUTF("Question: " + asked + "\n\n" +
+                            "Reply: ");
+                    socketOut.flush();
+                    if (socketIn != null) {
+                        try {
+                            String reply;
+                            do {
+                                reply = socketIn.readUTF();
+                            } while (reply.isEmpty());
+                            event.getMessage().reply(new EmbedBuilder()
+                                    .setTitle("Reply: " + reply)
+                                    .setColor(BasicCommands.getRandomColor()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            event.getMessage().reply(new EmbedBuilder()
+                                    .setTitle("Reply: " + "...")
+                                    .setColor(BasicCommands.getRandomColor()));
+                        }
+                    } else {
+                        event.getMessage().reply(new EmbedBuilder()
+                                .setTitle("Reply: " + "...")
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    event.getMessage().reply(new EmbedBuilder()
+                            .setTitle("Reply: " + "...")
+                            .setColor(BasicCommands.getRandomColor()));
+                }
             } else {
                 event.getMessage().reply(new EmbedBuilder()
                         .setTitle("Reply: " + "...")

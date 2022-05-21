@@ -26,8 +26,8 @@ public class Shop {
     public static Map<Long, Map<String, Integer>> ownedItems = new HashMap<>();
 
     public static void initShop() {
-        ShopItem juice = new ShopItem("Juice", "Refresh yourself with a cool an of juice.", "You drink some juice, and get refreshed.", "juice", 10000);
-        ShopItem nitro = new ShopItem("Nitro", "Speed up your work. Work cooldown will be halved.", "You use nitro and gain speed, resulting in your work being done faster.", "nitro", 20000, "nitro");
+        ShopItem juice = new ShopItem("Juice", "Refresh yourself with a cool an of juice.", "You drink some juice, and get refreshed.", "juice", 1000);
+        ShopItem nitro = new ShopItem("Nitro", "Speed up your day, and work. Work and daily cooldown will be over.", "You use nitro and gain speed, resulting in your work and day being finished faster.", "nitro", 5400, "nitro");
         ShopItem laptop = new ShopItem("Hacker Laptop", "Write code anytime, anywhere. Pen testing utilities pre-installed.", "HACKED EVERYTHING", "laptop", 30000);
         ShopItem code = new ShopItem("Hacker Code", "Very special bruteforce attack code. Tested upon top targets.", "HACKED PENTAGON", "code", 50000);
         ShopItem cat = new ShopItem("Pet Cat", "A pet cat, stays with you as a companion when you code.", "MEW!!! CODE!!!", "cat", 50000);
@@ -165,14 +165,14 @@ class NitroExec implements Runnable {
     public void run() {
         event.getMessageAuthor().asUser().ifPresentOrElse((user) -> {
             if (Main.userWorkedTimes.containsKey(user.getId())) {
-                long reduce = (30 - Duration.between(Main.userWorkedTimes.get(user.getId()), event.getMessage().getCreationTimestamp()).toSeconds()) / 2;
-                Main.userWorkedTimes.replace(user.getId(), Main.userWorkedTimes.get(user.getId()), Main.userWorkedTimes.get(user.getId()).minus(reduce, ChronoUnit.SECONDS));
+                long workReduce = (30 - Duration.between(Main.userWorkedTimes.get(user.getId()), event.getMessage().getCreationTimestamp()).toSeconds());
+                long dailyReduce = (86400 - Duration.between(Main.userDailyTimes.get(user.getId()), event.getMessage().getCreationTimestamp()).toSeconds());
+                Main.userWorkedTimes.replace(user.getId(), Main.userWorkedTimes.get(user.getId()), Main.userWorkedTimes.get(user.getId()).minus(workReduce, ChronoUnit.SECONDS));
+                Main.userDailyTimes.replace(user.getId(), Main.userDailyTimes.get(user.getId()), Main.userDailyTimes.get(user.getId()).minus(dailyReduce, ChronoUnit.SECONDS));
             }
-        }, () -> {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Error!")
-                    .setDescription("You are not a user! Maybe you are a bot.")
-                    .setColor(BasicCommands.getRandomColor()));
-        });
+        }, () -> event.getChannel().sendMessage(new EmbedBuilder()
+                .setTitle("Error!")
+                .setDescription("You are not a user! Maybe you are a bot.")
+                .setColor(BasicCommands.getRandomColor())));
     }
 }

@@ -90,7 +90,7 @@ public class ShopItem {
     public void buyItem(MessageCreateEvent event) {
         Long userId = event.getMessageAuthor().asUser().get().getId();
         if (!Shop.ownedItems.containsKey(userId)) {
-            Shop.ownedItems.put(userId, new HashMap<String, Integer>());
+            Shop.ownedItems.put(userId, new HashMap<>());
         }
         if (CurrencyCommands.debitBalance(itemCost, event.getMessageAuthor().asUser().get(), event)) {
             if (Shop.ownedItems.get(userId).containsKey(itemName)) {

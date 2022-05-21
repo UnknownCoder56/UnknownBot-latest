@@ -78,6 +78,10 @@ class AsyncListener implements Runnable {
                     BasicCommands.replies(event);
                 else if (command.startsWith(">botinfo"))
                     BasicCommands.botinfo(event);
+                else if (command.startsWith(">userinfo"))
+                    BasicCommands.userInfo(event);
+                else if (command.startsWith(">serverinfo"))
+                    BasicCommands.serverInfo(event);
                 else if (command.startsWith(">admes"))
                     BasicCommands.admes(event);
                 else if (command.startsWith(">gsearch"))
