@@ -1,0 +1,168 @@
+{
+  "utility": [
+    {
+      "name": ">hello",
+      "desc": "Says hello to you."
+    },
+    {
+      "name": ">userinfo (user)",
+      "desc": "Shows mentioned user's info, or yours if not specified"
+    },
+    {
+      "name": ">dm (mention) \"message\"",
+      "desc": "DMs a message to a user."
+    },
+    {
+      "name": ">rps (choice)",
+      "desc": "Play \"Rock Paper Scissors\" with the bot. Choices include: ```r, p, s``` or ```rock, paper, scissors```."
+    },
+    {
+      "name": ">setting (type) (true or false)",
+      "desc": "Changes your user settings, where type include - 'bankdm', 'passive'. Example: \">setting bankdm false\""
+    },
+    {
+      "name": ">admes (query)",
+      "desc": "Ask anything to the bot."
+    },
+    {
+      "name": ">noreply (text)",
+      "desc": "Disables custom reply."
+    },
+    {
+      "name": ">tti (text)",
+      "desc": "Converts given text to image."
+    },
+    {
+      "name": ">reply (text),(reply) _Warning: No spaces after/before/in commas_",
+      "desc": "Makes the bot reply when you send a specific text."
+    },
+    {
+      "name": ">ping",
+      "desc": "Displays bot latency."
+    },
+    {
+      "name": ">dt",
+      "desc": "Shows the current date and time (AM/PM)."
+    },
+    {
+      "name": ">replies",
+      "desc": "Displays all custom replies set."
+    },
+    {
+      "name": ">calc (num1),(sign),(num2) _Warning: No spaces after/before/in commas_",
+      "desc": "Does calculation. Supported signs -> +, -, *, /"
+    },
+    {
+      "name": ">serverinfo",
+      "desc": "Shows the server's info on which command is run."
+    },
+    {
+      "name": ">botinfo",
+      "desc": "Shows information about UnknownBot."
+    },
+    {
+      "name": ">help (category)",
+      "desc": "Displays this help message."
+    },
+    {
+      "name": ">gsearch (search text)",
+      "desc": "Searches google and returns results as html."
+    },
+    {
+      "name": ">makefile (text)",
+      "desc": "Creates file from text."
+    }
+  ],
+  "moderation": [
+    {
+      "name": ">nuke",
+      "desc": "Cleans everything in a channel."
+    },
+    {
+      "name": ">clear (amount)",
+      "desc": "Clears specified number of messages."
+    },
+    {
+      "name": ">nowarns (mention)",
+      "desc": "Clear all warns for a user (Individual removal not supported yet)."
+    },
+    {
+      "name": ">kick (mention)",
+      "desc": "Kicks the mentioned user."
+    },
+    {
+      "name": ">ban (mention)",
+      "desc": "Bans the mentioned user."
+    },
+    {
+      "name": ">mute",
+      "desc": "Mutes the mentioned user (Mute = Disable chat and VC)."
+    },
+    {
+      "name": ">unmute",
+      "desc": "Unmutes the mentioned user (Mute = Enable chat and VC)."
+    },
+    {
+      "name": ">warn (mention) \"cause\"",
+      "desc": "Warns a user. _Usage: Type >warn, then mention user, then put reason within quotation marks (\") (no reason supported too). Put space between each argument. Multiple warns supported. Warns are isolated for each server._"
+    },
+    {
+      "name": ">unban (mention)",
+      "desc": "Unbans the mentioned user."
+    },
+    {
+      "name": ">getwarns (mention)",
+      "desc": "Gets all warns for a user."
+    }
+  ],
+  "economy": [
+    {
+      "name": ">daily",
+      "desc": "Get your daily earnings!"
+    },
+    {
+      "name": ">bal",
+      "desc": "Shows your current bank balance"
+    },
+    {
+      "name": ">glb",
+      "desc": "Compare and check richest users of our bot (Global)!"
+    },
+    {
+      "name": ">lb",
+      "desc": "Compare and check out richest users of your server!"
+    },
+    {
+      "name": ">give (amount) (mention)",
+      "desc": "Transfer money to others' accounts!"
+    },
+    {
+      "name": ">buy (item codename)",
+      "desc": "Buy an item from the shop. Codename with command is available when you type 'shop', under the 'Command for buying' section."
+    },
+    {
+      "name": ">shop",
+      "desc": "Shows a list of all items in the shop, and their details."
+    },
+    {
+      "name": ">bal (mention)",
+      "desc": "Shows others' current bank balance"
+    },
+    {
+      "name": ">work",
+      "desc": "You work and gain money!"
+    },
+    {
+      "name": ">rob (mention)",
+      "desc": "Rob others and get money, the dark way."
+    },
+    {
+      "name": ">use (item codename)",
+      "desc": "Use an item in your inventory. Codename with command is available when you type 'shop', under the 'Command for using' section"
+    },
+    {
+      "name": ">inv",
+      "desc": "Displays a list of all items in your inventory."
+    }
+  ]
+}

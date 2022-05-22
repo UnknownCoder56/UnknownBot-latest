@@ -1,8 +1,10 @@
 package com.uniqueapps.UnknownBot.commands;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mongodb.client.*;
 import com.uniqueapps.UnknownBot.Main;
-import com.uniqueapps.UnknownBot.objects.Help;
 import com.uniqueapps.UnknownBot.objects.UserSettings;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -17,6 +19,8 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
@@ -242,58 +246,69 @@ public class BasicCommands {
     }
 
     public static void help(MessageCreateEvent event) {
-        Help help = new Help();
-        String[] args = event.getMessage().getContent().split(" ");
-        String category = args.length > 1 ? args[1].toLowerCase(Locale.ROOT) : "";
-        String[] categories = {"utility", "moderation", "economy"};
-        if (Objects.equals(category, categories[0])) {
-            EmbedBuilder embedBuilder = new EmbedBuilder()
-                    .setTitle("UnknownBot's Utility commands:-")
-                    .setColor(getRandomColor());
+        try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("commands.json")))) {
+            JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
+            JsonArray utilityCommands = object.getAsJsonArray("utility");
+            JsonArray moderationCommands = object.getAsJsonArray("moderation");
+            JsonArray economyCommands = object.getAsJsonArray("economy");
 
-            for (String key : help.utilityCommands.keySet()) {
-                embedBuilder.addField(key, help.utilityCommands.get(key), true);
+            String[] args = event.getMessage().getContent().split(" ");
+            String category = args.length > 1 ? args[1].toLowerCase(Locale.ROOT) : "";
+            String[] categories = {"utility", "moderation", "economy"};
+            if (Objects.equals(category, categories[0])) {
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                        .setTitle("UnknownBot's Utility commands:-")
+                        .setColor(getRandomColor());
+
+                utilityCommands.forEach(jsonElement -> {
+                    JsonObject command = jsonElement.getAsJsonObject();
+                    embedBuilder.addField(command.get("name").getAsString(), command.get("desc").getAsString(), true);
+                });
+
+                event.getChannel().sendMessage(embedBuilder);
+            } else if (Objects.equals(category, categories[1])) {
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                        .setTitle("UnknownBot's Moderation commands:-")
+                        .setColor(getRandomColor());
+
+                moderationCommands.forEach(jsonElement -> {
+                    JsonObject command = jsonElement.getAsJsonObject();
+                    embedBuilder.addField(command.get("name").getAsString(), command.get("desc").getAsString(), true);
+                });
+
+                event.getChannel().sendMessage(embedBuilder);
+            } else if (Objects.equals(category, categories[2])) {
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                        .setTitle("UnknownBot's Economy commands:-")
+                        .setColor(getRandomColor());
+
+                economyCommands.forEach(jsonElement -> {
+                    JsonObject command = jsonElement.getAsJsonObject();
+                    embedBuilder.addField(command.get("name").getAsString(), command.get("desc").getAsString(), true);
+                });
+
+                event.getChannel().sendMessage(embedBuilder);
+            } else {
+                event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("UnknownBot's help docs")
+                        .setDescription("""
+                                UnknownBot is a multipurpose bot, currently under active development.
+                                To get help about commands, type ">help (category)", where categories include:-
+
+                                1) Utility ```>help utility```
+                                2) Moderation ```>help moderation```
+                                3) Economy ```>help economy```
+
+                                UnknownBot also includes slash commands, type / and select UnknownBot's logo to get a list of them.
+
+                                For more information on the bot, how to use it, or queries about, contact us on our official discord server:-
+                                https://discord.gg/t79ZyuHr5K/
+                                Or visit UnknownBot's website:-
+                                https://user783667580106702848.pepich.de/""")
+                        .setColor(getRandomColor()));
             }
-
-            event.getChannel().sendMessage(embedBuilder);
-        } else if (Objects.equals(category, categories[1])) {
-            EmbedBuilder embedBuilder = new EmbedBuilder()
-                    .setTitle("UnknownBot's Moderation commands:-")
-                    .setColor(getRandomColor());
-    
-            for (String key : help.moderationCommands.keySet()) {
-                embedBuilder.addField(key, help.moderationCommands.get(key), true);
-            }
-    
-            event.getChannel().sendMessage(embedBuilder);
-        } else if (Objects.equals(category, categories[2])) {
-            EmbedBuilder embedBuilder = new EmbedBuilder()
-                    .setTitle("UnknownBot's Economy commands:-")
-                    .setColor(getRandomColor());
-    
-            for (String key : help.economyCommands.keySet()) {
-                embedBuilder.addField(key, help.economyCommands.get(key), true);
-            }
-    
-            event.getChannel().sendMessage(embedBuilder);
-        } else {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("UnknownBot's help docs")
-                    .setDescription("""
-                            UnknownBot is a multipurpose bot, currently under active development.
-                            To get help about commands, type ">help (category)", where categories include:-
-
-                            1) Utility ```>help utility```
-                            2) Moderation ```>help moderation```
-                            3) Economy ```>help economy```
-
-                            UnknownBot also includes slash commands, type / and select UnknownBot's logo to get a list of them.
-
-                            For more information on the bot, how to use it, or queries about, contact us on our official discord server:-
-                            https://discord.gg/t79ZyuHr5K/
-                            Or visit UnknownBot's website:-
-                            https://user783667580106702848.pepich.de/""")
-                    .setColor(getRandomColor()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
