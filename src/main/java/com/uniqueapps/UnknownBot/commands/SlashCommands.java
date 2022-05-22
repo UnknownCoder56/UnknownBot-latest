@@ -2,6 +2,7 @@ package com.uniqueapps.UnknownBot.commands;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.uniqueapps.UnknownBot.Main;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -15,18 +16,13 @@ import org.javacord.api.interaction.SlashCommandOptionType;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Currency;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
@@ -52,10 +48,6 @@ public class SlashCommands {
     }
 
     private void createCommandsIfNotExist() {
-        var currencySet = Currency.getAvailableCurrencies();
-        List<SlashCommandOptionChoice> currencyChoices = new ArrayList<>();
-        currencySet.forEach(currency -> currencyChoices.add(SlashCommandOptionChoice.create(currency.getDisplayName(), currency.getCurrencyCode())));
-
         Server server = botApi.getServerById(973174048672600104L).orElseThrow();
         botApi.bulkOverwriteGlobalApplicationCommands(new ArrayList<>()).join();
         botApi.bulkOverwriteServerApplicationCommands(server, new ArrayList<>()).join();
@@ -97,12 +89,23 @@ public class SlashCommands {
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("currconv"))) {
-                SlashCommand.with("currconv", "Converts one currency to another.")
-                        .addOption(SlashCommandOption.createDecimalOption("convert_amount", "The amount of money to convert", true))
-                        .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "from_currency", "The currency of the given amount", true, currencyChoices))
-                        .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "to_currency", "The currency to convert the amount to", true, currencyChoices))
-                        .createForServer(server)
-                        .join();
+                try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("/currencies.json")))) {
+                    JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
+                    var jsonArray = object.get("currencies").getAsJsonArray();
+                    List<SlashCommandOptionChoice> currencyChoices = new ArrayList<>();
+                    jsonArray.forEach((jsonElement -> {
+                        JsonObject currency = jsonElement.getAsJsonObject();
+                        currencyChoices.add(SlashCommandOptionChoice.create(currency.get("name").getAsString(), currency.get("code").getAsString()));
+                    }));
+                    SlashCommand.with("currconv", "Converts one currency to another.")
+                            .addOption(SlashCommandOption.createDecimalOption("convert_amount", "The amount of money to convert", true))
+                            .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "from_currency", "The currency of the given amount", true, currencyChoices))
+                            .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "to_currency", "The currency to convert the amount to", true, currencyChoices))
+                            .createForServer(server)
+                            .join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return null;
         });

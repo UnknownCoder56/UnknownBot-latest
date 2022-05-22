@@ -16,6 +16,7 @@ import com.mongodb.client.model.Filters;
 import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.commands.BasicCommands;
 
+import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
 import org.bson.Document;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -144,7 +145,7 @@ public class Shop {
                     } else {
                         collection.insertOne(doc);
                     }
-                    return "Updated replies!";
+                    return "Updated ownerships!";
                 };
     
                 System.out.println(session.withTransaction(txnBody));
@@ -166,9 +167,13 @@ class NitroExec implements Runnable {
         event.getMessageAuthor().asUser().ifPresentOrElse((user) -> {
             if (Main.userWorkedTimes.containsKey(user.getId())) {
                 long workReduce = (30 - Duration.between(Main.userWorkedTimes.get(user.getId()), event.getMessage().getCreationTimestamp()).toSeconds());
-                long dailyReduce = (86400 - Duration.between(Main.userDailyTimes.get(user.getId()), event.getMessage().getCreationTimestamp()).toSeconds());
                 Main.userWorkedTimes.replace(user.getId(), Main.userWorkedTimes.get(user.getId()), Main.userWorkedTimes.get(user.getId()).minus(workReduce, ChronoUnit.SECONDS));
+                CurrencyCommands.refreshWorks();
+            }
+            if (Main.userDailyTimes.containsKey(user.getId())) {
+                long dailyReduce = (86400 - Duration.between(Main.userDailyTimes.get(user.getId()), event.getMessage().getCreationTimestamp()).toSeconds());
                 Main.userDailyTimes.replace(user.getId(), Main.userDailyTimes.get(user.getId()), Main.userDailyTimes.get(user.getId()).minus(dailyReduce, ChronoUnit.SECONDS));
+                CurrencyCommands.refreshDailies();
             }
         }, () -> event.getChannel().sendMessage(new EmbedBuilder()
                 .setTitle("Error!")
