@@ -1,6 +1,7 @@
 package com.uniqueapps.UnknownBot.commands;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mongodb.client.*;
@@ -246,7 +247,7 @@ public class BasicCommands {
     }
 
     public static void help(MessageCreateEvent event) {
-        try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("commands.json")))) {
+        try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("/commands.json")))) {
             JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray utilityCommands = object.getAsJsonArray("utility");
             JsonArray moderationCommands = object.getAsJsonArray("moderation");
@@ -308,7 +309,7 @@ public class BasicCommands {
                         .setColor(getRandomColor()));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -348,7 +349,7 @@ public class BasicCommands {
 
 			event.getChannel().sendMessage(embed);
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
     }
 
