@@ -208,7 +208,7 @@ public class Main {
         StringBuilder content = new StringBuilder();
         try {
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("/public/index.html"))));
+                    new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("public/index.html"))));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line).append("\n");
