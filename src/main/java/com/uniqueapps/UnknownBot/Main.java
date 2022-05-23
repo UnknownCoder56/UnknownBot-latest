@@ -64,7 +64,7 @@ public class Main {
         } else {
             Spark.port(8080);
         }
-        Spark.staticFileLocation("/");
+        Spark.staticFileLocation("/public/");
 
         Spark.get("/", (req, res) -> {
             res.type("text/html");
@@ -208,7 +208,7 @@ public class Main {
         StringBuilder content = new StringBuilder();
         try {
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("index.html"))));
+                    new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("/public/index.html"))));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line).append("\n");
