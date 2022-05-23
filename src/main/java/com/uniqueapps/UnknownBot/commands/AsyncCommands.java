@@ -2,6 +2,7 @@ package com.uniqueapps.UnknownBot.commands;
 
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -159,16 +160,17 @@ public class AsyncCommands {
                 FileWriter writer = new FileWriter(file);
                 writer.write(doc.html());
                 writer.close();
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("Here are your results:- " + searchURL)
-                        .setColor(BasicCommands.getRandomColor()));
-                event.getChannel().sendMessage(file);
+                new MessageBuilder()
+                        .setEmbed(new EmbedBuilder()
+                                .setTitle("Here are your results for\n```" + searchURL + "```:-")
+                                .setColor(BasicCommands.getRandomColor()))
+                        .addAttachment(file)
+                        .send(event.getChannel());
             } catch (StringIndexOutOfBoundsException | IOException ex) {
                 ex.printStackTrace();
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
-                        .setDescription("Please type search text after typing '>gsearch' and " +
-                                "put space between command and text.")
+                        .setDescription("Incorrect arguments given! Correct syntax: >gsearch (search text)")
                         .setColor(BasicCommands.getRandomColor()));
             }
         }
@@ -185,22 +187,28 @@ public class AsyncCommands {
         @Override
         public void run() {
             try {
-                String text = event.getMessage().getContent().substring(10);
-                File file = new File("text.txt");
+                String[] args = event.getMessage().getContent().split(" ");
+                String text = args[2];
+                File file = new File(args[1]);
                 file.delete();
                 file.createNewFile();
                 FileWriter writer = new FileWriter(file);
                 writer.write(text);
                 writer.close();
-                event.getChannel().sendMessage(file);
-            } catch (StringIndexOutOfBoundsException ex) {
+                new MessageBuilder()
+                        .setEmbed(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Here's your file:-")
+                                .setColor(BasicCommands.getRandomColor()))
+                        .addAttachment(file)
+                        .send(event.getChannel());
+            } catch (IndexOutOfBoundsException ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
-                        .setDescription("Please type text after typing '>makefile' and " +
-                                "put space between command and text.")
+                        .setDescription("Incorrect arguments given! Correct syntax: >makefile (file name) (file content)")
                         .setColor(BasicCommands.getRandomColor()));
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }

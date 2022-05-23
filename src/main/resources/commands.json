@@ -69,7 +69,7 @@
       "desc": "Searches google and returns results as html."
     },
     {
-      "name": ">makefile (text)",
+      "name": ">makefile (file name) (file content)",
       "desc": "Creates file from text."
     }
   ],

@@ -3,7 +3,6 @@ package com.uniqueapps.UnknownBot.commands;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.uniqueapps.UnknownBot.Main;
-import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
@@ -13,45 +12,50 @@ import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
 
-public class SlashCommands {
+public class SlashCommands implements SlashCommandCreateListener {
 
-    DiscordApi botApi;
-
-    public SlashCommands(DiscordApi api) {
-        this.botApi = api;
+    public SlashCommands() {
         createCommandsIfNotExist();
-        api.addSlashCommandCreateListener(event -> {
-            var command = event.getSlashCommandInteraction().getCommandName();
-            switch (command) {
-                case "ping" -> ping(event);
-                case "hello" -> hello(event);
-                case "datetime" -> datetime(event);
-                case "calculate" -> calc(event);
-                case "dm" -> dm(event);
-                case "currconv" -> currencyConvert(event);
-            }
-        });
+    }
+
+    @Override
+    public void onSlashCommandCreate(SlashCommandCreateEvent event) {
+        var command = event.getSlashCommandInteraction().getCommandName();
+        switch (command) {
+            case "ping" -> ping(event);
+            case "hello" -> hello(event);
+            case "datetime" -> datetime(event);
+            case "calculate" -> calc(event);
+            case "dm" -> dm(event);
+            case "currconv" -> currencyConvert(event);
+        }
     }
 
     private void createCommandsIfNotExist() {
-        Server server = botApi.getServerById(973174048672600104L).orElseThrow();
-        botApi.bulkOverwriteGlobalApplicationCommands(new ArrayList<>()).join();
-        botApi.bulkOverwriteServerApplicationCommands(server, new ArrayList<>()).join();
-        botApi.getServerSlashCommands(server).thenApplyAsync(commands -> {
+        Server server = Main.api.getServerById(973174048672600104L).orElseThrow();
+        Main.api.bulkOverwriteGlobalApplicationCommands(new ArrayList<>()).join();
+        Main.api.bulkOverwriteServerApplicationCommands(server, new ArrayList<>()).join();
+        Main.api.getServerSlashCommands(server).thenApplyAsync(commands -> {
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("ping"))) {
                 SlashCommand.with("ping", "Displays bot latency.")
                         .createForServer(server)
@@ -115,7 +119,7 @@ public class SlashCommands {
         event.getSlashCommandInteraction().createImmediateResponder()
                 .addEmbed(new EmbedBuilder()
                         .setTitle("Pong!")
-                        .setDescription("Latency is " + botApi.measureRestLatency().join().toMillis() + " ms.")
+                        .setDescription("Latency is " + Main.api.measureRestLatency().join().toMillis() + " ms.")
                         .setColor(getRandomColor()))
                 .respond();
     }

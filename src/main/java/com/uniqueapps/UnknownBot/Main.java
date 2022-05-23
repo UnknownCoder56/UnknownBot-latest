@@ -76,7 +76,7 @@ public class Main {
         initUserSettings(api.getServers());
 
         api.addListener(new CommandsListener());
-        new SlashCommands(api);
+        api.addSlashCommandCreateListener(new SlashCommands());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
         System.out.println("Invite link for UnknownBot: " + api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
     }
