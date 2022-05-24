@@ -65,18 +65,6 @@ public class BasicCommands {
         }
     }
 
-    public static void gsearch(MessageCreateEvent event) {
-        AsyncCommands.Gsearch gsearch = new AsyncCommands.Gsearch(event);
-        CompletableFuture<AsyncCommands.Gsearch> completableFuture = CompletableFuture
-                .supplyAsync(() -> gsearch);
-
-        completableFuture
-                .thenApplyAsync(gsearch1 -> {
-                    gsearch1.run();
-                    return gsearch1;
-                });
-    }
-
     public static void makefile(MessageCreateEvent event) {
         AsyncCommands.Makefile makefile = new AsyncCommands.Makefile(event);
         CompletableFuture<AsyncCommands.Makefile> completableFuture = CompletableFuture

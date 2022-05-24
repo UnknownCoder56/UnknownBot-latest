@@ -8,6 +8,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
+import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
@@ -16,6 +17,9 @@ import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 import org.javamoney.moneta.Money;
 
 import javax.money.Monetary;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,6 +52,8 @@ public class SlashCommands implements SlashCommandCreateListener {
             case "calculate" -> calc(event);
             case "dm" -> dm(event);
             case "currconv" -> currencyConvert(event);
+            case "makecolor" -> generateColor(event);
+            case "randomcolor" -> randomColor(event);
         }
     }
 
@@ -92,6 +98,19 @@ public class SlashCommands implements SlashCommandCreateListener {
                         .createForServer(server)
                         .join();
             }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("gencolor"))) {
+                SlashCommand.with("makecolor", "Generates a color based on given RGB values.")
+                        .addOption(SlashCommandOption.createLongOption("red", "The red value of the color. Must be between -1 and 256 (exclusive).", true))
+                        .addOption(SlashCommandOption.createLongOption("green", "The green value of the color. Must be between -1 and 256 (exclusive).", true))
+                        .addOption(SlashCommandOption.createLongOption("blue", "The blue value of the color. Must be between -1 and 256 (exclusive).", true))
+                        .createForServer(server)
+                        .join();
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("randcolor"))) {
+                SlashCommand.with("randomcolor", "Generates a random color.")
+                        .createForServer(server)
+                        .join();
+            }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("currconv"))) {
                 try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("/currencies.json")))) {
                     JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
@@ -111,7 +130,7 @@ public class SlashCommands implements SlashCommandCreateListener {
                     e.printStackTrace();
                 }
             }
-            return null;
+            return commands;
         });
     }
 
@@ -251,5 +270,65 @@ public class SlashCommands implements SlashCommandCreateListener {
                     .respond();
             e.printStackTrace();
         }
+    }
+
+    private void generateColor(SlashCommandCreateEvent event) {
+        long red = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("red")).findFirst().orElseThrow().getLongValue().orElseThrow();
+        long green = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("green")).findFirst().orElseThrow().getLongValue().orElseThrow();
+        long blue = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("blue")).findFirst().orElseThrow().getLongValue().orElseThrow();
+        if (red >= 0 && red <= 255 && green >= 0 && green <= 255 && blue >= 0 && blue <= 255) {
+            event.getSlashCommandInteraction().createImmediateResponder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Creating color...")
+                            .setColor(getRandomColor()))
+                    .respond();
+            Color color = new Color(Math.toIntExact(red), Math.toIntExact(green), Math.toIntExact(blue));
+            BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics.setColor(color);
+            graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 30, 30);
+            graphics.dispose();
+            event.getSlashCommandInteraction().createImmediateResponder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Creating color...")
+                            .setColor(getRandomColor()))
+                    .respond();
+            event.getSlashCommandInteraction().createFollowupMessageBuilder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Success!")
+                            .setDescription("Here's your color for (R:" + red + ", G:" + green + ", B:" + blue + "):-")
+                            .setImage(image)
+                            .setColor(getRandomColor()))
+                    .send();
+        } else {
+            event.getSlashCommandInteraction().createImmediateResponder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("Value of R, G and B must between -1 and 256 (exclusive)!"))
+                    .respond();
+        }
+    }
+
+    private void randomColor(SlashCommandCreateEvent event) {
+        event.getSlashCommandInteraction().createImmediateResponder()
+                .addEmbed(new EmbedBuilder()
+                        .setTitle("Creating color...")
+                        .setColor(getRandomColor()))
+                .respond();
+        Color color = getRandomColor();
+        BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setColor(color);
+        graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 30, 30);
+        graphics.dispose();
+        event.getSlashCommandInteraction().createFollowupMessageBuilder()
+                .addEmbed(new EmbedBuilder()
+                        .setTitle("Success!")
+                        .setDescription("Here's your color for (R:" + color.getRed() + ", G:" + color.getGreen() + ", B:" + color.getBlue() + "):-")
+                        .setImage(image)
+                        .setColor(getRandomColor()))
+                .send();
     }
 }

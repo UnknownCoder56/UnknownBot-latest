@@ -720,10 +720,12 @@ public class CurrencyCommands {
         }).start();
     }
 
-    public static int getRandomInteger(int max, int min) {
-        int val = (int) (Math.random() * (max + 1));
-        while (val < min) {
-            val = (int) (Math.random() * (max + 1));
+    public static int getRandomInteger(int maxInclusive, int minInclusive) {
+        if (maxInclusive == minInclusive) return maxInclusive;
+        if (maxInclusive < minInclusive) return 0;
+        int val = (int) (Math.random() * (maxInclusive + 1));
+        while (val < minInclusive) {
+            val = (int) (Math.random() * (maxInclusive + 1));
         }
         return val;
     }

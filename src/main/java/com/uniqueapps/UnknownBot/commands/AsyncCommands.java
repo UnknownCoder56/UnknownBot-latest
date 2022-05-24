@@ -6,15 +6,13 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class AsyncCommands {
     public static class Clear implements Runnable {
@@ -138,44 +136,6 @@ public class AsyncCommands {
         }
     }
 
-    public static class Gsearch implements Runnable {
-
-        public static final String GOOGLE_SEARCH_URL = "https://www.google.com/search";
-        MessageCreateEvent event;
-
-        public Gsearch(MessageCreateEvent event) {
-            this.event = event;
-        }
-
-        @Override
-        public void run() {
-            try {
-                String search = URLEncoder.encode(event.getMessage().getContent().substring(9), StandardCharsets.UTF_8);
-                String searchURL = GOOGLE_SEARCH_URL + "?q=" + search + "&num=" + 10 + "&sourceid=chrome&ie=UTF-8";
-                System.out.println("SEARCH: " + searchURL);
-                Document doc = Jsoup.connect(searchURL).userAgent("Chrome/70.0.3538.77").get();
-                File file = new File("draft.html");
-                file.delete();
-                file.createNewFile();
-                FileWriter writer = new FileWriter(file);
-                writer.write(doc.html());
-                writer.close();
-                new MessageBuilder()
-                        .setEmbed(new EmbedBuilder()
-                                .setTitle("Here are your results for\n```" + searchURL + "```:-")
-                                .setColor(BasicCommands.getRandomColor()))
-                        .addAttachment(file)
-                        .send(event.getChannel());
-            } catch (StringIndexOutOfBoundsException | IOException ex) {
-                ex.printStackTrace();
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("Error!")
-                        .setDescription("Incorrect arguments given! Correct syntax: >gsearch (search text)")
-                        .setColor(BasicCommands.getRandomColor()));
-            }
-        }
-    }
-
     public static class Makefile implements Runnable {
 
         MessageCreateEvent event;
@@ -187,9 +147,9 @@ public class AsyncCommands {
         @Override
         public void run() {
             try {
-                String[] args = event.getMessage().getContent().split(" ");
-                String text = args[2];
-                File file = new File(args[1]);
+                List<String> args = List.of(event.getMessage().getContent().split(" "));
+                String text = args.stream().filter(s -> args.indexOf(s) > 1).collect(Collectors.joining(" "));
+                File file = new File(args.get(1));
                 file.delete();
                 file.createNewFile();
                 FileWriter writer = new FileWriter(file);
@@ -198,10 +158,11 @@ public class AsyncCommands {
                 new MessageBuilder()
                         .setEmbed(new EmbedBuilder()
                                 .setTitle("Success!")
-                                .setDescription("Here's your file:-")
+                                .setDescription("Here's your file")
                                 .setColor(BasicCommands.getRandomColor()))
                         .addAttachment(file)
                         .send(event.getChannel());
+                file.deleteOnExit();
             } catch (IndexOutOfBoundsException ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")

@@ -65,10 +65,6 @@
       "desc": "Displays this help message."
     },
     {
-      "name": ">gsearch (search text)",
-      "desc": "Searches google and returns results as html."
-    },
-    {
       "name": ">makefile (file name) (file content)",
       "desc": "Creates file from text."
     }

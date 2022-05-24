@@ -47,15 +47,7 @@ public class Main {
                         Intent.GUILD_PRESENCES)
                 .login().join();
 
-        Main app = new Main();
-
-        org.jsoup.nodes.Document doc = Jsoup.parse(app.getBotSiteHtmlCode());
-        Element inviteLinkElement = doc.select("a").first();
-        if (inviteLinkElement != null) {
-            inviteLinkElement.attr("href", api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
-        } else {
-            throw new NoSuchElementException("Element \"a\" not found!");
-        }
+        org.jsoup.nodes.Document doc = prepareBotSite();
 
         System.out.print("\033\143");
         String portEnv = System.getenv("PORT");
@@ -204,18 +196,32 @@ public class Main {
         }
     }
 
-    private String getBotSiteHtmlCode() {
+    private static org.jsoup.nodes.Document prepareBotSite() {
+        org.jsoup.nodes.Document doc = Jsoup.parse(Main.getBotSiteHtmlCode());
+
+        // Update invite link
+        Element inviteLinkElement = doc.select("a").first();
+        if (inviteLinkElement != null) {
+            inviteLinkElement.attr("href", api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
+        } else {
+            throw new NoSuchElementException("Element \"a\" not found!");
+        }
+
+        return doc;
+    }
+
+    private static String getBotSiteHtmlCode() {
         StringBuilder content = new StringBuilder();
         try {
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("public/index.html"))));
+                    new InputStreamReader(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("public/index.html"))));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line).append("\n");
             }
             bufferedReader.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return content.toString();
     }

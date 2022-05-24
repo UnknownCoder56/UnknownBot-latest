@@ -84,8 +84,6 @@ class AsyncListener implements Runnable {
                     BasicCommands.serverInfo(event);
                 else if (command.startsWith(">admes"))
                     BasicCommands.admes(event);
-                else if (command.startsWith(">gsearch"))
-                    BasicCommands.gsearch(event);
                 else if (command.startsWith(">makefile"))
                     BasicCommands.makefile(event);
                 else if (command.startsWith(">calc"))
