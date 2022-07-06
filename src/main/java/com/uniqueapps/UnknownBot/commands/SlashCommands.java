@@ -290,13 +290,15 @@ public class SlashCommands implements SlashCommandCreateListener {
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.setColor(color);
             graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 50, 50);
+            graphics.drawString("RGB: " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue(), 10, 10);
+            graphics.drawString("HEX: " + String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue()), 10, 20);
             graphics.dispose();
             event.getSlashCommandInteraction().createFollowupMessageBuilder()
                     .addEmbed(new EmbedBuilder()
                             .setTitle("Success!")
                             .setDescription("Here's your color for (R:" + red + ", G:" + green + ", B:" + blue + "):-")
                             .setImage(image)
-                            .setColor(getRandomColor()))
+                            .setColor(color))
                     .send();
         } else {
             event.getSlashCommandInteraction().createImmediateResponder()
@@ -325,7 +327,7 @@ public class SlashCommands implements SlashCommandCreateListener {
                         .setTitle("Success!")
                         .setDescription("Here's your color for (R:" + color.getRed() + ", G:" + color.getGreen() + ", B:" + color.getBlue() + "):-")
                         .setImage(image)
-                        .setColor(getRandomColor()))
+                        .setColor(color))
                 .send();
     }
 }
