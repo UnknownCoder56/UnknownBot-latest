@@ -1,24 +1,10 @@
 package com.uniqueapps.UnknownBot.commands;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.uniqueapps.UnknownBot.Main;
-import org.javacord.api.entity.channel.PrivateChannel;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
-import org.javacord.api.event.interaction.SlashCommandCreateEvent;
-import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.api.interaction.SlashCommand;
-import org.javacord.api.interaction.SlashCommandOption;
-import org.javacord.api.interaction.SlashCommandOptionChoice;
-import org.javacord.api.interaction.SlashCommandOptionType;
-import org.javacord.api.listener.interaction.SlashCommandCreateListener;
-import org.javamoney.moneta.Money;
+import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
 
-import javax.money.Monetary;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +20,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
+import javax.money.Monetary;
+
+import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
+import org.javacord.api.event.interaction.SlashCommandCreateEvent;
+import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandOption;
+import org.javacord.api.interaction.SlashCommandOptionChoice;
+import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.api.listener.interaction.SlashCommandCreateListener;
+import org.javamoney.moneta.Money;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.uniqueapps.UnknownBot.Main;
 
 public class SlashCommands implements SlashCommandCreateListener {
 
@@ -283,17 +285,12 @@ public class SlashCommands implements SlashCommandCreateListener {
                             .setColor(getRandomColor()))
                     .respond();
             Color color = new Color(Math.toIntExact(red), Math.toIntExact(green), Math.toIntExact(blue));
-            BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
+            BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics = image.createGraphics();
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.setColor(color);
-            graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 30, 30);
+            graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 50, 50);
             graphics.dispose();
-            event.getSlashCommandInteraction().createImmediateResponder()
-                    .addEmbed(new EmbedBuilder()
-                            .setTitle("Creating color...")
-                            .setColor(getRandomColor()))
-                    .respond();
             event.getSlashCommandInteraction().createFollowupMessageBuilder()
                     .addEmbed(new EmbedBuilder()
                             .setTitle("Success!")
@@ -317,11 +314,11 @@ public class SlashCommands implements SlashCommandCreateListener {
                         .setColor(getRandomColor()))
                 .respond();
         Color color = getRandomColor();
-        BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = image.createGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setColor(color);
-        graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 30, 30);
+        graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 50, 50);
         graphics.dispose();
         event.getSlashCommandInteraction().createFollowupMessageBuilder()
                 .addEmbed(new EmbedBuilder()
