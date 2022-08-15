@@ -63,7 +63,7 @@ public class SlashCommands implements SlashCommandCreateListener {
         Server server = Main.api.getServerById(973174048672600104L).orElseThrow();
         Main.api.bulkOverwriteGlobalApplicationCommands(new ArrayList<>()).join();
         Main.api.bulkOverwriteServerApplicationCommands(server, new ArrayList<>()).join();
-        Main.api.getServerSlashCommands(server).thenApplyAsync(commands -> {
+        Main.api.getGlobalSlashCommands().thenApplyAsync(commands -> {
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("ping"))) {
                 SlashCommand.with("ping", "Displays bot latency.")
                         .createForServer(server)
@@ -290,6 +290,7 @@ public class SlashCommands implements SlashCommandCreateListener {
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.setColor(color);
             graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 50, 50);
+            graphics.setColor(new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue()));
             graphics.drawString("RGB: " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue(), 10, 10);
             graphics.drawString("HEX: " + String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue()), 10, 20);
             graphics.dispose();
@@ -321,6 +322,9 @@ public class SlashCommands implements SlashCommandCreateListener {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setColor(color);
         graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 50, 50);
+        graphics.setColor(new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue()));
+        graphics.drawString("RGB: " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue(), 10, 10);
+        graphics.drawString("HEX: " + String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue()), 10, 20);
         graphics.dispose();
         event.getSlashCommandInteraction().createFollowupMessageBuilder()
                 .addEmbed(new EmbedBuilder()
