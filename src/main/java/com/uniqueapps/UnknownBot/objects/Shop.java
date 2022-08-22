@@ -66,7 +66,7 @@ public class Shop {
                 int index = 0;
                 for (ShopItem item : items) {
                     index++;
-                    embed.addField(index + ")" + item.emoji +  item.itemName, 
+                    embed.addField(index + ") " + item.emoji + " " + item.itemName, 
                         "> Description: " + item.itemDesc + "\n" + 
                         "> Cost: :coin: " + item.itemCost + "\n" +
                         "> Amount owned: " + getAmountOwned(userId, item.itemName) + "\n" + 
@@ -95,7 +95,7 @@ public class Shop {
                     .setTitle("Error!")
                     .setDescription("No item was specified! Type '>shop' to buy stuff, or type '>help' to get help about the commands.")
                     .setColor(BasicCommands.getRandomColor()));
-            } 
+            }
         } else if (command.startsWith(">buy")) {
             String[] args = command.split(" ");
             if (args.length > 1) {

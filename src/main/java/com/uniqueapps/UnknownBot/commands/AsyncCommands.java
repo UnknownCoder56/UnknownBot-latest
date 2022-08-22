@@ -148,6 +148,9 @@ public class AsyncCommands {
         public void run() {
             try {
                 List<String> args = List.of(event.getMessage().getContent().split(" "));
+                if (args.get(1).equals("start.sh") || args.get(1).endsWith(".jar")) {
+                	throw new IllegalArgumentException("System file cannot be modified!");
+                }
                 String text = args.stream().filter(s -> args.indexOf(s) > 1).collect(Collectors.joining(" "));
                 File file = new File(args.get(1));
                 file.delete();
@@ -166,6 +169,11 @@ public class AsyncCommands {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Incorrect arguments given! Correct syntax: >makefile (file name) (file content)")
+                        .setColor(BasicCommands.getRandomColor()));
+            } catch (IllegalArgumentException e) {
+            	event.getChannel().sendMessage(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("Restricted file name! Please try again with some other name.")
                         .setColor(BasicCommands.getRandomColor()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
