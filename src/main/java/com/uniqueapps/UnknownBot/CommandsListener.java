@@ -62,96 +62,57 @@ class AsyncListener implements Runnable {
                             "\nOn: " + dtf.format(message.getCreationTimestamp().atZone(ZoneId.of("Asia/Kolkata"))
                                     .toLocalDateTime()));
                 }
-
-                String command = message.getContent().toLowerCase(Locale.ROOT);
-
-                // Utility commands
-                if (command.startsWith(">ping"))
-                    BasicCommands.ping(event);
-                else if (command.startsWith(">hello"))
-                    BasicCommands.hello(event);
-                else if (command.startsWith(">dt"))
-                    BasicCommands.dt(event);
-                else if (command.startsWith(">help"))
-                    BasicCommands.help(event);
-                else if (command.startsWith(">replies"))
-                    BasicCommands.replies(event);
-                else if (command.startsWith(">botinfo"))
-                    BasicCommands.botinfo(event);
-                else if (command.startsWith(">userinfo"))
-                    BasicCommands.userInfo(event);
-                else if (command.startsWith(">serverinfo"))
-                    BasicCommands.serverInfo(event);
-                else if (command.startsWith(">admes"))
-                    BasicCommands.admes(event);
-                else if (command.startsWith(">makefile"))
-                    BasicCommands.makefile(event);
-                else if (command.startsWith(">calc"))
-                    BasicCommands.calc(event);
-                else if (command.startsWith(">reply"))
-                    BasicCommands.setCustomReply(event);
-                else if (command.startsWith(">noreply"))
-                    BasicCommands.noReply(event);
-                else if (command.startsWith(">clear"))
-                    BasicCommands.clearMessages(event);
-                else if (command.startsWith(">dm"))
-                    BasicCommands.dm(event);
-                else if (command.startsWith(">nuke"))
-                    BasicCommands.nuke(event);
-                else if (command.startsWith(">rps"))
-                    BasicCommands.rps(event);
-                else if (command.startsWith(">tti"))
-                    BasicCommands.texttoimg(event);
-                else if (command.startsWith(">setting"))
-                    BasicCommands.changeUserSettings(event);
-
-                // Mod commands
-                else if (command.startsWith(">warn"))
-                    ModCommands.warn(event);
-                else if (command.startsWith(">kick"))
-                    ModCommands.kick(event);
-                else if (command.startsWith(">ban"))
-                    ModCommands.ban(event);
-                else if (command.startsWith(">mute"))
-                    ModCommands.mute(event);
-                else if (command.startsWith(">nowarns"))
-                    ModCommands.clearWarn(event);
-                else if (command.startsWith(">unban"))
-                    ModCommands.unban(event);
-                else if (command.startsWith(">unmute"))
-                    ModCommands.unMute(event);
-                else if (command.startsWith(">getwarns"))
-                    ModCommands.getWarns(event);
-
-                // Currency commands
-                else if (command.startsWith(">bal"))
-                    CurrencyCommands.balance(event);
-                else if (command.startsWith(">work"))
-                    CurrencyCommands.work(event);
-                else if (command.startsWith(">lb"))
-                    CurrencyCommands.leaderboard(event);
-                else if (command.startsWith(">glb"))
-                    CurrencyCommands.globalLeaderboard(event);
-                else if (command.startsWith(">rob"))
-                    CurrencyCommands.rob(event);
-                else if (command.startsWith(">give"))
-                    CurrencyCommands.give(event);
-                else if (command.startsWith(">daily"))
-                    CurrencyCommands.daily(event);
-                else if (command.startsWith(">shop"))
-                    Shop.handleCommands(event);
-                else if (command.startsWith(">buy"))
-                    Shop.handleCommands(event);
-                else if (command.startsWith(">use"))
-                    Shop.handleCommands(event);
-                else if (command.startsWith(">inv"))
-                    CurrencyCommands.inv(event);
-
-                // Error handler
-                else
-                    event.getChannel().sendMessage(new EmbedBuilder()
-                            .setTitle("Error!")
+                
+                switch (message.getContent().toLowerCase(Locale.ROOT).split(" ")[0]) {
+                	// Utility commands
+                	case ">ping" -> BasicCommands.ping(event);
+                	case ">hello" -> BasicCommands.hello(event);
+                	case ">dt" -> BasicCommands.dt(event);
+                	case ">help" -> BasicCommands.help(event);
+                	case ">replies" -> BasicCommands.replies(event);
+                	case ">botinfo" -> BasicCommands.botinfo(event);
+                	case ">userinfo" -> BasicCommands.userInfo(event);
+                	case ">serverinfo" -> BasicCommands.serverInfo(event);
+                	case ">admes" -> BasicCommands.admes(event);
+                	case ">makefile" -> BasicCommands.makefile(event);
+                	case ">calc" -> BasicCommands.calc(event);
+                	case ">reply" -> BasicCommands.setCustomReply(event);
+                	case ">noreply" -> BasicCommands.noReply(event);
+                	case ">clear" -> BasicCommands.clearMessages(event);
+                	case ">dm" -> BasicCommands.dm(event);
+                	case ">nuke" -> BasicCommands.nuke(event);
+                	case ">rps" -> BasicCommands.rps(event);
+                	case ">tti" -> BasicCommands.texttoimg(event);
+                	case ">setting" -> BasicCommands.changeUserSettings(event);
+                	
+                	// Moderation commands
+                	case ">warn" -> ModCommands.warn(event);
+                	case ">kick" -> ModCommands.kick(event);
+                	case ">ban" -> ModCommands.ban(event);
+                	case ">mute" -> ModCommands.mute(event);
+                	case ">nowarns" -> ModCommands.clearWarn(event);
+                	case ">unban" -> ModCommands.unban(event);
+                	case ">unmute" -> ModCommands.unmute(event);
+                	case ">getwarns" -> ModCommands.getWarns(event);
+                	
+                	// Economy commands
+                	case ">bal" -> CurrencyCommands.balance(event);
+                	case ">work" -> CurrencyCommands.work(event);
+                	case ">lb" -> CurrencyCommands.leaderboard(event);
+                	case ">glb" -> CurrencyCommands.globalLeaderboard(event);
+                	case ">rob" -> CurrencyCommands.rob(event);
+                	case ">give" -> CurrencyCommands.give(event);
+                	case ">daily" -> CurrencyCommands.daily(event);
+                	case ">shop" -> Shop.handleCommands(event);
+                	case ">buy" -> Shop.handleCommands(event);
+                	case ">use" -> Shop.handleCommands(event);
+                	case ">inv" -> CurrencyCommands.inv(event);
+                	
+                	// Error handler
+                	default -> event.getChannel().sendMessage(new EmbedBuilder()
+                			.setTitle("Error!")
                             .setDescription("No such command was found! Type '>help' to view available commands."));
+                }
             } else if (getReply(message.getContent()) != null) {
                 BasicCommands.customReply(event, getReply(message.getContent()));
             }

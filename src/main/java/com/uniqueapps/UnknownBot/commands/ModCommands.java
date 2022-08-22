@@ -134,7 +134,7 @@ public class ModCommands {
         }
     }
 
-    public static void unMute(MessageCreateEvent event) {
+    public static void unmute(MessageCreateEvent event) {
         if (event.getMessageAuthor().isServerAdmin()) {
             if (event.getServer().isPresent()) {
                 if (event.getServer().get().canMuteMembers(Main.api.getYourself())) {
