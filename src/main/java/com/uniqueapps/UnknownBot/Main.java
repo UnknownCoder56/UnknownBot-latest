@@ -80,7 +80,6 @@ public class Main {
 
         org.jsoup.nodes.Document doc = prepareBotSite();
 
-        System.out.print("\033\143");
         String portEnv = System.getenv("PORT");
         if (portEnv != null && !Objects.equals(portEnv, "")) {
             Spark.port(Integer.parseInt(portEnv));
