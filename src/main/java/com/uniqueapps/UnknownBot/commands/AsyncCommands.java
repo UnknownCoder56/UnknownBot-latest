@@ -162,7 +162,6 @@ public class AsyncCommands {
                                 .setColor(BasicCommands.getRandomColor()))
                         .addAttachment(file)
                         .send(event.getChannel());
-                file.deleteOnExit();
             } catch (IndexOutOfBoundsException ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")

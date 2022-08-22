@@ -1,10 +1,19 @@
 package com.uniqueapps.UnknownBot;
 
-import com.mongodb.client.*;
-import com.uniqueapps.UnknownBot.commands.*;
-import com.uniqueapps.UnknownBot.objects.Shop;
-import com.uniqueapps.UnknownBot.objects.UserSettings;
-import com.uniqueapps.UnknownBot.objects.Warn;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
 import org.bson.Document;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -17,12 +26,22 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
-import spark.Spark;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.time.Instant;
-import java.util.*;
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.TransactionBody;
+import com.uniqueapps.UnknownBot.commands.AsyncCommands;
+import com.uniqueapps.UnknownBot.commands.BasicCommands;
+import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
+import com.uniqueapps.UnknownBot.commands.ModCommands;
+import com.uniqueapps.UnknownBot.commands.SlashCommands;
+import com.uniqueapps.UnknownBot.objects.Shop;
+import com.uniqueapps.UnknownBot.objects.UserSettings;
+import com.uniqueapps.UnknownBot.objects.Warn;
+
+import spark.Spark;
 
 public class Main {
 
@@ -35,6 +54,18 @@ public class Main {
 
     public static void main(String[] args) {
         FallbackLoggerConfiguration.setDebug(true);
+        try (var files = Files.list(Path.of("./"))) {
+            files.filter(path -> !path.toFile().getName().endsWith(".jar") && !path.toFile().getName().equals("start.sh")).forEach(path -> {
+                try {
+                    System.out.println("Deleting temporary file: " + path.getFileName());
+                    Files.delete(path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         initData();
         Shop.initShop();
@@ -214,7 +245,7 @@ public class Main {
         StringBuilder content = new StringBuilder();
         try {
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("public/index.html"))));
+                    new InputStreamReader(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("index.html"))));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line).append("\n");

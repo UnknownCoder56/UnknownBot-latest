@@ -3,9 +3,12 @@ package com.uniqueapps.UnknownBot.commands;
 import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,10 +24,10 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import javax.money.Monetary;
+import javax.swing.JLabel;
 
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
@@ -56,27 +59,25 @@ public class SlashCommands implements SlashCommandCreateListener {
             case "currconv" -> currencyConvert(event);
             case "makecolor" -> generateColor(event);
             case "randomcolor" -> randomColor(event);
+            case "makefile" -> makeFile(event);
         }
     }
 
     private void createCommandsIfNotExist() {
-        Server server = Main.api.getServerById(973174048672600104L).orElseThrow();
-        Main.api.bulkOverwriteGlobalApplicationCommands(new ArrayList<>()).join();
-        Main.api.bulkOverwriteServerApplicationCommands(server, new ArrayList<>()).join();
         Main.api.getGlobalSlashCommands().thenApplyAsync(commands -> {
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("ping"))) {
                 SlashCommand.with("ping", "Displays bot latency.")
-                        .createForServer(server)
+                        .createGlobal(Main.api)
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("hello"))) {
                 SlashCommand.with("hello", "Says hello to the user.")
-                        .createForServer(server)
+                        .createGlobal(Main.api)
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("datetime"))) {
                 SlashCommand.with("datetime", "Displays the current UTC or GMT date and time.")
-                        .createForServer(server)
+                        .createGlobal(Main.api)
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("calculate"))) {
@@ -90,14 +91,14 @@ public class SlashCommands implements SlashCommandCreateListener {
                                         SlashCommandOptionChoice.create("divide", "/")
                                 )))
                         .addOption(SlashCommandOption.create(SlashCommandOptionType.DECIMAL, "number_2", "The number 2 of the problem.", true))
-                        .createForServer(server)
+                        .createGlobal(Main.api)
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("dm"))) {
                 SlashCommand.with("dm", "DMs a message to a user.")
                         .addOption(SlashCommandOption.create(SlashCommandOptionType.USER, "user", "The user to DM.", true))
                         .addOption(SlashCommandOption.create(SlashCommandOptionType.STRING, "dm_message", "The message to DM to the user", true))
-                        .createForServer(server)
+                        .createGlobal(Main.api)
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("gencolor"))) {
@@ -105,12 +106,12 @@ public class SlashCommands implements SlashCommandCreateListener {
                         .addOption(SlashCommandOption.createLongOption("red", "The red value of the color. Must be between -1 and 256 (exclusive).", true))
                         .addOption(SlashCommandOption.createLongOption("green", "The green value of the color. Must be between -1 and 256 (exclusive).", true))
                         .addOption(SlashCommandOption.createLongOption("blue", "The blue value of the color. Must be between -1 and 256 (exclusive).", true))
-                        .createForServer(server)
+                        .createGlobal(Main.api)
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("randcolor"))) {
                 SlashCommand.with("randomcolor", "Generates a random color.")
-                        .createForServer(server)
+                        .createGlobal(Main.api)
                         .join();
             }
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("currconv"))) {
@@ -126,11 +127,18 @@ public class SlashCommands implements SlashCommandCreateListener {
                             .addOption(SlashCommandOption.createDecimalOption("convert_amount", "The amount of money to convert", true))
                             .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "from_currency", "The currency of the given amount", true, currencyChoices))
                             .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "to_currency", "The currency to convert the amount to", true, currencyChoices))
-                            .createForServer(server)
+                            .createGlobal(Main.api)
                             .join();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("makefile"))) {
+                SlashCommand.with("makefile", "Creates a new file with the specified name and content and returns it.")
+                        .addOption(SlashCommandOption.createStringOption("filename", "The name of the file to create.", true))
+                        .addOption(SlashCommandOption.createStringOption("content", "The content of the file to create.", true))
+                        .createGlobal(Main.api)
+                        .join();
             }
             return commands;
         });
@@ -290,9 +298,12 @@ public class SlashCommands implements SlashCommandCreateListener {
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.setColor(color);
             graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 50, 50);
-            graphics.setColor(new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue()));
-            graphics.drawString("RGB: " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue(), 10, 10);
-            graphics.drawString("HEX: " + String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue()), 10, 20);
+            graphics.setColor(Color.WHITE);
+            graphics.fillRoundRect(0, 0, 200, 55, 50, 50);
+            graphics.setColor(Color.BLACK);
+            graphics.setFont(new JLabel().getFont().deriveFont(Font.BOLD, 18F));
+            graphics.drawString("RGB: " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue(), 10, 25);
+            graphics.drawString("HEX: " + String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue()), 10, 46);
             graphics.dispose();
             event.getSlashCommandInteraction().createFollowupMessageBuilder()
                     .addEmbed(new EmbedBuilder()
@@ -322,9 +333,12 @@ public class SlashCommands implements SlashCommandCreateListener {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setColor(color);
         graphics.fillRoundRect(0, 0, image.getWidth(), image.getHeight(), 50, 50);
-        graphics.setColor(new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue()));
-        graphics.drawString("RGB: " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue(), 10, 10);
-        graphics.drawString("HEX: " + String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue()), 10, 20);
+        graphics.setColor(Color.WHITE);
+        graphics.fillRoundRect(0, 0, 200, 55, 50, 50);
+        graphics.setColor(Color.BLACK);
+        graphics.setFont(new JLabel().getFont().deriveFont(Font.BOLD, 18F));
+        graphics.drawString("RGB: " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue(), 10, 25);
+        graphics.drawString("HEX: " + String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue()), 10, 46);
         graphics.dispose();
         event.getSlashCommandInteraction().createFollowupMessageBuilder()
                 .addEmbed(new EmbedBuilder()
@@ -333,5 +347,41 @@ public class SlashCommands implements SlashCommandCreateListener {
                         .setImage(image)
                         .setColor(color))
                 .send();
+    }
+
+    private void makeFile(SlashCommandCreateEvent event) {
+        String fileName = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("filename")).findFirst().orElseThrow().getStringValue().orElseThrow();
+        String fileContent = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("content")).findFirst().orElseThrow().getStringValue().orElseThrow();
+
+        try {
+            event.getSlashCommandInteraction().createImmediateResponder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Creating file...")
+                            .setColor(getRandomColor()))
+                    .respond();
+            if (fileName.equals("start.sh") || fileName.endsWith(".jar")) {
+            	throw new IOException("System file cannot be modified!");
+            }
+            File file = new File(fileName);
+            file.delete();
+            file.createNewFile();
+            FileWriter writer = new FileWriter(file);
+            writer.write(fileContent);
+            writer.close();
+            event.getSlashCommandInteraction().createFollowupMessageBuilder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Success!")
+                            .setDescription("Here's your file")
+                            .setColor(BasicCommands.getRandomColor()))
+                    .addAttachment(file)
+                    .send();
+        } catch (IOException e) {
+            event.getSlashCommandInteraction().createFollowupMessageBuilder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("Failed to create file! Please try again.")
+                            .setColor(BasicCommands.getRandomColor()))
+                    .send();
+        }
     }
 }

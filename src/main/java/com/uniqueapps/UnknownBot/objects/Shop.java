@@ -27,13 +27,13 @@ public class Shop {
     public static Map<Long, Map<String, Integer>> ownedItems = new HashMap<>();
 
     public static void initShop() {
-        ShopItem juice = new ShopItem("Juice", "Refresh yourself with a cool an of juice.", "You drink some juice, and get refreshed.", "juice", 1000);
-        ShopItem nitro = new ShopItem("Nitro", "Speed up your day, and work. Work and daily cooldown will be over.", "You use nitro and gain speed, resulting in your work and day being finished faster.", "nitro", 5400, "nitro");
-        ShopItem laptop = new ShopItem("Hacker Laptop", "Write code anytime, anywhere. Pen testing utilities pre-installed.", "HACKED EVERYTHING", "laptop", 30000);
-        ShopItem code = new ShopItem("Hacker Code", "Very special bruteforce attack code. Tested upon top targets.", "HACKED PENTAGON", "code", 50000);
-        ShopItem cat = new ShopItem("Pet Cat", "A pet cat, stays with you as a companion when you code.", "MEW!!! CODE!!!", "cat", 50000);
-        ShopItem pass = new ShopItem("Premium Pass", "Flex item, shows up on rich people's profiles.", "No use lol. Flex on others.", "pass", 100000);
-        ShopItem diamond = new ShopItem("Magna Diamond", "Flex item for the very-rich.", "FLEX TIME!", "magna", 500000);
+        ShopItem juice = new ShopItem("Juice", "Refresh yourself with a cool can of juice.", "You drink some juice, and get refreshed.", "juice", ":beverage_box:", 1000);
+        ShopItem nitro = new ShopItem("Nitro", "Speed up your day, and work. Work and daily cooldown will be over.", "You use nitro and gain speed, resulting in your work and day being finished faster.", "nitro", ":rocket:", 5400, "nitro");
+        ShopItem laptop = new ShopItem("Hacker Laptop", "Write code anytime, anywhere. Pen testing utilities pre-installed.", "HACKED EVERYTHING", "laptop", ":computer:", 30000);
+        ShopItem code = new ShopItem("Hacker Code", "Very special bruteforce attack code. Tested upon top targets.", "HACKED PENTAGON", "code", ":dvd:", 50000);
+        ShopItem cat = new ShopItem("Pet Cat", "A pet cat, stays with you as a companion when you code.", "MEW!!! CODE!!!", "cat", ":cat:", 50000);
+        ShopItem pass = new ShopItem("Premium Pass", "Flex item, shows up on rich people's profiles.", "No use lol. Flex on others.", "pass", ":crown:", 100000);
+        ShopItem diamond = new ShopItem("Magna Diamond", "Flex item for the very-rich.", "FLEX TIME!", "magna", ":large_blue_diamond:", 500000);
 
         items.add(juice);
         items.add(nitro);
@@ -66,12 +66,12 @@ public class Shop {
                 int index = 0;
                 for (ShopItem item : items) {
                     index++;
-                    embed.addField(index + ")" + item.itemName, 
-                        "Description: " + item.itemDesc + "\n" + 
-                        "Cost: " + item.itemCost + "\n" +
-                        "Amount owned: " + getAmountOwned(userId, item.itemName) + "\n" + 
-                        "Command to get: ```" + ">shop " + item.command + "```" + "\n" +
-                        "Command to use: ```" + ">use " + item.command + "```");
+                    embed.addField(index + ")" + item.emoji +  item.itemName, 
+                        "> Description: " + item.itemDesc + "\n" + 
+                        "> Cost: :coin: " + item.itemCost + "\n" +
+                        "> Amount owned: " + getAmountOwned(userId, item.itemName) + "\n" + 
+                        "> Command to get: ```" + ">shop " + item.command + "```" + "\n" +
+                        "> Command to use: ```" + ">use " + item.command + "```");
                     embed.setColor(BasicCommands.getRandomColor());
                 }
                 event.getChannel().sendMessage(embed);

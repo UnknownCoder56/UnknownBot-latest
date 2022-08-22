@@ -15,25 +15,28 @@ public class ShopItem {
     String useMessage;
     String command;
     String funcName;
+    String emoji;
     int itemCost;
     boolean isFunctional;
 
-    public ShopItem(String name, String desc, String useM, String command, int cost) {
+    public ShopItem(String name, String desc, String useM, String command, String emoji, int cost) {
         itemName = name;
         itemDesc = desc;
         itemCost = cost;
         useMessage = useM;
         this.command = command;
+        this.emoji = emoji;
         funcName = null;
         isFunctional = false;
     }
 
-    public ShopItem(String name, String desc, String useM, String command, int cost, String funcName) {
+    public ShopItem(String name, String desc, String useM, String command, String emoji, int cost, String funcName) {
         itemName = name;
         itemDesc = desc;
         itemCost = cost;
         useMessage = useM;
         this.command = command;
+        this.emoji = emoji;
         this.funcName = funcName;
         isFunctional = true;
     }
