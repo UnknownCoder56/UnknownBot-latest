@@ -63,10 +63,10 @@ public class Shop {
 				for (ShopItem item : items) {
 					if (itemChoice.equalsIgnoreCase(item.command)) {
 						event.getChannel().sendMessage(new EmbedBuilder()
-								.setTitle("UnknownBot's Shop - Information about " + item.emoji + " " + item.itemName)
-								.setDescription("> Description: " + item.itemDesc + "\n" + 
-												"> Cost: :coin: " + item.itemCost + "\n" +
-												"> Amount owned: " + getAmountOwned(userId, item.itemName) + "\n" + 
+								.setTitle("UnknownBot's Shop - Information about " + item.emoji + " " + item.name)
+								.setDescription("> Description: " + item.desc + "\n" + 
+												"> Cost: :coin: " + item.cost + "\n" +
+												"> Amount owned: " + getAmountOwned(userId, item.name) + "\n" + 
 												"> Command to get: ```" + ">buy " + item.command + "```" + "\n" +
 												"> Command to use: ```" + ">use " + item.command + "```")
 								.setColor(BasicCommands.getRandomColor()));
@@ -82,10 +82,10 @@ public class Shop {
 				int index = 0;
 				for (ShopItem item : items) {
 					index++;
-					embed.addField(index + ") " + item.emoji + " " + item.itemName, 
-							"> Description: " + item.itemDesc + "\n" + 
-									"> Cost: :coin: " + item.itemCost + "\n" +
-									"> Amount owned: " + getAmountOwned(userId, item.itemName) + "\n" + 
+					embed.addField(index + ") " + item.emoji + " " + item.name, 
+							"> Description: " + item.desc + "\n" + 
+									"> Cost: :coin: " + item.cost + "\n" +
+									"> Amount owned: " + getAmountOwned(userId, item.name) + "\n" + 
 									"> Command to get: ```" + ">buy " + item.command + "```" + "\n" +
 									"> Command to use: ```" + ">use " + item.command + "```");
 					embed.setColor(BasicCommands.getRandomColor());

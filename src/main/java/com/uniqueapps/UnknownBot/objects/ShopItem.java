@@ -2,41 +2,41 @@ package com.uniqueapps.UnknownBot.objects;
 
 import java.util.HashMap;
 
-import com.uniqueapps.UnknownBot.commands.BasicCommands;
-import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
-
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import com.uniqueapps.UnknownBot.commands.BasicCommands;
+import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
+
 public class ShopItem {
 
-    String itemName;
-    String itemDesc;
+    String name;
+    String desc;
     String useMessage;
     String command;
-    String funcName;
     String emoji;
-    int itemCost;
+    String funcName;
+    int cost;
     boolean isFunctional;
 
-    public ShopItem(String name, String desc, String useM, String command, String emoji, int cost) {
-        itemName = name;
-        itemDesc = desc;
-        itemCost = cost;
-        useMessage = useM;
+    public ShopItem(String name, String desc, String useMessage, String command, String emoji, int cost) {
+        this.name = name;
+        this.desc = desc;
+        this.useMessage = useMessage;
         this.command = command;
         this.emoji = emoji;
+        this.cost = cost;
         funcName = null;
         isFunctional = false;
     }
 
-    public ShopItem(String name, String desc, String useM, String command, String emoji, int cost, String funcName) {
-        itemName = name;
-        itemDesc = desc;
-        itemCost = cost;
-        useMessage = useM;
+    public ShopItem(String name, String desc, String useMessage, String command, String emoji, int cost, String funcName) {
+        this.name = name;
+        this.desc = desc;
+        this.useMessage = useMessage;
         this.command = command;
         this.emoji = emoji;
+        this.cost = cost;
         this.funcName = funcName;
         isFunctional = true;
     }
@@ -44,14 +44,14 @@ public class ShopItem {
     public void useItem(MessageCreateEvent event) {
         Long userId = event.getMessageAuthor().asUser().get().getId();
         if (Shop.ownedItems.containsKey(userId)) {
-            if (Shop.ownedItems.get(userId).containsKey(itemName)) {
+            if (Shop.ownedItems.get(userId).containsKey(name)) {
                 if (!isFunctional) {
-                    if (Shop.ownedItems.get(userId).get(itemName) > 0) {
-                        int owned = Shop.ownedItems.get(userId).get(itemName);
-                        Shop.ownedItems.get(userId).replace(itemName, owned, owned - 1);
+                    if (Shop.ownedItems.get(userId).get(name) > 0) {
+                        int owned = Shop.ownedItems.get(userId).get(name);
+                        Shop.ownedItems.get(userId).replace(name, owned, owned - 1);
                         event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle(event.getMessageAuthor().getDisplayName() + " used " + itemName)
-                                .setDescription(useMessage + "\nYou now have " + (owned - 1) + " " + itemName + "(s).")
+                                .setTitle(event.getMessageAuthor().getDisplayName() + " used " + emoji + " " + name)
+                                .setDescription(useMessage + "\nYou now have " + (owned - 1) + " " + emoji + " " + name + "(s).")
                                 .setColor(BasicCommands.getRandomColor()));
                         Shop.refreshOwnerships();
                         return;
@@ -64,13 +64,13 @@ public class ShopItem {
                     return;
                 } else {
                     if (funcName.equals("nitro")) {
-                        if (Shop.ownedItems.get(userId).get(itemName) > 0) {
-                            int owned = Shop.ownedItems.get(userId).get(itemName);
-                            Shop.ownedItems.get(userId).replace(itemName, owned, owned - 1);
+                        if (Shop.ownedItems.get(userId).get(name) > 0) {
+                            int owned = Shop.ownedItems.get(userId).get(name);
+                            Shop.ownedItems.get(userId).replace(name, owned, owned - 1);
                             new Thread(new NitroExec(event)).start();
                             event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle(event.getMessageAuthor().getDisplayName() + " used " + itemName)
-                                .setDescription(useMessage + "\nYou now have " + (owned - 1) + " " + itemName + "(s).")
+                                .setTitle(event.getMessageAuthor().getDisplayName() + " used " + emoji + " " + name)
+                                .setDescription(useMessage + "\nYou now have " + (owned - 1) + " " + emoji + " " + name + "(s).")
                                 .setColor(BasicCommands.getRandomColor()));
                             Shop.refreshOwnerships();
                         } else {
@@ -95,18 +95,18 @@ public class ShopItem {
         if (!Shop.ownedItems.containsKey(userId)) {
             Shop.ownedItems.put(userId, new HashMap<>());
         }
-        if (CurrencyCommands.debitBalance(itemCost, event.getMessageAuthor().asUser().get(), event)) {
-            if (Shop.ownedItems.get(userId).containsKey(itemName)) {
-                int owned = Shop.ownedItems.get(userId).get(itemName);
-                Shop.ownedItems.get(userId).replace(itemName, owned, owned + 1);
+        if (CurrencyCommands.debitBalance(cost, event.getMessageAuthor().asUser().get(), event)) {
+            if (Shop.ownedItems.get(userId).containsKey(name)) {
+                int owned = Shop.ownedItems.get(userId).get(name);
+                Shop.ownedItems.get(userId).replace(name, owned, owned + 1);
             } else {
-                Shop.ownedItems.get(userId).put(itemName, 1);
+                Shop.ownedItems.get(userId).put(name, 1);
             }
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Success!")
                     .setDescription(
-                            event.getMessageAuthor().getDisplayName() + " purchased 1 " + itemName + ".\nNow you have "
-                                    + Shop.ownedItems.get(userId).get(itemName) + " " + itemName + "(s).")
+                            event.getMessageAuthor().getDisplayName() + " purchased 1 " + emoji + " " + name + ".\nNow you have "
+                                    + Shop.ownedItems.get(userId).get(name) + " " + emoji + " " + name + "(s).")
                     .setColor(BasicCommands.getRandomColor()));
             Shop.refreshOwnerships();
         }
