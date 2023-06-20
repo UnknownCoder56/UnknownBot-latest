@@ -78,14 +78,14 @@ class AsyncListener implements Runnable {
                 	case ">calc" -> BasicCommands.calc(event);
                 	case ">reply" -> BasicCommands.setCustomReply(event);
                 	case ">noreply" -> BasicCommands.noReply(event);
-                	case ">clear" -> BasicCommands.clearMessages(event);
                 	case ">dm" -> BasicCommands.dm(event);
-                	case ">nuke" -> BasicCommands.nuke(event);
                 	case ">rps" -> BasicCommands.rps(event);
                 	case ">tti" -> BasicCommands.texttoimg(event);
                 	case ">setting" -> BasicCommands.changeUserSettings(event);
                 	
                 	// Moderation commands
+                    case ">nuke" -> ModCommands.nuke(event);
+                    case ">clear" -> ModCommands.clearMessages(event);
                 	case ">warn" -> ModCommands.warn(event);
                 	case ">kick" -> ModCommands.kick(event);
                 	case ">ban" -> ModCommands.ban(event);
@@ -103,10 +103,10 @@ class AsyncListener implements Runnable {
                 	case ">rob" -> CurrencyCommands.rob(event);
                 	case ">give" -> CurrencyCommands.give(event);
                 	case ">daily" -> CurrencyCommands.daily(event);
-                	case ">shop" -> Shop.handleCommands(event);
-                	case ">buy" -> Shop.handleCommands(event);
-                	case ">use" -> Shop.handleCommands(event);
-                	case ">inv" -> CurrencyCommands.inv(event);
+                    case ">weekly" -> CurrencyCommands.weekly(event);
+                    case ">monthly" -> CurrencyCommands.monthly(event);
+                	case ">shop", ">buy", ">use" -> Shop.handleCommands(event);
+                    case ">inv" -> CurrencyCommands.inv(event);
                 	
                 	// Error handler
                 	default -> event.getChannel().sendMessage(new EmbedBuilder()

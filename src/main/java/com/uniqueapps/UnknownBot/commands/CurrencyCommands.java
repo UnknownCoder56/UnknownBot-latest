@@ -29,13 +29,22 @@ import org.javacord.api.event.message.MessageCreateEvent;
 public class CurrencyCommands {
 
     public static Map<Long, Long> balanceMap = new HashMap<>();
-    public static String[] works = { "did babysitting for 6 hours and earned", "finished a 100-day job and earned",
-            "found some money on road and got", "sold a modern art picture and earned",
-            "caught a robber and was prized with",
-            "fixed neighbour's PC and earned", "checked his car bonnet and found", "won a bet and earned",
-            "repaired cars at workshop for a day and earned", "won a lucky draw and earned" };
+    public static String[] works = {
+        "did babysitting for 6 hours and earned",
+        "finished a 100-day job and earned",
+        "found some money on road and got",
+        "sold a modern art picture and earned",
+        "caught a robber and was prized with",
+        "fixed neighbour's PC and earned",
+        "checked his car bonnet and found",
+        "won a bet and earned",
+        "repaired cars at workshop for a day and earned",
+        "won a lucky draw and earned"
+    };
     static int coolDown = 30;
     static int dailyCoolDown = 86400;
+    static int weeklyCoolDown = 604800;
+    static int monthlyCoolDown = 2592000;
 
     public static void balance(MessageCreateEvent event) {
         if (event.getMessage().getMentionedUsers().size() > 0) {
@@ -117,6 +126,104 @@ public class CurrencyCommands {
                             .setColor(BasicCommands.getRandomColor()));
                 }
                 refreshDailies();
+            }
+        } else {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("You are not a user! Maybe you are a bot.")
+                    .setColor(BasicCommands.getRandomColor()));
+        }
+    }
+
+    public static void weekly(MessageCreateEvent event) {
+        if (event.getMessageAuthor().asUser().isPresent()) {
+            Long userId = event.getMessageAuthor().asUser().get().getId();
+            if (Main.userWeeklyTimes.containsKey(userId)) {
+                if (Duration.between(Main.userWeeklyTimes.get(userId), event.getMessage().getCreationTimestamp())
+                        .toSeconds() >= (weeklyCoolDown)) {
+                    Main.userDailyTimes.put(userId, event.getMessage().getCreationTimestamp());
+                    int earn = 10000;
+                    if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle(event.getMessageAuthor().getDisplayName() + "'s Weekly Earnings")
+                                .setDescription(event.getMessageAuthor().getDisplayName()
+                                        + " got their weekly earnings: :coin: " + earn)
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                    refreshWeeklies();
+                } else {
+                    int leftSeconds = (int) (weeklyCoolDown - Duration.between(Main.userWeeklyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
+                    long days = leftSeconds / (24 * 3600);
+                    leftSeconds = leftSeconds % (24 * 3600);
+                    int hours = (int) (leftSeconds / 3600);
+                    int minutes = (int) ((leftSeconds % 3600) / 60);
+                    int seconds = (int) (leftSeconds % 60);
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("You are currently on cooldown! You may use this command again after " + days + " days, " + hours
+                            + " hours, " + minutes + " minutes and " + seconds + " seconds."));
+                    System.out.println("Cooldown block faced!");
+                }
+            } else {
+                Main.userWeeklyTimes.put(userId, event.getMessage().getCreationTimestamp());
+                int earn = 10000;
+                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle(event.getMessageAuthor().getDisplayName() + "'s Weekly Earnings")
+                            .setDescription(event.getMessageAuthor().getDisplayName()
+                                    + " got their weekly earnings: :coin: " + earn)
+                            .setColor(BasicCommands.getRandomColor()));
+                }
+                refreshWeeklies();
+            }
+        } else {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("You are not a user! Maybe you are a bot.")
+                    .setColor(BasicCommands.getRandomColor()));
+        }
+    }
+
+    public static void monthly(MessageCreateEvent event) {
+        if (event.getMessageAuthor().asUser().isPresent()) {
+            Long userId = event.getMessageAuthor().asUser().get().getId();
+            if (Main.userMonthlyTimes.containsKey(userId)) {
+                if (Duration.between(Main.userMonthlyTimes.get(userId), event.getMessage().getCreationTimestamp())
+                        .toSeconds() >= (monthlyCoolDown)) {
+                    Main.userMonthlyTimes.put(userId, event.getMessage().getCreationTimestamp());
+                    int earn = 50000;
+                    if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                        event.getChannel().sendMessage(new EmbedBuilder()
+                                .setTitle(event.getMessageAuthor().getDisplayName() + "'s Monthly Earnings")
+                                .setDescription(event.getMessageAuthor().getDisplayName()
+                                        + " got their monthly earnings: :coin: " + earn)
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                    refreshMonthlies();
+                } else {
+                    int leftSeconds = (int) (monthlyCoolDown - Duration.between(Main.userMonthlyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
+                    long days = leftSeconds / (24 * 3600);
+                    leftSeconds = leftSeconds % (24 * 3600);
+                    int hours = (int) (leftSeconds / 3600);
+                    int minutes = (int) ((leftSeconds % 3600) / 60);
+                    int seconds = (int) (leftSeconds % 60);
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle("Error!")
+                            .setDescription("You are currently on cooldown! You may use this command again after " + days + " days, " + hours
+                            + " hours, " + minutes + " minutes and " + seconds + " seconds."));
+                    System.out.println("Cooldown block faced!");
+                }
+            } else {
+                Main.userMonthlyTimes.put(userId, event.getMessage().getCreationTimestamp());
+                int earn = 50000;
+                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                    event.getChannel().sendMessage(new EmbedBuilder()
+                            .setTitle(event.getMessageAuthor().getDisplayName() + "'s Monthly Earnings")
+                            .setDescription(event.getMessageAuthor().getDisplayName()
+                                    + " got their monthly earnings: :coin: " + earn)
+                            .setColor(BasicCommands.getRandomColor()));
+                }
+                refreshMonthlies();
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
@@ -713,6 +820,58 @@ public class CurrencyCommands {
                         collection.insertOne(doc);
                     }
                     return "Updated daily times!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
+            }
+        }).start();
+    }
+
+    public static void refreshWeeklies() {
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Date> dates = new ArrayList<>();
+                    for (Instant i : Main.userWeeklyTimes.values()) {
+                        dates.add(Date.from(i));
+                    }
+                    Document doc = new Document()
+                            .append("name", "weekly")
+                            .append("key", Main.userWeeklyTimes.keySet())
+                            .append("val", dates);
+                    if (collection.countDocuments(Filters.eq("name", "weekly")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "weekly"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
+                    return "Updated weekly times!";
+                };
+    
+                System.out.println(session.withTransaction(txnBody));
+            }
+        }).start();
+    }
+
+    public static void refreshMonthlies() {
+        new Thread(() -> {
+            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
+                TransactionBody<String> txnBody = () -> {
+                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
+                    List<Date> dates = new ArrayList<>();
+                    for (Instant i : Main.userMonthlyTimes.values()) {
+                        dates.add(Date.from(i));
+                    }
+                    Document doc = new Document()
+                            .append("name", "monthly")
+                            .append("key", Main.userMonthlyTimes.keySet())
+                            .append("val", dates);
+                    if (collection.countDocuments(Filters.eq("name", "monthly")) > 0) {
+                        collection.replaceOne(Filters.eq("name", "monthly"), doc);
+                    } else {
+                        collection.insertOne(doc);
+                    }
+                    return "Updated monthly times!";
                 };
     
                 System.out.println(session.withTransaction(txnBody));

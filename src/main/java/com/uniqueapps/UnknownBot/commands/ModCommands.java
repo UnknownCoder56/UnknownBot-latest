@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
@@ -318,5 +319,29 @@ public class ModCommands {
                 System.out.println(session.withTransaction(txnBody));
             }
         }).start();
+    }
+
+    public static void clearMessages(MessageCreateEvent event) {
+        AsyncCommands.Clear clear = new AsyncCommands.Clear(event);
+        CompletableFuture<AsyncCommands.Clear> completableFuture = CompletableFuture
+                .supplyAsync(() -> clear);
+
+        completableFuture
+                .thenApplyAsync(clear1 -> {
+                    clear1.run();
+                    return clear1;
+                });
+    }
+
+    public static void nuke(MessageCreateEvent event) {
+        AsyncCommands.Nuke nuke = new AsyncCommands.Nuke(event);
+        CompletableFuture<AsyncCommands.Nuke> completableFuture = CompletableFuture
+                .supplyAsync(() -> nuke);
+
+        completableFuture
+                .thenApplyAsync(nuke1 -> {
+                    nuke1.run();
+                    return nuke1;
+                });
     }
 }

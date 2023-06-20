@@ -194,18 +194,6 @@ public class BasicCommands {
         }
     }
 
-    public static void clearMessages(MessageCreateEvent event) {
-        AsyncCommands.Clear clear = new AsyncCommands.Clear(event);
-        CompletableFuture<AsyncCommands.Clear> completableFuture = CompletableFuture
-                .supplyAsync(() -> clear);
-
-        completableFuture
-                .thenApplyAsync(clear1 -> {
-                    clear1.run();
-                    return clear1;
-                });
-    }
-
     public static void ping(MessageCreateEvent event) {
         try {
 			event.getChannel().sendMessage(new EmbedBuilder()
@@ -385,18 +373,6 @@ public class BasicCommands {
                     .setDescription("DM to user failed (Possible reason: User's DMs are closed).")
                     .setColor(getRandomColor()));
         }
-    }
-
-    public static void nuke(MessageCreateEvent event) {
-        AsyncCommands.Nuke nuke = new AsyncCommands.Nuke(event);
-        CompletableFuture<AsyncCommands.Nuke> completableFuture = CompletableFuture
-                .supplyAsync(() -> nuke);
-
-        completableFuture
-                .thenApplyAsync(nuke1 -> {
-                    nuke1.run();
-                    return nuke1;
-                });
     }
 
     public static void rps(MessageCreateEvent event) {

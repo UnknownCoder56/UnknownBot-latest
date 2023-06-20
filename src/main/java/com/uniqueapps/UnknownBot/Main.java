@@ -49,6 +49,8 @@ public class Main {
     public static Map<Long, Instant> userWorkedTimes = new HashMap<>();
     public static Map<Long, Instant> userRobbedTimes = new HashMap<>();
     public static Map<Long, Instant> userDailyTimes = new HashMap<>();
+    public static Map<Long, Instant> userWeeklyTimes = new HashMap<>();
+    public static Map<Long, Instant> userMonthlyTimes = new HashMap<>();
     public static Map<Long, UserSettings> userSettingsMap = new HashMap<>();
     public static String settings = System.getenv("CONNSTR");
 
@@ -182,8 +184,22 @@ public class Main {
                         for (int i = 0; i < keys.size(); i++) {
                             userDailyTimes.put(keys.get(i), vals.get(i).toInstant());
                         }
+                    } else if (doc.get("name").equals("weekly")) {
+                        userWeeklyTimes = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Date.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            userWeeklyTimes.put(keys.get(i), vals.get(i).toInstant());
+                        }
+                    } else if (doc.get("name").equals("monthly")) {
+                        userMonthlyTimes = new HashMap<>();
+                        var keys = doc.getList("key", Long.class);
+                        var vals = doc.getList("val", Date.class);
+                        for (int i = 0; i < keys.size(); i++) {
+                            userMonthlyTimes.put(keys.get(i), vals.get(i).toInstant());
+                        }
                     } else {
-                        System.out.println("Unknown document found! Skipping");
+                        System.out.println("Unknown document '" + (doc.get("name") != null ? doc.get("name") : "") + "' found! Skipping");
                     }
                 }
                 return "Retrieved all data.";

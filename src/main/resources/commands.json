@@ -114,7 +114,15 @@
   "economy": [
     {
       "name": ">daily",
-      "desc": "Get your daily earnings!"
+      "desc": "Get your daily :coin: 5000 earnings!"
+    },
+    {
+      "name": ">weekly",
+      "desc": "Get your weekly :coin: 10000 earnings!"
+    },
+    {
+      "name": ">monthly",
+      "desc": "Get your monthly :coin: 50000 earnings!"
     },
     {
       "name": ">bal",
@@ -122,15 +130,15 @@
     },
     {
       "name": ">glb",
-      "desc": "Compare and check richest users of our bot (Global)!"
+      "desc": "Compare and check out the richest users of our bot (Global)!"
     },
     {
       "name": ">lb",
-      "desc": "Compare and check out richest users of your server!"
+      "desc": "Compare and check out the richest users of your server!"
     },
     {
       "name": ">give (amount) (mention)",
-      "desc": "Transfer money to others' accounts!"
+      "desc": "Transfer money to others' accounts! (Does not work in passive mode)."
     },
     {
       "name": ">buy (item codename)",
@@ -150,7 +158,7 @@
     },
     {
       "name": ">rob (mention)",
-      "desc": "Rob others and get money, the dark way."
+      "desc": "Rob others and get money, the dark way (Does not work in passive mode)."
     },
     {
       "name": ">use (item codename)",
