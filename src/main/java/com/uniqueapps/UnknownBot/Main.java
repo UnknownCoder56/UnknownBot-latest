@@ -77,7 +77,7 @@ public class Main {
                 .setToken(System.getenv("TOKEN"))
                 .setIntents(Intent.DIRECT_MESSAGES, Intent.GUILD_BANS, Intent.GUILD_MEMBERS, Intent.GUILDS,
                         Intent.DIRECT_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGE_TYPING, Intent.GUILD_MESSAGES,
-                        Intent.GUILD_PRESENCES)
+                        Intent.GUILD_PRESENCES, Intent.MESSAGE_CONTENT)
                 .login().join();
 
         org.jsoup.nodes.Document doc = prepareBotSite();
@@ -99,7 +99,7 @@ public class Main {
 
         initUserSettings(api.getServers());
 
-        api.addListener(new CommandsListener());
+        api.addMessageCreateListener(new CommandsListener());
         api.addSlashCommandCreateListener(new SlashCommands());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
         System.out.println("Invite link for UnknownBot: " + api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
