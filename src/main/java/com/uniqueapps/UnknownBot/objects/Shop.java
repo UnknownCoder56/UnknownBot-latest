@@ -31,12 +31,12 @@ public class Shop {
 				"You drink some juice, and get refreshed.", "juice", ":beverage_box:", 1000);
 		ShopItem nitro = new ShopItem("Nitro", "Speed up your day, and work. Work and daily cooldown will be over.",
 				"You use nitro and gain speed, resulting in your work and day being finished faster.", "nitro",
-				":rocket:", 5400, "nitro");
+				":rocket:", 5400, Nitro.class);
+		ShopItem code = new ShopItem("Hacker Code", "Very special bruteforce attack code. Tested upon top targets.",
+				"HACKED PENTAGON", "code", ":dvd:", 30000, HackerCode.class);
 		ShopItem laptop = new ShopItem("Hacker Laptop",
 				"Write code anytime, anywhere. Pen testing utilities pre-installed.", "HACKED EVERYTHING", "laptop",
-				":computer:", 30000);
-		ShopItem code = new ShopItem("Hacker Code", "Very special bruteforce attack code. Tested upon top targets.",
-				"HACKED PENTAGON", "code", ":dvd:", 50000);
+				":computer:", 50000, HackerLaptop.class);
 		ShopItem cat = new ShopItem("Pet Cat", "A pet cat, stays with you as a companion when you code.",
 				"MEW!!! CODE!!!", "cat", ":cat:", 50000);
 		ShopItem pass = new ShopItem("Premium Pass", "Flex item, shows up on rich people's profiles.",
@@ -46,8 +46,8 @@ public class Shop {
 
 		items.add(juice);
 		items.add(nitro);
-		items.add(laptop);
 		items.add(code);
+		items.add(laptop);
 		items.add(cat);
 		items.add(pass);
 		items.add(diamond);
@@ -55,83 +55,88 @@ public class Shop {
 
 	public static void handleCommands(MessageCreateEvent event) {
 		String command = event.getMessage().getContent();
-		Long userId = event.getMessageAuthor().asUser().get().getId();
-		if (command.startsWith(">shop")) {
-			String[] args = command.split(" ");
-			if (args.length > 1) {
-				String itemChoice = args[1];
-				for (ShopItem item : items) {
-					if (itemChoice.equalsIgnoreCase(item.command)) {
-						event.getChannel().sendMessage(new EmbedBuilder()
-								.setTitle("UnknownBot's Shop - Information about " + item.emoji + " " + item.name)
-								.setDescription("> Description: " + item.desc + "\n" + 
-												"> Cost: :coin: " + item.cost + "\n" +
-												"> Amount owned: " + getAmountOwned(userId, item.name) + "\n" + 
-												"> Command to get: ```" + ">buy " + item.command + "```" + "\n" +
-												"> Command to use: ```" + ">use " + item.command + "```")
-								.setColor(BasicCommands.getRandomColor()));
-						return;
+		event.getMessageAuthor().asUser().ifPresentOrElse(user -> {
+			Long userId = user.getId();
+			if (command.startsWith(">shop")) {
+				String[] args = command.split(" ");
+				if (args.length > 1) {
+					String itemChoice = args[1];
+					for (ShopItem item : items) {
+						if (itemChoice.equalsIgnoreCase(item.command)) {
+							event.getChannel().sendMessage(new EmbedBuilder()
+									.setTitle("UnknownBot's Shop - Information about " + item.emoji + " " + item.name)
+									.setDescription("> Description: " + item.desc + "\n" +
+											"> Cost: :coin: " + item.cost + "\n" +
+											"> Amount owned: " + getAmountOwned(userId, item.name) + "\n" +
+											"> Command to get: ```" + ">buy " + item.command + "```" + "\n" +
+											"> Command to use: ```" + ">use " + item.command + "```")
+									.setColor(BasicCommands.getRandomColor()));
+							return;
+						}
 					}
-				}
-				event.getChannel().sendMessage(new EmbedBuilder()
-						.setTitle("Error!")
-						.setDescription("No item named " + itemChoice + " was found! Type '>shop' to see the available items.")
-						.setColor(BasicCommands.getRandomColor()));
-			} else {
-				EmbedBuilder embed = new EmbedBuilder().setTitle("UnknownBot's Shop");
-				int index = 0;
-				for (ShopItem item : items) {
-					index++;
-					embed.addField(index + ") " + item.emoji + " " + item.name, 
-							"> Description: " + item.desc + "\n" + 
-									"> Cost: :coin: " + item.cost + "\n" +
-									"> Amount owned: " + getAmountOwned(userId, item.name) + "\n" + 
-									"> Command to get: ```" + ">buy " + item.command + "```" + "\n" +
-									"> Command to use: ```" + ">use " + item.command + "```");
-					embed.setColor(BasicCommands.getRandomColor());
-				}
-				event.getChannel().sendMessage(embed);
-			}
-		} else if (command.startsWith(">use")) {
-			String[] args = command.split(" ");
-			if (args.length > 1) {
-				String itemChoice = args[1];
-				for (ShopItem item : items) {
-					if (itemChoice.equalsIgnoreCase(item.command)) {
-						item.useItem(event);
-						return;
+					event.getChannel().sendMessage(new EmbedBuilder()
+							.setTitle("Error!")
+							.setDescription("No item named " + itemChoice + " was found! Type '>shop' to see the available items.")
+							.setColor(BasicCommands.getRandomColor()));
+				} else {
+					EmbedBuilder embed = new EmbedBuilder().setTitle("UnknownBot's Shop");
+					int index = 0;
+					for (ShopItem item : items) {
+						index++;
+						embed.addField(index + ") " + item.emoji + " " + item.name,
+								"> Description: " + item.desc + "\n" +
+										"> Cost: :coin: " + item.cost + "\n" +
+										"> Amount owned: " + getAmountOwned(userId, item.name) + "\n" +
+										"> Command to get: ```" + ">buy " + item.command + "```" + "\n" +
+										"> Command to use: ```" + ">use " + item.command + "```");
+						embed.setColor(BasicCommands.getRandomColor());
 					}
+					event.getChannel().sendMessage(embed);
 				}
-				event.getChannel().sendMessage(new EmbedBuilder()
-						.setTitle("Error!")
-						.setDescription("No item named " + itemChoice + " was found! Type '>shop' to see the available items.")
-						.setColor(BasicCommands.getRandomColor()));
-			} else {
-				event.getChannel().sendMessage(new EmbedBuilder()
-						.setTitle("Error!")
-						.setDescription("No item was specified! Type '>shop' to know about buying stuff, or type '>help' to get help about the commands.")
-						.setColor(BasicCommands.getRandomColor()));
-			}
-		} else if (command.startsWith(">buy")) {
-			String[] args = command.split(" ");
-			if (args.length > 1) {
-				String itemChoice = args[1];
-				for (ShopItem item : items) {
-					if (itemChoice.equalsIgnoreCase(item.command)) {
-						item.buyItem(event);
-						return;
+			} else if (command.startsWith(">use")) {
+				String[] args = command.split(" ");
+				if (args.length > 1) {
+					String itemChoice = args[1];
+					for (ShopItem item : items) {
+						if (itemChoice.equalsIgnoreCase(item.command)) {
+							item.useItem(event);
+							return;
+						}
 					}
+					event.getChannel().sendMessage(new EmbedBuilder()
+							.setTitle("Error!")
+							.setDescription("No item named " + itemChoice + " was found! Type '>shop' to see the available items.")
+							.setColor(BasicCommands.getRandomColor()));
+				} else {
+					event.getChannel().sendMessage(new EmbedBuilder()
+							.setTitle("Error!")
+							.setDescription("No item was specified! Type '>shop' to know about buying stuff, or type '>help' to get help about the commands.")
+							.setColor(BasicCommands.getRandomColor()));
 				}
-				event.getChannel().sendMessage(new EmbedBuilder()
-						.setTitle("Error!")
-						.setDescription("No item named " + itemChoice + " was found! Type '>shop' to see the available items.")
-						.setColor(BasicCommands.getRandomColor()));
-			} else {
-				event.getChannel().sendMessage(new EmbedBuilder()
-						.setTitle("Error!")
-						.setDescription("No argument was supplied! Type '>shop' to get the commands for items, or type '>help' to get help on commands."));
+			} else if (command.startsWith(">buy")) {
+				String[] args = command.split(" ");
+				if (args.length > 1) {
+					String itemChoice = args[1];
+					for (ShopItem item : items) {
+						if (itemChoice.equalsIgnoreCase(item.command)) {
+							item.buyItem(event);
+							return;
+						}
+					}
+					event.getChannel().sendMessage(new EmbedBuilder()
+							.setTitle("Error!")
+							.setDescription("No item named " + itemChoice + " was found! Type '>shop' to see the available items.")
+							.setColor(BasicCommands.getRandomColor()));
+				} else {
+					event.getChannel().sendMessage(new EmbedBuilder()
+							.setTitle("Error!")
+							.setDescription("No argument was supplied! Type '>shop' to get the commands for items, or type '>help' to get help on commands."));
+				}
 			}
-		}
+		}, () -> event.getChannel().sendMessage(new EmbedBuilder()
+				.setTitle("Error!")
+				.setDescription("You are not a user! You can't use this command.")
+				.setColor(BasicCommands.getRandomColor())));
 	}
 
 	public static int getAmountOwned(Long userId, String itemName) {
@@ -170,11 +175,11 @@ public class Shop {
 	}
 }
 
-class NitroExec implements Runnable {
+class Nitro implements Runnable {
 
 	MessageCreateEvent event;
 
-	public NitroExec(MessageCreateEvent event) {
+	public Nitro(MessageCreateEvent event) {
 		this.event = event;
 	}
 
@@ -199,5 +204,33 @@ class NitroExec implements Runnable {
 			}
 		}, () -> event.getChannel().sendMessage(new EmbedBuilder().setTitle("Error!")
 				.setDescription("You are not a user! Maybe you are a bot.").setColor(BasicCommands.getRandomColor())));
+	}
+}
+
+class HackerLaptop implements Runnable {
+
+	MessageCreateEvent event;
+
+	public HackerLaptop(MessageCreateEvent event) {
+		this.event = event;
+	}
+
+	@Override
+	public void run() {
+
+	}
+}
+
+class HackerCode implements Runnable {
+
+	MessageCreateEvent event;
+
+	public HackerCode(MessageCreateEvent event) {
+		this.event = event;
+	}
+
+	@Override
+	public void run() {
+
 	}
 }

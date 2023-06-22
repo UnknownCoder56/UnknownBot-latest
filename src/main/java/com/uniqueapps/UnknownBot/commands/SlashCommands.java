@@ -1,31 +1,8 @@
 package com.uniqueapps.UnknownBot.commands;
 
-import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-
-import javax.money.Monetary;
-import javax.swing.JLabel;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.uniqueapps.UnknownBot.Main;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
@@ -37,9 +14,21 @@ import org.javacord.api.interaction.SlashCommandOptionType;
 import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 import org.javamoney.moneta.Money;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.uniqueapps.UnknownBot.Main;
+import javax.money.Monetary;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
 
 public class SlashCommands implements SlashCommandCreateListener {
 
@@ -60,6 +49,9 @@ public class SlashCommands implements SlashCommandCreateListener {
             case "makecolor" -> generateColor(event);
             case "randomcolor" -> randomColor(event);
             case "makefile" -> makeFile(event);
+            case "botinfo" -> botInfo(event);
+            case "userinfo" -> userInfo(event);
+            case "serverinfo" -> serverInfo(event);
         }
     }
 
@@ -101,7 +93,7 @@ public class SlashCommands implements SlashCommandCreateListener {
                         .createGlobal(Main.api)
                         .join();
             }
-            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("gencolor"))) {
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("makecolor"))) {
                 SlashCommand.with("makecolor", "Generates a color based on given RGB values.")
                         .addOption(SlashCommandOption.createLongOption("red", "The red value of the color. Must be between -1 and 256 (exclusive).", true))
                         .addOption(SlashCommandOption.createLongOption("green", "The green value of the color. Must be between -1 and 256 (exclusive).", true))
@@ -109,7 +101,7 @@ public class SlashCommands implements SlashCommandCreateListener {
                         .createGlobal(Main.api)
                         .join();
             }
-            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("randcolor"))) {
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("randomcolor"))) {
                 SlashCommand.with("randomcolor", "Generates a random color.")
                         .createGlobal(Main.api)
                         .join();
@@ -137,6 +129,23 @@ public class SlashCommands implements SlashCommandCreateListener {
                 SlashCommand.with("makefile", "Creates a new file with the specified name and content and returns it.")
                         .addOption(SlashCommandOption.createStringOption("filename", "The name of the file to create.", true))
                         .addOption(SlashCommandOption.createStringOption("content", "The content of the file to create.", true))
+                        .createGlobal(Main.api)
+                        .join();
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("botinfo"))) {
+                SlashCommand.with("botinfo", "Shows information about UnknownBot.")
+                        .createGlobal(Main.api)
+                        .join();
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("userinfo"))) {
+                SlashCommand.with("userinfo", "Shows mentioned user's info, or yours if not specified")
+                        .addOption(SlashCommandOption.createUserOption("user", "The user whose information you want to see.", false))
+                        .createGlobal(Main.api)
+                        .join();
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("serverinfo"))) {
+                SlashCommand.with("serverinfo", "Shows the server's info on which command is run.")
+                        .setEnabledInDms(false)
                         .createGlobal(Main.api)
                         .join();
             }
@@ -383,5 +392,28 @@ public class SlashCommands implements SlashCommandCreateListener {
                             .setColor(BasicCommands.getRandomColor()))
                     .send();
         }
+    }
+
+    private void botInfo(SlashCommandCreateEvent event) {
+        event.getSlashCommandInteraction().createImmediateResponder()
+                .addEmbed(InfoEmbeds.botInfo(event.getSlashCommandInteraction().getServer()))
+                .respond();
+    }
+
+    private void userInfo(SlashCommandCreateEvent event) {
+        Optional<User> authorOptional = Optional.of(event.getSlashCommandInteraction().getUser());
+        event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("user")).findFirst().orElseThrow().getUserValue().ifPresentOrElse(
+                user -> event.getSlashCommandInteraction().createImmediateResponder()
+                        .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), user))
+                        .respond(),
+                () -> event.getSlashCommandInteraction().createImmediateResponder()
+                        .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), null))
+                        .respond());
+    }
+
+    private void serverInfo(SlashCommandCreateEvent event) {
+        event.getSlashCommandInteraction().createImmediateResponder()
+                .addEmbed(InfoEmbeds.serverInfo(event.getSlashCommandInteraction().getServer()))
+                .respond();
     }
 }

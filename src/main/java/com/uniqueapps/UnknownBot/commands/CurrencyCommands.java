@@ -155,9 +155,9 @@ public class CurrencyCommands {
                     int leftSeconds = (int) (weeklyCoolDown - Duration.between(Main.userWeeklyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
                     long days = leftSeconds / (24 * 3600);
                     leftSeconds = leftSeconds % (24 * 3600);
-                    int hours = (int) (leftSeconds / 3600);
-                    int minutes = (int) ((leftSeconds % 3600) / 60);
-                    int seconds = (int) (leftSeconds % 60);
+                    int hours = leftSeconds / 3600;
+                    int minutes = (leftSeconds % 3600) / 60;
+                    int seconds = leftSeconds % 60;
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("You are currently on cooldown! You may use this command again after " + days + " days, " + hours
@@ -204,9 +204,9 @@ public class CurrencyCommands {
                     int leftSeconds = (int) (monthlyCoolDown - Duration.between(Main.userMonthlyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
                     long days = leftSeconds / (24 * 3600);
                     leftSeconds = leftSeconds % (24 * 3600);
-                    int hours = (int) (leftSeconds / 3600);
-                    int minutes = (int) ((leftSeconds % 3600) / 60);
-                    int seconds = (int) (leftSeconds % 60);
+                    int hours = leftSeconds / 3600;
+                    int minutes = (leftSeconds % 3600) / 60;
+                    int seconds = leftSeconds % 60;
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("You are currently on cooldown! You may use this command again after " + days + " days, " + hours
@@ -537,7 +537,7 @@ public class CurrencyCommands {
             }
             SortByBalance sortByBalance = new SortByBalance(balanceMap);
             arrangedUsers.sort(Collections.reverseOrder(sortByBalance));
-            arrangedUsers.removeIf(user -> arrangedUsers.indexOf(user) > 5);
+            arrangedUsers.removeIf(user -> arrangedUsers.indexOf(user) > 4);
             System.out.println(arrangedUsers);
             StringBuilder formattedTopUsers = new StringBuilder();
             int win = 0;
@@ -590,7 +590,7 @@ public class CurrencyCommands {
         }
         SortByBalance sortByBalance = new SortByBalance(balanceMap);
         arrangedUsers.sort(Collections.reverseOrder(sortByBalance));
-        arrangedUsers.removeIf(user -> arrangedUsers.indexOf(user) > 5);
+        arrangedUsers.removeIf(user -> arrangedUsers.indexOf(user) > 4);
         System.out.println(arrangedUsers);
         StringBuilder formattedTopUsers = new StringBuilder();
         int win = 0;

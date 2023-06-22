@@ -193,7 +193,7 @@ public class ModCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Success!")
                     .setDescription("Successfully warned " + user.getDiscriminatedName() + " for cause:\n" +
-                            cause + "\nHe/She now has " + warnMap.get(event.getServer().get().getId()).get(user.getId()).warns + " warn(s).")
+                            cause + "\nThey now have " + warnMap.get(event.getServer().get().getId()).get(user.getId()).warns + " warn(s).")
                     .setColor(BasicCommands.getRandomColor()));
             if (user.getPrivateChannel().isPresent()) {
                 if (event.getServer().isPresent()) {

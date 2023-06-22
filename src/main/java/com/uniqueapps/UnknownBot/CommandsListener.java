@@ -65,20 +65,20 @@ class AsyncListener implements Runnable {
                 
                 switch (message.getContent().toLowerCase(Locale.ROOT).split(" ")[0]) {
                 	// Utility commands
-                	case ">ping" -> BasicCommands.ping(event);
-                	case ">hello" -> BasicCommands.hello(event);
-                	case ">dt" -> BasicCommands.dt(event);
+                	case ">ping" -> BasicCommands.ping(event); // Slashed
+                	case ">hello" -> BasicCommands.hello(event); // Slashed
+                	case ">dt" -> BasicCommands.dt(event); // Slashed
                 	case ">help" -> BasicCommands.help(event);
                 	case ">replies" -> BasicCommands.replies(event);
-                	case ">botinfo" -> BasicCommands.botinfo(event);
-                	case ">userinfo" -> BasicCommands.userInfo(event);
-                	case ">serverinfo" -> BasicCommands.serverInfo(event);
+                	case ">botinfo" -> BasicCommands.botInfo(event); // Slashed
+                	case ">userinfo" -> BasicCommands.userInfo(event); // Slashed
+                	case ">serverinfo" -> BasicCommands.serverInfo(event); // Slashed
                 	case ">admes" -> BasicCommands.admes(event);
-                	case ">makefile" -> BasicCommands.makefile(event);
-                	case ">calc" -> BasicCommands.calc(event);
+                	case ">makefile" -> BasicCommands.makefile(event); // Slashed
+                	case ">calc" -> BasicCommands.calc(event); // Slashed
                 	case ">reply" -> BasicCommands.setCustomReply(event);
                 	case ">noreply" -> BasicCommands.noReply(event);
-                	case ">dm" -> BasicCommands.dm(event);
+                	case ">dm" -> BasicCommands.dm(event); // Slashed
                 	case ">rps" -> BasicCommands.rps(event);
                 	case ">tti" -> BasicCommands.texttoimg(event);
                 	case ">setting" -> BasicCommands.changeUserSettings(event);
