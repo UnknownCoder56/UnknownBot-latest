@@ -402,10 +402,14 @@ public class SlashCommands implements SlashCommandCreateListener {
 
     private void userInfo(SlashCommandCreateEvent event) {
         Optional<User> authorOptional = Optional.of(event.getSlashCommandInteraction().getUser());
-        event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("user")).findFirst().orElseThrow().getUserValue().ifPresentOrElse(
-                user -> event.getSlashCommandInteraction().createImmediateResponder()
-                        .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), user))
-                        .respond(),
+        event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("user")).findFirst().ifPresentOrElse(
+                slashCommandInteractionOption -> slashCommandInteractionOption.getUserValue().ifPresentOrElse(
+                        user -> event.getSlashCommandInteraction().createImmediateResponder()
+                                .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), user))
+                                .respond(),
+                        () -> event.getSlashCommandInteraction().createImmediateResponder()
+                                .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), null))
+                                .respond()),
                 () -> event.getSlashCommandInteraction().createImmediateResponder()
                         .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), null))
                         .respond());
