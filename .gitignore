@@ -2,3 +2,5 @@
 /target/
 /bin/
 /.idea/
+/.vscode/
+/unknownbot.iml

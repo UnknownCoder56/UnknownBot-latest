@@ -1,6 +1,7 @@
 package com.uniqueapps.UnknownBot.commands;
 
 import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.UnknownBot.objects.UserSettings;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
@@ -8,18 +9,17 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class InfoEmbeds {
+public class HybridCommands {
 
     public static EmbedBuilder botInfo(Optional<Server> serverOptional) {
         try {
@@ -151,6 +151,119 @@ public class InfoEmbeds {
         }, () -> embedBuilder.set(new EmbedBuilder()
                 .setTitle("Error!")
                 .setDescription("This command only works in servers!")));
+
+        return embedBuilder.get();
+    }
+
+    public static EmbedBuilder textToImage(String text) {
+        if (!(text.charAt(0) == ' ')) text = " " + text;
+        if (!(text.charAt(text.length() - 1) == ' ')) text += " ";
+
+        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
+        Font font = new Font("Arial", Font.PLAIN, 48);
+        g2d.setFont(font);
+        FontMetrics fm = g2d.getFontMetrics();
+        int width = fm.stringWidth(text);
+        int height = fm.getHeight();
+        g2d.dispose();
+
+        img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        g2d = img.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        g2d.setFont(font);
+        fm = g2d.getFontMetrics();
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(text, 0, fm.getAscent());
+        g2d.dispose();
+
+        return new EmbedBuilder()
+                .setTitle("Success!")
+                .setDescription("Here is your image.")
+                .setImage(img)
+                .setColor(BasicCommands.getRandomColor());
+    }
+
+    public static EmbedBuilder changeUserSettings(Optional<User> authorOptional, String setting, String settingValue) {
+        AtomicReference<EmbedBuilder> embedBuilder = new AtomicReference<>();
+        authorOptional.ifPresentOrElse(user -> {
+            long id = user.getId();
+            if (Objects.equals(settingValue, "true")) {
+                UserSettings settings = Main.userSettingsMap.get(id);
+                switch (setting) {
+                    case "bankdm" -> {
+                        settings.setBankDmEnabled(true);
+                        embedBuilder.set(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Enabled bank transaction DMs! Now you WILL be DMed about all your bank transactions.")
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                    case "passive" -> {
+                        settings.setBankPassiveEnabled(true);
+                        embedBuilder.set(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Enabled passive mode! Now NEITHER anyone can rob you, NOR you can rob anyone else.\n" +
+                                        "You also CANNOT give money to someone else.")
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                    default -> {
+                        embedBuilder.set(new EmbedBuilder()
+                                .setTitle("Error!")
+                                .setDescription("Setting type " + setting + " not found!")
+                                .setColor(BasicCommands.getRandomColor()));
+                        return;
+                    }
+                }
+                Main.userSettingsMap.replace(id, settings);
+                BasicCommands.refreshUserSettings();
+            } else if (Objects.equals(settingValue, "false")) {
+                UserSettings settings = Main.userSettingsMap.get(id);
+                switch (setting) {
+                    case "bankdm" -> {
+                        settings.setBankDmEnabled(false);
+                        embedBuilder.set(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Disabled bank transaction DMs! Now you WON'T be DMed about any of your bank transactions.")
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                    case "passive" -> {
+                        settings.setBankPassiveEnabled(false);
+                        embedBuilder.set(new EmbedBuilder()
+                                .setTitle("Success!")
+                                .setDescription("Disabled passive mode! Now anyone CAN rob you, and you CAN rob anyone else.\n" +
+                                        "You also CAN give money to someone else.")
+                                .setColor(BasicCommands.getRandomColor()));
+                    }
+                    default -> {
+                        embedBuilder.set(new EmbedBuilder()
+                                .setTitle("Error!")
+                                .setDescription("Setting type " + setting + " not found!")
+                                .setColor(BasicCommands.getRandomColor()));
+                        return;
+                    }
+                }
+                Main.userSettingsMap.replace(id, settings);
+                BasicCommands.refreshUserSettings();
+            } else {
+                embedBuilder.set(new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("Incorrect arguments given! Correct syntax: '>setting (type) (true or false)'.\n" +
+                                "Example: >setting bankdm false")
+                        .setColor(BasicCommands.getRandomColor()));
+            }
+        }, () -> embedBuilder.set(new EmbedBuilder()
+                .setTitle("Error!")
+                .setDescription("You are not a user! You can't use this command.")
+                .setColor(BasicCommands.getRandomColor())));
 
         return embedBuilder.get();
     }

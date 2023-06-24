@@ -52,6 +52,8 @@ public class SlashCommands implements SlashCommandCreateListener {
             case "botinfo" -> botInfo(event);
             case "userinfo" -> userInfo(event);
             case "serverinfo" -> serverInfo(event);
+            case "tti" -> textToImage(event);
+            case "setting" -> changeUserSettings(event);
         }
     }
 
@@ -146,6 +148,27 @@ public class SlashCommands implements SlashCommandCreateListener {
             if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("serverinfo"))) {
                 SlashCommand.with("serverinfo", "Shows the server's info on which command is run.")
                         .setEnabledInDms(false)
+                        .createGlobal(Main.api)
+                        .join();
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("tti"))) {
+                SlashCommand.with("tti", "Converts given text to image.")
+                        .addOption(SlashCommandOption.createStringOption("text", "The text to convert into image", true))
+                        .createGlobal(Main.api)
+                        .join();
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("setting"))) {
+                SlashCommand.with("setting", "Changes your user settings, where type include - 'bankdm', 'passive'.")
+                        .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "type", "The type of setting to change.", true,
+                                Arrays.asList(
+                                        SlashCommandOptionChoice.create("Bank transaction DM", "bankdm"),
+                                        SlashCommandOptionChoice.create("Passive mode", "passive")
+                                )))
+                        .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "value", "The value of the setting.", true,
+                                Arrays.asList(
+                                        SlashCommandOptionChoice.create("Enabled/True", "true"),
+                                        SlashCommandOptionChoice.create("Disabled/False", "false")
+                                )))
                         .createGlobal(Main.api)
                         .join();
             }
@@ -396,7 +419,7 @@ public class SlashCommands implements SlashCommandCreateListener {
 
     private void botInfo(SlashCommandCreateEvent event) {
         event.getSlashCommandInteraction().createImmediateResponder()
-                .addEmbed(InfoEmbeds.botInfo(event.getSlashCommandInteraction().getServer()))
+                .addEmbed(HybridCommands.botInfo(event.getSlashCommandInteraction().getServer()))
                 .respond();
     }
 
@@ -405,19 +428,34 @@ public class SlashCommands implements SlashCommandCreateListener {
         event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("user")).findFirst().ifPresentOrElse(
                 slashCommandInteractionOption -> slashCommandInteractionOption.getUserValue().ifPresentOrElse(
                         user -> event.getSlashCommandInteraction().createImmediateResponder()
-                                .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), user))
+                                .addEmbed(HybridCommands.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), user))
                                 .respond(),
                         () -> event.getSlashCommandInteraction().createImmediateResponder()
-                                .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), null))
+                                .addEmbed(HybridCommands.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), null))
                                 .respond()),
                 () -> event.getSlashCommandInteraction().createImmediateResponder()
-                        .addEmbed(InfoEmbeds.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), null))
+                        .addEmbed(HybridCommands.userInfo(authorOptional, event.getSlashCommandInteraction().getServer(), null))
                         .respond());
     }
 
     private void serverInfo(SlashCommandCreateEvent event) {
         event.getSlashCommandInteraction().createImmediateResponder()
-                .addEmbed(InfoEmbeds.serverInfo(event.getSlashCommandInteraction().getServer()))
+                .addEmbed(HybridCommands.serverInfo(event.getSlashCommandInteraction().getServer()))
+                .respond();
+    }
+
+    private void textToImage(SlashCommandCreateEvent event) {
+        String text = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("text")).findFirst().orElseThrow().getStringValue().orElseThrow();
+        event.getSlashCommandInteraction().createImmediateResponder()
+                .addEmbed(HybridCommands.textToImage(text))
+                .respond();
+    }
+
+    private void changeUserSettings(SlashCommandCreateEvent event) {
+        String setting = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("type")).findFirst().orElseThrow().getStringValue().orElseThrow();
+        String settingValue = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("value")).findFirst().orElseThrow().getStringValue().orElseThrow();
+        event.getSlashCommandInteraction().createImmediateResponder()
+                .addEmbed(HybridCommands.changeUserSettings(Optional.of(event.getSlashCommandInteraction().getUser()), setting, settingValue))
                 .respond();
     }
 }

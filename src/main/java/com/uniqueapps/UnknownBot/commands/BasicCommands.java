@@ -10,12 +10,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.component.ActionRow;
+import org.javacord.api.entity.message.component.SelectMenu;
+import org.javacord.api.entity.message.component.SelectMenuOption;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
@@ -261,11 +264,12 @@ public class BasicCommands {
 
                 event.getChannel().sendMessage(embedBuilder);
             } else {
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("UnknownBot's help docs")
-                        .setDescription("""
+                new MessageBuilder()
+                        .addEmbed(new EmbedBuilder()
+                                .setTitle("UnknownBot's help docs")
+                                .setDescription("""
                                 UnknownBot is a multipurpose bot, currently under active development.
-                                To get help about commands, type ">help (category)", where categories include:-
+                                To get help about commands, select one category below or type ">help (category)", where categories include:-
 
                                 1) Utility ```>help utility```
                                 2) Moderation ```>help moderation```
@@ -277,15 +281,78 @@ public class BasicCommands {
                                 https://discord.gg/t79ZyuHr5K/
                                 Or visit UnknownBot's website:-
                                 https://user783667580106702848.pepich.de/""")
-                        .setColor(getRandomColor()));
+                                .setColor(getRandomColor()))
+                        .addComponents(ActionRow.of(SelectMenu.createStringMenu("help_category",
+                                Arrays.asList(
+                                        SelectMenuOption.create("Utility", "utility"),
+                                        SelectMenuOption.create("Moderation", "moderation"),
+                                        SelectMenuOption.create("Economy", "economy")
+                                ))))
+                        .send(event.getChannel());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static EmbedBuilder help(String category) {
+        try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream("/commands.json")))) {
+            JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
+            JsonArray utilityCommands = object.getAsJsonArray("utility");
+            JsonArray moderationCommands = object.getAsJsonArray("moderation");
+            JsonArray economyCommands = object.getAsJsonArray("economy");
+            String[] categories = {"utility", "moderation", "economy"};
+            if (Objects.equals(category, categories[0])) {
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                        .setTitle("UnknownBot's Utility commands:-")
+                        .setColor(getRandomColor());
+
+                utilityCommands.forEach(jsonElement -> {
+                    JsonObject command = jsonElement.getAsJsonObject();
+                    embedBuilder.addField(command.get("name").getAsString(), command.get("desc").getAsString(), true);
+                });
+
+                return embedBuilder;
+            } else if (Objects.equals(category, categories[1])) {
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                        .setTitle("UnknownBot's Moderation commands:-")
+                        .setColor(getRandomColor());
+
+                moderationCommands.forEach(jsonElement -> {
+                    JsonObject command = jsonElement.getAsJsonObject();
+                    embedBuilder.addField(command.get("name").getAsString(), command.get("desc").getAsString(), true);
+                });
+
+                return embedBuilder;
+            } else if (Objects.equals(category, categories[2])) {
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                        .setTitle("UnknownBot's Economy commands:-")
+                        .setColor(getRandomColor());
+
+                economyCommands.forEach(jsonElement -> {
+                    JsonObject command = jsonElement.getAsJsonObject();
+                    embedBuilder.addField(command.get("name").getAsString(), command.get("desc").getAsString(), true);
+                });
+
+                return embedBuilder;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
     public static void botInfo(MessageCreateEvent event) {
-        event.getChannel().sendMessage(InfoEmbeds.botInfo(event.getServer()));
+        event.getChannel().sendMessage(HybridCommands.botInfo(event.getServer()));
+    }
+
+    public static void userInfo(MessageCreateEvent event) {
+        User user = event.getMessage().getMentionedUsers().size() > 0 ? event.getMessage().getMentionedUsers().get(0) : null;
+        event.getChannel().sendMessage(HybridCommands.userInfo(event.getMessageAuthor().asUser(), event.getServer(), user));
+    }
+
+    public static void serverInfo(MessageCreateEvent event) {
+        event.getChannel().sendMessage(HybridCommands.serverInfo(event.getServer()));
     }
 
     public static void replies(MessageCreateEvent event) {
@@ -367,7 +434,7 @@ public class BasicCommands {
         }
     }
 
-    public static void texttoimg(MessageCreateEvent event) {
+    public static void textToImage(MessageCreateEvent event) {
         String text;
         try {
             text = event.getMessageContent().substring(5);
@@ -378,125 +445,21 @@ public class BasicCommands {
                 .setColor(getRandomColor()));
             return;
         }
-        if (!(text.charAt(0) == ' ')) text = " " + text;
-        if (!(text.charAt(text.length() - 1) == ' ')) text += " ";
-        
-        BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = img.createGraphics();
-        Font font = new Font("Arial", Font.PLAIN, 48);
-        g2d.setFont(font);
-        FontMetrics fm = g2d.getFontMetrics();
-        int width = fm.stringWidth(text);
-        int height = fm.getHeight();
-        g2d.dispose();
-
-        img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        g2d = img.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-        g2d.setFont(font);
-        fm = g2d.getFontMetrics();
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, 0, img.getWidth(), img.getHeight());
-        g2d.setColor(Color.WHITE);
-        g2d.drawString(text, 0, fm.getAscent());
-        g2d.dispose();
-
-        event.getChannel().sendMessage(new EmbedBuilder()
-            .setTitle("Success!")
-            .setDescription("Here is your image.")
-            .setImage(img)
-            .setColor(getRandomColor()));
+        event.getChannel().sendMessage(HybridCommands.textToImage(text));
     }
 
     public static void changeUserSettings(MessageCreateEvent event) {
-        String[] args = event.getMessage().getContent().split(" ");
-        String setting = args[1].toLowerCase(Locale.ROOT);
-        String settingValue = args[2].toLowerCase(Locale.ROOT);
-        event.getMessageAuthor().asUser().ifPresentOrElse(user -> {
-            long id = user.getId();
-            if (Objects.equals(settingValue, "true")) {
-                UserSettings settings = Main.userSettingsMap.get(id);
-                switch (setting) {
-                    case "bankdm" -> {
-                        settings.setBankDmEnabled(true);
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("Success!")
-                                .setDescription("Enabled bank transaction DMs! Now you WILL be DMed about all your bank transactions.")
-                                .setColor(getRandomColor()));
-                    }
-                    case "passive" -> {
-                        settings.setBankPassiveEnabled(true);
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("Success!")
-                                .setDescription("Enabled passive mode! Now NEITHER anyone can rob you, NOR you can rob anyone else.\n" +
-                                        "You also CANNOT give money to someone else.")
-                                .setColor(getRandomColor()));
-                    }
-                    default -> {
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("Error!")
-                                .setDescription("Setting type " + args[1] + " not found!")
-                                .setColor(getRandomColor()));
-                        return;
-                    }
-                }
-                Main.userSettingsMap.replace(id, settings);
-                refreshUserSettings();
-            } else if (Objects.equals(settingValue, "false")) {
-                UserSettings settings = Main.userSettingsMap.get(id);
-                switch (setting) {
-                    case "bankdm" -> {
-                        settings.setBankDmEnabled(false);
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("Success!")
-                                .setDescription("Disabled bank transaction DMs! Now you WON'T be DMed about any of your bank transactions.")
-                                .setColor(getRandomColor()));
-                    }
-                    case "passive" -> {
-                        settings.setBankPassiveEnabled(false);
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("Success!")
-                                .setDescription("Disabled passive mode! Now anyone CAN rob you, and you CAN rob anyone else.\n" +
-                                        "You also CAN give money to someone else.")
-                                .setColor(getRandomColor()));
-                    }
-                    default -> {
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("Error!")
-                                .setDescription("Setting type " + args[1] + " not found!")
-                                .setColor(getRandomColor()));
-                        return;
-                    }
-                }
-                Main.userSettingsMap.replace(id, settings);
-                refreshUserSettings();
-            } else {
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("Error!")
-                        .setDescription("Incorrect arguments given! Correct syntax: '>setting (type) (true or false)'.\n" +
-                                "Example: >setting bankdm false")
-                        .setColor(getRandomColor()));
-            }
-        }, () -> event.getChannel().sendMessage(new EmbedBuilder()
-                .setTitle("Error!")
-                .setDescription("You are not a user! You can't use this command.")
-                .setColor(getRandomColor())));
-    }
-
-    public static void userInfo(MessageCreateEvent event) {
-        User user = event.getMessage().getMentionedUsers().size() > 0 ? event.getMessage().getMentionedUsers().get(0) : null;
-        event.getChannel().sendMessage(InfoEmbeds.userInfo(event.getMessageAuthor().asUser(), event.getServer(), user));
-    }
-
-    public static void serverInfo(MessageCreateEvent event) {
-        event.getChannel().sendMessage(InfoEmbeds.serverInfo(event.getServer()));
+        try {
+            String[] args = event.getMessage().getContent().split(" ");
+            String setting = args[1].toLowerCase(Locale.ROOT);
+            String settingValue = args[2].toLowerCase(Locale.ROOT);
+            event.getChannel().sendMessage(HybridCommands.changeUserSettings(event.getMessageAuthor().asUser(), setting, settingValue));
+        } catch (IndexOutOfBoundsException ex) {
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setTitle("Error!")
+                    .setDescription("Incorrect number arguments given! Correct syntax - >setting (bankdm or passive) (true or false).")
+                    .setColor(getRandomColor()));
+        }
     }
 
     // Helper methods
