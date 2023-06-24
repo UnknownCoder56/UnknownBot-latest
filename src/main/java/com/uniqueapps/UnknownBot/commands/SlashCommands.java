@@ -447,8 +447,13 @@ public class SlashCommands implements SlashCommandCreateListener {
     private void textToImage(SlashCommandCreateEvent event) {
         String text = event.getSlashCommandInteraction().getArguments().stream().filter(slashCommandInteractionOption -> slashCommandInteractionOption.getName().equals("text")).findFirst().orElseThrow().getStringValue().orElseThrow();
         event.getSlashCommandInteraction().createImmediateResponder()
-                .addEmbed(HybridCommands.textToImage(text))
+                .addEmbed(new EmbedBuilder()
+                        .setTitle("Creating image...")
+                        .setColor(getRandomColor()))
                 .respond();
+        event.getSlashCommandInteraction().createFollowupMessageBuilder()
+                .addEmbed(HybridCommands.textToImage(text))
+                .send();
     }
 
     private void changeUserSettings(SlashCommandCreateEvent event) {
