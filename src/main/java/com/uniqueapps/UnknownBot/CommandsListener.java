@@ -79,7 +79,7 @@ class AsyncListener implements Runnable {
                 	case ">reply" -> BasicCommands.setCustomReply(event);
                 	case ">noreply" -> BasicCommands.noReply(event);
                 	case ">dm" -> BasicCommands.dm(event); // Slashed
-                	case ">rps" -> BasicCommands.rps(event);
+                	case ">rps" -> BasicCommands.rps(event); // Slashed
                 	case ">tti" -> BasicCommands.textToImage(event); // Slashed
                 	case ">setting" -> BasicCommands.changeUserSettings(event); // Slashed
                 	
