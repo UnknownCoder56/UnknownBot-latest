@@ -2,6 +2,10 @@ package com.uniqueapps.UnknownBot.commands;
 
 import com.uniqueapps.UnknownBot.Main;
 import com.uniqueapps.UnknownBot.objects.UserSettings;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.component.ActionRow;
+import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
@@ -266,5 +270,50 @@ public class HybridCommands {
                 .setColor(BasicCommands.getRandomColor())));
 
         return embedBuilder.get();
+    }
+
+    public static EmbedBuilder rps(String chosenChoice, TextChannel channel) {
+        if (chosenChoice != null) {
+            char choice = chosenChoice.charAt(0);
+            int intChoice = CurrencyCommands.getRandomInteger(2, 0);
+            char[] botChoices = {'r', 'p', 's'};
+            char botChoice = botChoices[intChoice];
+            int winStatus = BasicCommands.getWinStatus(botChoice, choice);
+
+            if (winStatus == BasicCommands.userWin) {
+                return new EmbedBuilder()
+                        .setTitle("You win!")
+                        .setDescription("You chose " + BasicCommands.getChoiceName(choice) + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
+                        .setColor(BasicCommands.getRandomColor());
+            } else if (winStatus == BasicCommands.botWin) {
+                return new EmbedBuilder()
+                        .setTitle("Bot wins!")
+                        .setDescription("You chose " + BasicCommands.getChoiceName(choice) + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
+                        .setColor(BasicCommands.getRandomColor());
+            } else if (winStatus == BasicCommands.tie) {
+                return new EmbedBuilder()
+                        .setTitle("Tie!")
+                        .setDescription("You chose " + BasicCommands.getChoiceName(choice) + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
+                        .setColor(BasicCommands.getRandomColor());
+            } else if (winStatus == BasicCommands.error) {
+                return new EmbedBuilder()
+                        .setTitle("Error!")
+                        .setDescription("You chose " + chosenChoice + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
+                        .setColor(BasicCommands.getRandomColor());
+            }
+        } else {
+            new MessageBuilder()
+                    .addEmbed(new EmbedBuilder()
+                            .setTitle("Rock Paper Scissors!")
+                            .setDescription("Select a choice (rock/paper/scissors).")
+                            .setColor(BasicCommands.getRandomColor()))
+                    .addComponents(ActionRow.of(
+                            Button.success("rps_rock", "Rock"),
+                            Button.success("rps_paper", "Paper"),
+                            Button.success("rps_scissors", "Scissors")
+                    ))
+                    .send(channel);
+        }
+        return null;
     }
 }

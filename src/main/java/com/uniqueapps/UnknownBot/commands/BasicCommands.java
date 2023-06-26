@@ -404,33 +404,10 @@ public class BasicCommands {
 
     public static void rps(MessageCreateEvent event) {
         String[] args = event.getMessage().getContent().split(" ");
-        String actualChoice = args[1];
-        char choice = args[1].toLowerCase().charAt(0);
-        int intChoice = CurrencyCommands.getRandomInteger(2, 0);
-        char[] botChoices = {'r', 'p', 's'};
-        char botChoice = botChoices[intChoice];
-        int winStatus = getWinStatus(botChoice, choice);
-        
-        if (winStatus == userWin) {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("You win!")
-                    .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + ".")
-                    .setColor(getRandomColor()));
-        } else if (winStatus == botWin) {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Bot wins!")
-                    .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + ".")
-                    .setColor(getRandomColor()));
-        } else if (winStatus == tie) {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Tie!")
-                    .setDescription("You chose " + getChoiceName(choice) + " and bot chose " + getChoiceName(botChoice) + ".")
-                    .setColor(getRandomColor()));
-        } else if (winStatus == error) {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Error!")
-                    .setDescription("You chose " + actualChoice + " and bot chose " + getChoiceName(botChoice) + ".")
-                    .setColor(getRandomColor()));
+        try {
+            event.getChannel().sendMessage(HybridCommands.rps(String.valueOf(args[1].toLowerCase().charAt(0)), event.getChannel()));
+        } catch (IndexOutOfBoundsException ex) {
+            HybridCommands.rps(null, event.getChannel());
         }
     }
 

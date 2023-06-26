@@ -54,6 +54,7 @@ public class SlashCommands implements SlashCommandCreateListener {
             case "serverinfo" -> serverInfo(event);
             case "tti" -> textToImage(event);
             case "setting" -> changeUserSettings(event);
+            case "rps" -> rps(event);
         }
     }
 
@@ -169,6 +170,11 @@ public class SlashCommands implements SlashCommandCreateListener {
                                         SlashCommandOptionChoice.create("Enabled/True", "true"),
                                         SlashCommandOptionChoice.create("Disabled/False", "false")
                                 )))
+                        .createGlobal(Main.api)
+                        .join();
+            }
+            if (commands.stream().noneMatch(slashCommand -> slashCommand.getName().equals("rps"))) {
+                SlashCommand.with("rps", "Play \"Rock Paper Scissors\" with the bot.")
                         .createGlobal(Main.api)
                         .join();
             }
@@ -462,5 +468,14 @@ public class SlashCommands implements SlashCommandCreateListener {
         event.getSlashCommandInteraction().createImmediateResponder()
                 .addEmbed(HybridCommands.changeUserSettings(Optional.of(event.getSlashCommandInteraction().getUser()), setting, settingValue))
                 .respond();
+    }
+
+    private void rps(SlashCommandCreateEvent event) {
+        event.getSlashCommandInteraction().createImmediateResponder()
+                .addEmbed(new EmbedBuilder()
+                        .setTitle("Processing...")
+                        .setColor(BasicCommands.getRandomColor()))
+                .respond();
+        HybridCommands.rps(null, event.getSlashCommandInteraction().getChannel().orElseThrow());
     }
 }
