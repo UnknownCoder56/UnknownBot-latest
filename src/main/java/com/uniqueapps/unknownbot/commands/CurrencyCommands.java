@@ -113,7 +113,7 @@ public class CurrencyCommands {
             if (Main.userWeeklyTimes.containsKey(userId)) {
                 if (Duration.between(Main.userWeeklyTimes.get(userId), event.getMessage().getCreationTimestamp())
                         .toSeconds() >= (Helper.WEEKLY_COOLDOWN)) {
-                    Main.userDailyTimes.put(userId, event.getMessage().getCreationTimestamp());
+                    Main.userWeeklyTimes.put(userId, event.getMessage().getCreationTimestamp());
                     int earn = 10000;
                     if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                         event.getChannel().sendMessage(new EmbedBuilder()
