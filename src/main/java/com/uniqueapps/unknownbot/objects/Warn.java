@@ -1,4 +1,4 @@
-package com.uniqueapps.UnknownBot.objects;
+package com.uniqueapps.unknownbot.objects;
 
 import java.util.ArrayList;
 import java.util.List;

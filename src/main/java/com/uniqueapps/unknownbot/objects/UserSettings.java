@@ -1,4 +1,4 @@
-package com.uniqueapps.UnknownBot.objects;
+package com.uniqueapps.unknownbot.objects;
 
 public class UserSettings {
 

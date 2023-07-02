@@ -1,7 +1,8 @@
-package com.uniqueapps.UnknownBot.commands;
+package com.uniqueapps.unknownbot.commands;
 
-import com.uniqueapps.UnknownBot.Main;
-import com.uniqueapps.UnknownBot.objects.UserSettings;
+import com.uniqueapps.unknownbot.Helper;
+import com.uniqueapps.unknownbot.Main;
+import com.uniqueapps.unknownbot.objects.UserSettings;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.component.ActionRow;
@@ -53,11 +54,11 @@ public class HybridCommands {
                     .addField("Roles", stringBuilder.toString(), true)
                     .addField("Is bot admin?", isBotServerAdmin.get() ? "Yes" : "No", true)
                     .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
-                    .addField("Version", BasicCommands.version, true)
+                    .addField("Version", Helper.VERSION, true)
                     .addField("Bot website", "https://user783667580106702848.pepich.de/", true)
                     .addField("Bot type", "Utility, Moderation and Economy Bot", true)
                     .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
-                    .setColor(BasicCommands.getRandomColor());
+                    .setColor(Helper.getRandomColor());
 
             return embed;
         } catch (InterruptedException | ExecutionException e) {
@@ -110,13 +111,13 @@ public class HybridCommands {
 
             if (user.isBotOwner()) embed.addField("Is bot owner?: ", "Yes", true);
 
-            embed.setColor(BasicCommands.getRandomColor());
+            embed.setColor(Helper.getRandomColor());
 
             embedBuilder.set(embed);
         }, () -> embedBuilder.set(new EmbedBuilder()
                 .setTitle("Error!")
                 .setDescription("You are not a user! You can't use this command.")
-                .setColor(BasicCommands.getRandomColor())));
+                .setColor(Helper.getRandomColor())));
 
         return embedBuilder.get();
     }
@@ -149,7 +150,7 @@ public class HybridCommands {
                     .addField("Text / Voice channels count: ", server.getTextChannels().size() + " / " + server.getVoiceChannels().size(), true)
                     .addField("Boosts count:", String.valueOf(server.getBoostCount()), true)
                     .addField("Boost level: ", String.valueOf(server.getBoostLevel()), true)
-                    .setColor(BasicCommands.getRandomColor());
+                    .setColor(Helper.getRandomColor());
 
             embedBuilder.set(embed);
         }, () -> embedBuilder.set(new EmbedBuilder()
@@ -194,7 +195,7 @@ public class HybridCommands {
                 .setTitle("Success!")
                 .setDescription("Here is your image.")
                 .setImage(img)
-                .setColor(BasicCommands.getRandomColor());
+                .setColor(Helper.getRandomColor());
     }
 
     public static EmbedBuilder changeUserSettings(Optional<User> authorOptional, String setting, String settingValue) {
@@ -209,7 +210,7 @@ public class HybridCommands {
                         embedBuilder.set(new EmbedBuilder()
                                 .setTitle("Success!")
                                 .setDescription("Enabled bank transaction DMs! Now you WILL be DMed about all your bank transactions.")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                     case "passive" -> {
                         settings.setBankPassiveEnabled(true);
@@ -217,18 +218,18 @@ public class HybridCommands {
                                 .setTitle("Success!")
                                 .setDescription("Enabled passive mode! Now NEITHER anyone can rob you, NOR you can rob anyone else.\n" +
                                         "You also CANNOT give money to someone else.")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                     default -> {
                         embedBuilder.set(new EmbedBuilder()
                                 .setTitle("Error!")
                                 .setDescription("Setting type " + setting + " not found!")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                         return;
                     }
                 }
                 Main.userSettingsMap.replace(id, settings);
-                BasicCommands.refreshUserSettings();
+                Helper.refreshUserSettings();
             } else if (Objects.equals(settingValue, "false")) {
                 UserSettings settings = Main.userSettingsMap.get(id);
                 switch (setting) {
@@ -237,7 +238,7 @@ public class HybridCommands {
                         embedBuilder.set(new EmbedBuilder()
                                 .setTitle("Success!")
                                 .setDescription("Disabled bank transaction DMs! Now you WON'T be DMed about any of your bank transactions.")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                     case "passive" -> {
                         settings.setBankPassiveEnabled(false);
@@ -245,29 +246,29 @@ public class HybridCommands {
                                 .setTitle("Success!")
                                 .setDescription("Disabled passive mode! Now anyone CAN rob you, and you CAN rob anyone else.\n" +
                                         "You also CAN give money to someone else.")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                     default -> {
                         embedBuilder.set(new EmbedBuilder()
                                 .setTitle("Error!")
                                 .setDescription("Setting type " + setting + " not found!")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                         return;
                     }
                 }
                 Main.userSettingsMap.replace(id, settings);
-                BasicCommands.refreshUserSettings();
+                Helper.refreshUserSettings();
             } else {
                 embedBuilder.set(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Incorrect arguments given! Correct syntax: '>setting (type) (true or false)'.\n" +
                                 "Example: >setting bankdm false")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         }, () -> embedBuilder.set(new EmbedBuilder()
                 .setTitle("Error!")
                 .setDescription("You are not a user! You can't use this command.")
-                .setColor(BasicCommands.getRandomColor())));
+                .setColor(Helper.getRandomColor())));
 
         return embedBuilder.get();
     }
@@ -275,38 +276,38 @@ public class HybridCommands {
     public static EmbedBuilder rps(String chosenChoice, TextChannel channel) {
         if (chosenChoice != null) {
             char choice = chosenChoice.charAt(0);
-            int intChoice = CurrencyCommands.getRandomInteger(2, 0);
+            int intChoice = Helper.getRandomInteger(2, 0);
             char[] botChoices = {'r', 'p', 's'};
             char botChoice = botChoices[intChoice];
-            int winStatus = BasicCommands.getWinStatus(botChoice, choice);
+            Helper.RpsResult winStatus = Helper.getWinStatus(botChoice, choice);
 
-            if (winStatus == BasicCommands.userWin) {
+            if (winStatus == Helper.RpsResult.USER_WIN) {
                 return new EmbedBuilder()
                         .setTitle("You win!")
-                        .setDescription("You chose " + BasicCommands.getChoiceName(choice) + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
-                        .setColor(BasicCommands.getRandomColor());
-            } else if (winStatus == BasicCommands.botWin) {
+                        .setDescription("You chose " + Helper.getChoiceName(choice) + " and bot chose " + Helper.getChoiceName(botChoice) + ".")
+                        .setColor(Helper.getRandomColor());
+            } else if (winStatus == Helper.RpsResult.BOT_WIN) {
                 return new EmbedBuilder()
                         .setTitle("Bot wins!")
-                        .setDescription("You chose " + BasicCommands.getChoiceName(choice) + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
-                        .setColor(BasicCommands.getRandomColor());
-            } else if (winStatus == BasicCommands.tie) {
+                        .setDescription("You chose " + Helper.getChoiceName(choice) + " and bot chose " + Helper.getChoiceName(botChoice) + ".")
+                        .setColor(Helper.getRandomColor());
+            } else if (winStatus == Helper.RpsResult.TIE) {
                 return new EmbedBuilder()
                         .setTitle("Tie!")
-                        .setDescription("You chose " + BasicCommands.getChoiceName(choice) + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
-                        .setColor(BasicCommands.getRandomColor());
-            } else if (winStatus == BasicCommands.error) {
+                        .setDescription("You chose " + Helper.getChoiceName(choice) + " and bot chose " + Helper.getChoiceName(botChoice) + ".")
+                        .setColor(Helper.getRandomColor());
+            } else if (winStatus == Helper.RpsResult.ERROR) {
                 return new EmbedBuilder()
                         .setTitle("Error!")
-                        .setDescription("You chose " + chosenChoice + " and bot chose " + BasicCommands.getChoiceName(botChoice) + ".")
-                        .setColor(BasicCommands.getRandomColor());
+                        .setDescription("You chose " + chosenChoice + " and bot chose " + Helper.getChoiceName(botChoice) + ".")
+                        .setColor(Helper.getRandomColor());
             }
         } else {
             new MessageBuilder()
                     .addEmbed(new EmbedBuilder()
                             .setTitle("Rock Paper Scissors!")
                             .setDescription("Select a choice (rock/paper/scissors).")
-                            .setColor(BasicCommands.getRandomColor()))
+                            .setColor(Helper.getRandomColor()))
                     .addComponents(ActionRow.of(
                             Button.success("rps_rock", "Rock"),
                             Button.success("rps_paper", "Paper"),

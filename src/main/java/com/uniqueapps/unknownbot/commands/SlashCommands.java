@@ -1,8 +1,9 @@
-package com.uniqueapps.UnknownBot.commands;
+package com.uniqueapps.unknownbot.commands;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.uniqueapps.UnknownBot.Main;
+import com.uniqueapps.unknownbot.Helper;
+import com.uniqueapps.unknownbot.Main;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
@@ -28,7 +29,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static com.uniqueapps.UnknownBot.commands.BasicCommands.getRandomColor;
+import static com.uniqueapps.unknownbot.Helper.getRandomColor;
 
 public class SlashCommands implements SlashCommandCreateListener {
 
@@ -410,7 +411,7 @@ public class SlashCommands implements SlashCommandCreateListener {
                     .addEmbed(new EmbedBuilder()
                             .setTitle("Success!")
                             .setDescription("Here's your file")
-                            .setColor(BasicCommands.getRandomColor()))
+                            .setColor(Helper.getRandomColor()))
                     .addAttachment(file)
                     .send();
         } catch (IOException e) {
@@ -418,7 +419,7 @@ public class SlashCommands implements SlashCommandCreateListener {
                     .addEmbed(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("Failed to create file! Please try again.")
-                            .setColor(BasicCommands.getRandomColor()))
+                            .setColor(Helper.getRandomColor()))
                     .send();
         }
     }
@@ -474,7 +475,7 @@ public class SlashCommands implements SlashCommandCreateListener {
         event.getSlashCommandInteraction().createImmediateResponder()
                 .addEmbed(new EmbedBuilder()
                         .setTitle("Processing...")
-                        .setColor(BasicCommands.getRandomColor()))
+                        .setColor(Helper.getRandomColor()))
                 .respond();
         HybridCommands.rps(null, event.getSlashCommandInteraction().getChannel().orElseThrow());
     }

@@ -1,9 +1,9 @@
-package com.uniqueapps.UnknownBot;
+package com.uniqueapps.unknownbot;
 
-import com.uniqueapps.UnknownBot.commands.BasicCommands;
-import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
-import com.uniqueapps.UnknownBot.commands.ModCommands;
-import com.uniqueapps.UnknownBot.objects.Shop;
+import com.uniqueapps.unknownbot.commands.BasicCommands;
+import com.uniqueapps.unknownbot.commands.CurrencyCommands;
+import com.uniqueapps.unknownbot.commands.ModCommands;
+import com.uniqueapps.unknownbot.objects.Shop;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
@@ -140,9 +140,9 @@ class AsyncListener implements Runnable {
     }
 
     public String getReply(String text) {
-        for (String reply : BasicCommands.customReplies.keySet()) {
+        for (String reply : Helper.customReplies.keySet()) {
             if (text.contains(reply)) {
-                return BasicCommands.customReplies.get(reply);
+                return Helper.customReplies.get(reply);
             }
         }
         return null;

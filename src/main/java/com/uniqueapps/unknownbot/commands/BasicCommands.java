@@ -1,13 +1,11 @@
-package com.uniqueapps.UnknownBot.commands;
+package com.uniqueapps.unknownbot.commands;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mongodb.client.*;
-import com.uniqueapps.UnknownBot.Main;
-import com.uniqueapps.UnknownBot.objects.UserSettings;
+import com.uniqueapps.unknownbot.Helper;
+import com.uniqueapps.unknownbot.Main;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.Document;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -18,28 +16,20 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.List;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static com.mongodb.client.model.Filters.eq;
-
 public class BasicCommands {
-
-    public static Map<String, String> customReplies = new HashMap<>();
-    public static final String version = "3.8.0";
-    final static int botWin = 0;
-    final static int userWin = 1;
-    final static int tie = 2;
-    final static int error = 3;
 
     public static void admes(MessageCreateEvent event) {
         try {
@@ -58,7 +48,7 @@ public class BasicCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
             		.setTitle("Please ask something after typing '>admes' and " +
                     "put space between command and asking.")
-            		.setColor(getRandomColor()));
+            		.setColor(Helper.getRandomColor()));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -109,29 +99,29 @@ public class BasicCommands {
                 }
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle(reply)
-                        .setColor(getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } catch (NumberFormatException ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Please provide a number, as '>calc (num1),(+ or - or * or /),(num2)'.")
-                        .setColor(getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } catch (IndexOutOfBoundsException ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Incorrect number of arguments given. Correct syntax - >calc (num1),(+ or - or * or /),(num2)")
-                        .setColor(getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } catch (Exception ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Unknown Error Occurred! Please report this to the developer (UnknownPro56).\n" +
                                 "Error: " + ex.getMessage())
-                        .setColor(getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         } catch (IndexOutOfBoundsException ex) {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("Incorrect number of arguments given. Correct syntax - >calc (num1),(+ or - or * or /),(num2)")
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -143,24 +133,24 @@ public class BasicCommands {
             argsList.set(0, argsList.get(0).replace(">reply ", ""));
             System.out.println("Args: " + argsList);
             if (!argsList.get(0).isEmpty() && !argsList.get(1).isEmpty()) {
-                customReplies.put(argsList.get(0), argsList.get(1));
+                Helper.customReplies.put(argsList.get(0), argsList.get(1));
                 event.getChannel().sendMessage(new EmbedBuilder()
                 		.setTitle("Success!")
                 		.setDescription("Successfully set custom reply! Bot will now reply with '"
-                		+ customReplies.get(argsList.get(0)) + "' when any message contains '" + argsList.get(0) + "'.")
-                		.setColor(getRandomColor()));
-            	refreshReplies();
+                		+ Helper.customReplies.get(argsList.get(0)) + "' when any message contains '" + argsList.get(0) + "'.")
+                		.setColor(Helper.getRandomColor()));
+            	Helper.refreshReplies();
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                 		.setTitle("Error!")
                 		.setDescription("No arguments given! Correct syntax - >reply (text),(reply) _No spaces between commas and arguments!_")
-                		.setColor(getRandomColor()));
+                		.setColor(Helper.getRandomColor()));
             }
         } catch (IndexOutOfBoundsException ex) {
             event.getChannel().sendMessage(new EmbedBuilder()
             		.setTitle("Error!")
             		.setDescription("Incorrect arguments given. Correct syntax - >reply (text),(reply) _No spaces between commas and arguments!_")
-            		.setColor(getRandomColor()));
+            		.setColor(Helper.getRandomColor()));
         }
     }
 
@@ -169,14 +159,14 @@ public class BasicCommands {
     }
 
     public static void noReply(MessageCreateEvent event) {
-        for (String text : customReplies.keySet()) {
+        for (String text : Helper.customReplies.keySet()) {
             if (event.getMessage().getContent().contains(text)) {
-                customReplies.remove(text);
-                refreshReplies();
+                Helper.customReplies.remove(text);
+                Helper.refreshReplies();
                 event.getChannel().sendMessage(new EmbedBuilder()
                 		.setTitle("Success!")
                 		.setDescription("Successfully disabled custom reply " + text + "!")
-                		.setColor(getRandomColor()));
+                		.setColor(Helper.getRandomColor()));
                 return;
             }
         }
@@ -184,12 +174,12 @@ public class BasicCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("No reply named '" + event.getMessage().getContent().substring(9) + "' was found!")
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         } catch (IndexOutOfBoundsException ex) {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("Incorrect arguments given. Correct syntax - >noreply (reply name)")
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -198,7 +188,7 @@ public class BasicCommands {
 			event.getChannel().sendMessage(new EmbedBuilder()
 					.setTitle("Pong!")
 					.setDescription("Latency is " + TimeUnit.NANOSECONDS.toMillis(Main.api.measureRestLatency().get().getNano()) + " ms")
-					.setColor(getRandomColor()));
+					.setColor(Helper.getRandomColor()));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -209,7 +199,7 @@ public class BasicCommands {
         		.setTitle("Hello!")
         		.setDescription("Hello There, " + event.getMessageAuthor().getName() + "! UnknownBot"
         				+ " here at your service. Type '>help' for more information on supported commands.")
-        		.setColor(getRandomColor()));
+        		.setColor(Helper.getRandomColor()));
     }
 
     public static void dt(MessageCreateEvent event) {
@@ -217,7 +207,7 @@ public class BasicCommands {
         		.setTitle("Current Time:-")
         		.addField("UTC or GMT", LocalDateTime.now(ZoneId.of("UTC")).format(
         				new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
-        		.setColor(getRandomColor()));
+        		.setColor(Helper.getRandomColor()));
     }
 
     public static void help(MessageCreateEvent event) {
@@ -233,7 +223,7 @@ public class BasicCommands {
             if (Objects.equals(category, categories[0])) {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTitle("UnknownBot's Utility commands:-")
-                        .setColor(getRandomColor());
+                        .setColor(Helper.getRandomColor());
 
                 utilityCommands.forEach(jsonElement -> {
                     JsonObject command = jsonElement.getAsJsonObject();
@@ -244,7 +234,7 @@ public class BasicCommands {
             } else if (Objects.equals(category, categories[1])) {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTitle("UnknownBot's Moderation commands:-")
-                        .setColor(getRandomColor());
+                        .setColor(Helper.getRandomColor());
 
                 moderationCommands.forEach(jsonElement -> {
                     JsonObject command = jsonElement.getAsJsonObject();
@@ -255,7 +245,7 @@ public class BasicCommands {
             } else if (Objects.equals(category, categories[2])) {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTitle("UnknownBot's Economy commands:-")
-                        .setColor(getRandomColor());
+                        .setColor(Helper.getRandomColor());
 
                 economyCommands.forEach(jsonElement -> {
                     JsonObject command = jsonElement.getAsJsonObject();
@@ -281,7 +271,7 @@ public class BasicCommands {
                                 https://discord.gg/t79ZyuHr5K/
                                 Or visit UnknownBot's website:-
                                 https://user783667580106702848.pepich.de/""")
-                                .setColor(getRandomColor()))
+                                .setColor(Helper.getRandomColor()))
                         .addComponents(ActionRow.of(SelectMenu.createStringMenu("help_category",
                                 Arrays.asList(
                                         SelectMenuOption.create("Utility", "utility"),
@@ -305,7 +295,7 @@ public class BasicCommands {
             if (Objects.equals(category, categories[0])) {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTitle("UnknownBot's Utility commands:-")
-                        .setColor(getRandomColor());
+                        .setColor(Helper.getRandomColor());
 
                 utilityCommands.forEach(jsonElement -> {
                     JsonObject command = jsonElement.getAsJsonObject();
@@ -316,7 +306,7 @@ public class BasicCommands {
             } else if (Objects.equals(category, categories[1])) {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTitle("UnknownBot's Moderation commands:-")
-                        .setColor(getRandomColor());
+                        .setColor(Helper.getRandomColor());
 
                 moderationCommands.forEach(jsonElement -> {
                     JsonObject command = jsonElement.getAsJsonObject();
@@ -327,7 +317,7 @@ public class BasicCommands {
             } else if (Objects.equals(category, categories[2])) {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setTitle("UnknownBot's Economy commands:-")
-                        .setColor(getRandomColor());
+                        .setColor(Helper.getRandomColor());
 
                 economyCommands.forEach(jsonElement -> {
                     JsonObject command = jsonElement.getAsJsonObject();
@@ -357,19 +347,19 @@ public class BasicCommands {
 
     public static void replies(MessageCreateEvent event) {
         StringBuilder repl = new StringBuilder();
-        for (String reply : customReplies.keySet()) {
-            repl.append(reply).append(": ").append(customReplies.get(reply)).append("\n");
+        for (String reply : Helper.customReplies.keySet()) {
+            repl.append(reply).append(": ").append(Helper.customReplies.get(reply)).append("\n");
         }
         if (!repl.toString().equals("")) {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Currently set custom replies:-")
                     .setDescription(repl.toString())
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Currently set custom replies:-")
                     .setDescription("No custom replies have been set up yet!")
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -383,22 +373,22 @@ public class BasicCommands {
                             .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + " at " +
                                     server.getName() + " :-")
                             .setDescription(message)
-                            .setColor(getRandomColor())),
+                            .setColor(Helper.getRandomColor())),
                     () -> channel.sendMessage(new EmbedBuilder()
                             .setTitle("Alert! Message from " + event.getMessageAuthor().getName() + ":-")
                             .setDescription(message)
-                            .setColor(getRandomColor())));
+                            .setColor(Helper.getRandomColor())));
 
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Success!")
                     .setDescription("Successfully DM-ed message to user.")
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("DM to user failed (Possible reason: User's DMs are closed).")
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -419,7 +409,7 @@ public class BasicCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
                 .setTitle("Error!")
                 .setDescription("No arguments were supplied! To get help about this command, type '>help'.")
-                .setColor(getRandomColor()));
+                .setColor(Helper.getRandomColor()));
             return;
         }
         event.getChannel().sendMessage(HybridCommands.textToImage(text));
@@ -435,108 +425,7 @@ public class BasicCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("Incorrect number arguments given! Correct syntax - >setting (bankdm or passive) (true or false).")
-                    .setColor(getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
-    }
-
-    // Helper methods
-    public static void refreshReplies() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    Document doc = new Document()
-                            .append("name", "reply")
-                            .append("key", customReplies.keySet())
-                            .append("val", customReplies.values());
-                    if (collection.countDocuments(eq("name", "reply")) > 0) {
-                        collection.replaceOne(eq("name", "reply"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated replies!";
-                };
-    
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-
-    public static void refreshUserSettings() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    List<Document> settings = new ArrayList<>();
-                    for (int i = 0; i < Main.userSettingsMap.size(); i++) {
-                        UserSettings userSettings = (UserSettings) Main.userSettingsMap.values().toArray()[i];
-                        Document setting = new Document()
-                                .append("dm", userSettings.isBankDmEnabled())
-                                .append("passive", userSettings.isBankPassiveEnabled());
-                        settings.add(setting);
-                    }
-                    Document doc = new Document()
-                            .append("name", "usersettings")
-                            .append("key", Main.userSettingsMap.keySet())
-                            .append("val", settings);
-                    if (collection.countDocuments(eq("name", "usersettings")) > 0) {
-                        collection.replaceOne(eq("name", "usersettings"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated all user settings!";
-                };
-
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-    
-    public static Color getRandomColor() {
-        int red = new Random().nextInt(256);
-        int green = new Random().nextInt(256);
-        int blue = new Random().nextInt(256);
-        return new Color(red, green, blue);
-    }
-
-    public static int getWinStatus(char choiceBot, char choiceUser) {
-        if (choiceBot == 'r') {
-            if (choiceUser == 'r') {
-                return tie;
-            } else if (choiceUser == 'p') {
-                return userWin;
-            } else if (choiceUser == 's') {
-                return botWin;
-            }
-        } else if (choiceBot == 'p') {
-            if (choiceUser == 'r') {
-                return botWin;
-            } else if (choiceUser == 'p') {
-                return tie;
-            } else if (choiceUser == 's') {
-                return userWin;
-            }
-        } else if (choiceBot == 's') {
-            if (choiceUser == 'r') {
-                return userWin;
-            } else if (choiceUser == 'p') {
-                return botWin;
-            } else if (choiceUser == 's') {
-                return tie;
-            }
-        }
-        return error;
-    }
-
-    public static String getChoiceName(char choice) {
-        if (choice == 'r') {
-            return "Rock";
-        } else if (choice == 'p') {
-            return "Paper";
-        } else if (choice == 's') {
-            return "Scissors";
-        }
-        return null;
     }
 }
-

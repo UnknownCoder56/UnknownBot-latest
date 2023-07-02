@@ -1,5 +1,6 @@
-package com.uniqueapps.UnknownBot.commands;
+package com.uniqueapps.unknownbot.commands;
 
+import com.uniqueapps.unknownbot.Helper;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -34,20 +35,20 @@ public class AsyncCommands {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Success!")
                             .setDescription(event.getMessageAuthor().getName() + " cleared " + (messages.size() - 1) + " message(s) in: " + (event.getServerTextChannel().isPresent() ? event.getServerTextChannel().get().getMentionTag() : null))
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 } catch (NumberFormatException e) {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("Supplied argument is not a number or is too large!")
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("You don't have admin perms, so you cannot use mod commands!")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         }
     }
@@ -110,28 +111,28 @@ public class AsyncCommands {
                             } while (reply.isEmpty());
                             event.getMessage().reply(new EmbedBuilder()
                                     .setTitle("Reply: " + reply)
-                                    .setColor(BasicCommands.getRandomColor()));
+                                    .setColor(Helper.getRandomColor()));
                         } catch (IOException e) {
                             e.printStackTrace();
                             event.getMessage().reply(new EmbedBuilder()
                                     .setTitle("Reply: " + "...")
-                                    .setColor(BasicCommands.getRandomColor()));
+                                    .setColor(Helper.getRandomColor()));
                         }
                     } else {
                         event.getMessage().reply(new EmbedBuilder()
                                 .setTitle("Reply: " + "...")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                     event.getMessage().reply(new EmbedBuilder()
                             .setTitle("Reply: " + "...")
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
             } else {
                 event.getMessage().reply(new EmbedBuilder()
                         .setTitle("Reply: " + "...")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         }
     }
@@ -162,19 +163,19 @@ public class AsyncCommands {
                         .setEmbed(new EmbedBuilder()
                                 .setTitle("Success!")
                                 .setDescription("Here's your file")
-                                .setColor(BasicCommands.getRandomColor()))
+                                .setColor(Helper.getRandomColor()))
                         .addAttachment(file)
                         .send(event.getChannel());
             } catch (IndexOutOfBoundsException ex) {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Incorrect arguments given! Correct syntax: >makefile (file name) (file content)")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } catch (IllegalArgumentException e) {
             	event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Restricted file name! Please try again with some other name.")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -206,7 +207,7 @@ public class AsyncCommands {
                                 .setTitle("Success!")
                                 .setDescription("Successfully nuked this channel (Nuked By: " +
                                         event.getMessageAuthor().getName() + ").")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
@@ -215,7 +216,7 @@ public class AsyncCommands {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("You don't have admin perms, so you cannot use mod commands!")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         }
     }

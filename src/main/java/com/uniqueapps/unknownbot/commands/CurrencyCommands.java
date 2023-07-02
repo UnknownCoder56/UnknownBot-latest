@@ -1,86 +1,58 @@
-package com.uniqueapps.UnknownBot.commands;
+package com.uniqueapps.unknownbot.commands;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import com.mongodb.client.ClientSession;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.TransactionBody;
-import com.mongodb.client.model.Filters;
-import com.uniqueapps.UnknownBot.Main;
-import com.uniqueapps.UnknownBot.objects.Shop;
-import com.uniqueapps.UnknownBot.objects.SortByBalance;
+import com.uniqueapps.unknownbot.Helper;
+import com.uniqueapps.unknownbot.Main;
+import com.uniqueapps.unknownbot.objects.Shop;
+import com.uniqueapps.unknownbot.objects.SortByBalance;
 
-import org.bson.Document;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public class CurrencyCommands {
 
-    public static Map<Long, Long> balanceMap = new HashMap<>();
-    public static String[] works = {
-        "did babysitting for 6 hours and earned",
-        "finished a 100-day job and earned",
-        "found some money on road and got",
-        "sold a modern art picture and earned",
-        "caught a robber and was prized with",
-        "fixed neighbour's PC and earned",
-        "checked his car bonnet and found",
-        "won a bet and earned",
-        "repaired cars at workshop for a day and earned",
-        "won a lucky draw and earned"
-    };
-    static int coolDown = 30;
-    static int dailyCoolDown = 86400;
-    static int weeklyCoolDown = 604800;
-    static int monthlyCoolDown = 2592000;
-
     public static void balance(MessageCreateEvent event) {
         if (event.getMessage().getMentionedUsers().size() > 0) {
             if (event.getMessageAuthor().asUser().isPresent()) {
                 User balUser = event.getMessage().getMentionedUsers().get(0);
-                if (!balanceMap.containsKey(balUser.getId())) {
-                    balanceMap.put(balUser.getId(), 0L);
-                    refreshBalances();
+                if (!Helper.balanceMap.containsKey(balUser.getId())) {
+                    Helper.balanceMap.put(balUser.getId(), 0L);
+                    Helper.refreshBalances();
                 }
-                long bal = balanceMap.get(balUser.getId());
+                long bal = Helper.balanceMap.get(balUser.getId());
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle(balUser.getDiscriminatedName() + "'s balance:-")
                         .addField("Bank", ":coin: " + bal)
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Only users can access this command! Maybe you are a bot.")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         } else {
             if (event.getMessageAuthor().asUser().isPresent()) {
-                if (!balanceMap.containsKey(event.getMessageAuthor().asUser().get().getId())) {
-                    balanceMap.put(event.getMessageAuthor().asUser().get().getId(), 0L);
-                    refreshBalances();
+                if (!Helper.balanceMap.containsKey(event.getMessageAuthor().asUser().get().getId())) {
+                    Helper.balanceMap.put(event.getMessageAuthor().asUser().get().getId(), 0L);
+                    Helper.refreshBalances();
                 }
-                long bal = balanceMap.get(event.getMessageAuthor().asUser().get().getId());
+                long bal = Helper.balanceMap.get(event.getMessageAuthor().asUser().get().getId());
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle(event.getMessageAuthor().getDisplayName() + "'s balance:-")
                         .addField("Bank", ":coin: " + bal)
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("Only users can access this command! Maybe you are a bot.")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         }
     }
@@ -90,19 +62,19 @@ public class CurrencyCommands {
             Long userId = event.getMessageAuthor().asUser().get().getId();
             if (Main.userDailyTimes.containsKey(userId)) {
                 if (Duration.between(Main.userDailyTimes.get(userId), event.getMessage().getCreationTimestamp())
-                        .toSeconds() >= (dailyCoolDown)) {
+                        .toSeconds() >= (Helper.DAILY_COOLDOWN)) {
                     Main.userDailyTimes.put(userId, event.getMessage().getCreationTimestamp());
                     int earn = 5000;
-                    if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                    if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle(event.getMessageAuthor().getDisplayName() + "'s Daily Earnings")
                                 .setDescription(event.getMessageAuthor().getDisplayName()
                                         + " got their daily earnings: :coin: " + earn)
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
-                    refreshDailies();
+                    Helper.refreshDailies();
                 } else {
-                    int leftSeconds = (int) (dailyCoolDown - Duration
+                    int leftSeconds = (int) (Helper.DAILY_COOLDOWN - Duration
                             .between(Main.userDailyTimes.get(userId), event.getMessage().getCreationTimestamp())
                             .toSeconds());
                     int p1 = leftSeconds % 60;
@@ -118,20 +90,20 @@ public class CurrencyCommands {
             } else {
                 Main.userDailyTimes.put(userId, event.getMessage().getCreationTimestamp());
                 int earn = 5000;
-                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle(event.getMessageAuthor().getDisplayName() + "'s Daily Earnings")
                             .setDescription(event.getMessageAuthor().getDisplayName()
                                     + " got their daily earnings: :coin: " + earn)
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
-                refreshDailies();
+                Helper.refreshDailies();
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("You are not a user! Maybe you are a bot.")
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -140,19 +112,19 @@ public class CurrencyCommands {
             Long userId = event.getMessageAuthor().asUser().get().getId();
             if (Main.userWeeklyTimes.containsKey(userId)) {
                 if (Duration.between(Main.userWeeklyTimes.get(userId), event.getMessage().getCreationTimestamp())
-                        .toSeconds() >= (weeklyCoolDown)) {
+                        .toSeconds() >= (Helper.WEEKLY_COOLDOWN)) {
                     Main.userDailyTimes.put(userId, event.getMessage().getCreationTimestamp());
                     int earn = 10000;
-                    if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                    if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle(event.getMessageAuthor().getDisplayName() + "'s Weekly Earnings")
                                 .setDescription(event.getMessageAuthor().getDisplayName()
                                         + " got their weekly earnings: :coin: " + earn)
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
-                    refreshWeeklies();
+                    Helper.refreshWeeklies();
                 } else {
-                    int leftSeconds = (int) (weeklyCoolDown - Duration.between(Main.userWeeklyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
+                    int leftSeconds = (int) (Helper.WEEKLY_COOLDOWN - Duration.between(Main.userWeeklyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
                     long days = leftSeconds / (24 * 3600);
                     leftSeconds = leftSeconds % (24 * 3600);
                     int hours = leftSeconds / 3600;
@@ -167,20 +139,20 @@ public class CurrencyCommands {
             } else {
                 Main.userWeeklyTimes.put(userId, event.getMessage().getCreationTimestamp());
                 int earn = 10000;
-                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle(event.getMessageAuthor().getDisplayName() + "'s Weekly Earnings")
                             .setDescription(event.getMessageAuthor().getDisplayName()
                                     + " got their weekly earnings: :coin: " + earn)
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
-                refreshWeeklies();
+                Helper.refreshWeeklies();
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("You are not a user! Maybe you are a bot.")
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -189,19 +161,19 @@ public class CurrencyCommands {
             Long userId = event.getMessageAuthor().asUser().get().getId();
             if (Main.userMonthlyTimes.containsKey(userId)) {
                 if (Duration.between(Main.userMonthlyTimes.get(userId), event.getMessage().getCreationTimestamp())
-                        .toSeconds() >= (monthlyCoolDown)) {
+                        .toSeconds() >= (Helper.MONTHLY_COOLDOWN)) {
                     Main.userMonthlyTimes.put(userId, event.getMessage().getCreationTimestamp());
                     int earn = 50000;
-                    if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                    if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle(event.getMessageAuthor().getDisplayName() + "'s Monthly Earnings")
                                 .setDescription(event.getMessageAuthor().getDisplayName()
                                         + " got their monthly earnings: :coin: " + earn)
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
-                    refreshMonthlies();
+                    Helper.refreshMonthlies();
                 } else {
-                    int leftSeconds = (int) (monthlyCoolDown - Duration.between(Main.userMonthlyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
+                    int leftSeconds = (int) (Helper.MONTHLY_COOLDOWN - Duration.between(Main.userMonthlyTimes.get(userId), event.getMessage().getCreationTimestamp()).toSeconds());
                     long days = leftSeconds / (24 * 3600);
                     leftSeconds = leftSeconds % (24 * 3600);
                     int hours = leftSeconds / 3600;
@@ -216,20 +188,20 @@ public class CurrencyCommands {
             } else {
                 Main.userMonthlyTimes.put(userId, event.getMessage().getCreationTimestamp());
                 int earn = 50000;
-                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle(event.getMessageAuthor().getDisplayName() + "'s Monthly Earnings")
                             .setDescription(event.getMessageAuthor().getDisplayName()
                                     + " got their monthly earnings: :coin: " + earn)
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
-                refreshMonthlies();
+                Helper.refreshMonthlies();
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("You are not a user! Maybe you are a bot.")
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -238,20 +210,20 @@ public class CurrencyCommands {
             Long userId = event.getMessageAuthor().asUser().get().getId();
             if (Main.userWorkedTimes.containsKey(userId)) {
                 if (Duration.between(Main.userWorkedTimes.get(userId), event.getMessage().getCreationTimestamp())
-                        .toSeconds() >= coolDown) {
+                        .toSeconds() >= Helper.BASIC_COOLDOWN) {
                     Main.userWorkedTimes.put(userId, event.getMessage().getCreationTimestamp());
-                    String work = CurrencyCommands.getRandomWork();
-                    int earn = CurrencyCommands.getRandomInteger(500, 100);
-                    if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                    String work = Helper.getRandomWork();
+                    int earn = Helper.getRandomInteger(500, 100);
+                    if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
                                 .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
                                         " :coin: " + earn)
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
-                    refreshWorks();
+                    Helper.refreshWorks();
                 } else {
-                    int left = (int) (coolDown - Duration
+                    int left = (int) (Helper.BASIC_COOLDOWN - Duration
                             .between(Main.userWorkedTimes.get(userId), event.getMessage().getCreationTimestamp())
                             .toSeconds());
                     event.getChannel().sendMessage(new EmbedBuilder()
@@ -262,22 +234,22 @@ public class CurrencyCommands {
                 }
             } else {
                 Main.userWorkedTimes.put(userId, event.getMessage().getCreationTimestamp());
-                String work = CurrencyCommands.getRandomWork();
-                int earn = CurrencyCommands.getRandomInteger(500, 100);
-                if (CurrencyCommands.creditBalance(earn, event.getMessageAuthor().asUser().get(), event)) {
+                String work = Helper.getRandomWork();
+                int earn = Helper.getRandomInteger(500, 100);
+                if (Helper.creditBalance(earn, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle(event.getMessageAuthor().getDisplayName() + " Worked")
                             .setDescription(event.getMessageAuthor().getDisplayName() + " " + work +
                                     " :coin: " + earn)
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
-                refreshWorks();
+                Helper.refreshWorks();
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("You are not a user! Maybe you are a bot.")
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -285,85 +257,85 @@ public class CurrencyCommands {
         Long commanderId = event.getMessageAuthor().asUser().get().getId();
         if (Main.userRobbedTimes.containsKey(commanderId)) {
             if (Duration.between(Main.userRobbedTimes.get(commanderId), event.getMessage().getCreationTimestamp())
-                    .toSeconds() >= coolDown) {
+                    .toSeconds() >= Helper.BASIC_COOLDOWN) {
                 Main.userRobbedTimes.put(commanderId, event.getMessage().getCreationTimestamp());
-                refreshRobs();
+                Helper.refreshRobs();
                 User robUser = event.getMessage().getMentionedUsers().get(0);
                 if (event.getServer().isPresent()) {
                     if (event.getMessageAuthor().asUser().isPresent()) {
                         if (!robUser.isBot()) {
                             if (!Main.userSettingsMap.get(commanderId).isBankPassiveEnabled()) {
                                 if (!Main.userSettingsMap.get(robUser.getId()).isBankPassiveEnabled()) {
-                                    int robValue = getRandomInteger(5000, 1000);
-                                    if (balanceMap.containsKey(robUser.getId())) {
+                                    int robValue = Helper.getRandomInteger(5000, 1000);
+                                    if (Helper.balanceMap.containsKey(robUser.getId())) {
                                         if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
-                                            if (balanceMap.get(robUser.getId()) > 1000) {
-                                                while (balanceMap.get(robUser.getId()) < robValue) {
-                                                    robValue = getRandomInteger(5000, 1000);
+                                            if (Helper.balanceMap.get(robUser.getId()) > 1000) {
+                                                while (Helper.balanceMap.get(robUser.getId()) < robValue) {
+                                                    robValue = Helper.getRandomInteger(5000, 1000);
                                                 }
-                                                if (debitBalance(robValue, robUser, event)) {
-                                                    if (creditBalance(robValue, event.getMessageAuthor().asUser().get(),
-                                                            event)) {
+                                                if (Helper.debitBalance(robValue, robUser, event.getChannel())) {
+                                                    if (Helper.creditBalance(robValue, event.getMessageAuthor().asUser().get(),
+                                                            event.getChannel())) {
                                                         event.getChannel().sendMessage(new EmbedBuilder()
                                                                 .setTitle("Success!")
                                                                 .setDescription(event.getMessageAuthor().getDisplayName()
                                                                         + " successfully robbed "
                                                                         + robUser.getDisplayName(event.getServer().get())
                                                                         + ", and earned :coin: " + robValue + ".")
-                                                                .setColor(BasicCommands.getRandomColor()));
-                                                        refreshBalances();
+                                                                .setColor(Helper.getRandomColor()));
+                                                        Helper.refreshBalances();
                                                     }
                                                 }
                                             } else {
                                                 event.getChannel().sendMessage(new EmbedBuilder()
                                                         .setTitle("Error!")
                                                         .setDescription("That user does not have enough money to rob!")
-                                                        .setColor(BasicCommands.getRandomColor()));
+                                                        .setColor(Helper.getRandomColor()));
                                             }
                                         } else {
                                             event.getChannel().sendMessage(new EmbedBuilder()
                                                     .setTitle("Error!")
                                                     .setDescription("You can't rob yourself!")
-                                                    .setColor(BasicCommands.getRandomColor()));
+                                                    .setColor(Helper.getRandomColor()));
                                         }
                                     } else {
                                         event.getChannel().sendMessage(new EmbedBuilder()
                                                 .setTitle("Error!")
                                                 .setDescription("That user does not have enough money to rob!")
-                                                .setColor(BasicCommands.getRandomColor()));
+                                                .setColor(Helper.getRandomColor()));
                                     }
                                 } else {
                                     event.getChannel().sendMessage(new EmbedBuilder()
                                             .setTitle("Error!")
                                             .setDescription("That user is in passive mode! Try someone else.")
-                                            .setColor(BasicCommands.getRandomColor()));
+                                            .setColor(Helper.getRandomColor()));
                                 }
                             } else {
                                 event.getChannel().sendMessage(new EmbedBuilder()
                                         .setTitle("Error!")
                                         .setDescription("You are in passive mode! You can't rob anyone.")
-                                        .setColor(BasicCommands.getRandomColor()));
+                                        .setColor(Helper.getRandomColor()));
                             }
                         } else {
                             event.getChannel().sendMessage(new EmbedBuilder()
                                     .setTitle("Error!")
                                     .setDescription("You can't rob bots!")
-                                    .setColor(BasicCommands.getRandomColor()));
+                                    .setColor(Helper.getRandomColor()));
                         }
                     } else {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Error!")
                                 .setDescription("You are not a user! Maybe you are a bot.")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("This command only works in servers!")
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
             } else {
-                int left = (int) (coolDown - Duration
+                int left = (int) (Helper.BASIC_COOLDOWN - Duration
                         .between(Main.userRobbedTimes.get(commanderId), event.getMessage().getCreationTimestamp())
                         .toSeconds());
                 event.getChannel().sendMessage(new EmbedBuilder()
@@ -374,79 +346,79 @@ public class CurrencyCommands {
             }
         } else {
             Main.userRobbedTimes.put(commanderId, event.getMessage().getCreationTimestamp());
-            refreshRobs();
+            Helper.refreshRobs();
             User robUser = event.getMessage().getMentionedUsers().get(0);
             if (event.getServer().isPresent()) {
                 if (event.getMessageAuthor().asUser().isPresent()) {
                     if (!robUser.isBot()) {
                         if (!Main.userSettingsMap.get(robUser.getId()).isBankPassiveEnabled()) {
                             if (!Main.userSettingsMap.get(robUser.getId()).isBankPassiveEnabled()) {
-                                int robValue = getRandomInteger(5000, 1000);
-                                if (balanceMap.containsKey(robUser.getId())) {
+                                int robValue = Helper.getRandomInteger(5000, 1000);
+                                if (Helper.balanceMap.containsKey(robUser.getId())) {
                                     if (robUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
-                                        if (balanceMap.get(robUser.getId()) > 1000) {
-                                            while (balanceMap.get(robUser.getId()) < robValue) {
-                                                robValue = getRandomInteger(5000, 1000);
+                                        if (Helper.balanceMap.get(robUser.getId()) > 1000) {
+                                            while (Helper.balanceMap.get(robUser.getId()) < robValue) {
+                                                robValue = Helper.getRandomInteger(5000, 1000);
                                             }
-                                            if (debitBalance(robValue, robUser, event)) {
-                                                if (creditBalance(robValue, event.getMessageAuthor().asUser().get(), event)) {
+                                            if (Helper.debitBalance(robValue, robUser, event.getChannel())) {
+                                                if (Helper.creditBalance(robValue, event.getMessageAuthor().asUser().get(), event.getChannel())) {
                                                     event.getChannel().sendMessage(new EmbedBuilder()
                                                             .setTitle("Success!")
                                                             .setDescription(event.getMessageAuthor().getDisplayName()
                                                                     + " successfully robbed "
                                                                     + robUser.getDisplayName(event.getServer().get())
                                                                     + ", and earned :coin: " + robValue + ".")
-                                                            .setColor(BasicCommands.getRandomColor()));
-                                                    refreshBalances();
+                                                            .setColor(Helper.getRandomColor()));
+                                                    Helper.refreshBalances();
                                                 }
                                             }
                                         } else {
                                             event.getChannel().sendMessage(new EmbedBuilder()
                                                     .setTitle("Error!")
                                                     .setDescription("That user does not have enough money to rob!")
-                                                    .setColor(BasicCommands.getRandomColor()));
+                                                    .setColor(Helper.getRandomColor()));
                                         }
                                     } else {
                                         event.getChannel().sendMessage(new EmbedBuilder()
                                                 .setTitle("Error!")
                                                 .setDescription("You can't rob yourself!")
-                                                .setColor(BasicCommands.getRandomColor()));
+                                                .setColor(Helper.getRandomColor()));
                                     }
                                 } else {
                                     event.getChannel().sendMessage(new EmbedBuilder()
                                             .setTitle("Error!")
                                             .setDescription("That user does not have enough money to rob!")
-                                            .setColor(BasicCommands.getRandomColor()));
+                                            .setColor(Helper.getRandomColor()));
                                 }
                             } else {
                                 event.getChannel().sendMessage(new EmbedBuilder()
                                         .setTitle("Error!")
                                         .setDescription("That user is in passive mode! Try someone else.")
-                                        .setColor(BasicCommands.getRandomColor()));
+                                        .setColor(Helper.getRandomColor()));
                             }
                         } else {
                             event.getChannel().sendMessage(new EmbedBuilder()
                                     .setTitle("Error!")
                                     .setDescription("You are in passive mode! You can't rob anyone.")
-                                    .setColor(BasicCommands.getRandomColor()));
+                                    .setColor(Helper.getRandomColor()));
                         }
                     } else {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Error!")
                                 .setDescription("You can't rob bots!")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("You are not a user! Maybe you are a bot.")
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("This command only works in servers!")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         }
     }
@@ -461,65 +433,65 @@ public class CurrencyCommands {
                 if (!giveUser.isBot()) {
                     if (!Main.userSettingsMap.get(id).isBankPassiveEnabled()) {
                         if (!Main.userSettingsMap.get(giveUser.getId()).isBankPassiveEnabled()) {
-                            if (!(giveValue > balanceMap.get(event.getMessageAuthor().asUser().get().getId()))) {
+                            if (!(giveValue > Helper.balanceMap.get(event.getMessageAuthor().asUser().get().getId()))) {
                                 if (giveUser.getId() != event.getMessageAuthor().asUser().get().getId()) {
-                                    if (!balanceMap.containsKey(giveUser.getId())) {
-                                        balanceMap.put(giveUser.getId(), 0L);
-                                        refreshBalances();
+                                    if (!Helper.balanceMap.containsKey(giveUser.getId())) {
+                                        Helper.balanceMap.put(giveUser.getId(), 0L);
+                                        Helper.refreshBalances();
                                     }
-                                    if (debitBalance(giveValue, event.getMessageAuthor().asUser().get(), event)) {
-                                        if (creditBalance(giveValue, giveUser, event)) {
+                                    if (Helper.debitBalance(giveValue, event.getMessageAuthor().asUser().get(), event.getChannel())) {
+                                        if (Helper.creditBalance(giveValue, giveUser, event.getChannel())) {
                                             event.getChannel().sendMessage(new EmbedBuilder()
                                                     .setTitle("Success!")
                                                     .setDescription(
                                                             event.getMessageAuthor().getDisplayName() + " successfully gave "
                                                                     + giveUser.getDisplayName(event.getServer().get())
                                                                     + " :coin: " + giveValue + ".")
-                                                    .setColor(BasicCommands.getRandomColor()));
-                                            refreshBalances();
+                                                    .setColor(Helper.getRandomColor()));
+                                            Helper.refreshBalances();
                                         }
                                     }
                                 } else {
                                     event.getChannel().sendMessage(new EmbedBuilder()
                                             .setTitle("Error!")
                                             .setDescription("You can't give money to yourself!")
-                                            .setColor(BasicCommands.getRandomColor()));
+                                            .setColor(Helper.getRandomColor()));
                                 }
                             } else {
                                 event.getChannel().sendMessage(new EmbedBuilder()
                                         .setTitle("Error!")
                                         .setDescription("You can't give more money than you have in your account!")
-                                        .setColor(BasicCommands.getRandomColor()));
+                                        .setColor(Helper.getRandomColor()));
                             }
                         } else {
                             event.getChannel().sendMessage(new EmbedBuilder()
                                     .setTitle("Error!")
                                     .setDescription("That user is in passive mode. You can't give money to them.")
-                                    .setColor(BasicCommands.getRandomColor()));
+                                    .setColor(Helper.getRandomColor()));
                         }
                     } else {
                         event.getChannel().sendMessage(new EmbedBuilder()
                                 .setTitle("Error!")
                                 .setDescription("You are in passive mode! You can't give money to anyone.")
-                                .setColor(BasicCommands.getRandomColor()));
+                                .setColor(Helper.getRandomColor()));
                     }
                 } else {
                     event.getChannel().sendMessage(new EmbedBuilder()
                             .setTitle("Error!")
                             .setDescription("You can't give money to bots!")
-                            .setColor(BasicCommands.getRandomColor()));
+                            .setColor(Helper.getRandomColor()));
                 }
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("Error!")
                         .setDescription("You are not a user! Maybe you are a bot.")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("This command only works in servers!")
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -530,12 +502,12 @@ public class CurrencyCommands {
             ArrayList<User> arrangedUsers = new ArrayList<>();
             for (User user : users) {
                 if (!user.isBot()) {
-                    if (balanceMap.containsKey(user.getId())) {
+                    if (Helper.balanceMap.containsKey(user.getId())) {
                         arrangedUsers.add(arrangedUsers.size(), user);
                     }
                 }
             }
-            SortByBalance sortByBalance = new SortByBalance(balanceMap);
+            SortByBalance sortByBalance = new SortByBalance(Helper.balanceMap);
             arrangedUsers.sort(Collections.reverseOrder(sortByBalance));
             arrangedUsers.removeIf(user -> arrangedUsers.indexOf(user) > 4);
             System.out.println(arrangedUsers);
@@ -547,7 +519,7 @@ public class CurrencyCommands {
                         .append(win)
                         .append(") ")
                         .append(user.getDisplayName(event.getServer().get())).append(" (:coin: ")
-                        .append(balanceMap.get(user.getId())).append(")")
+                        .append(Helper.balanceMap.get(user.getId())).append(")")
                         .append("\n");
             }
             if (arrangedUsers.size() > 0) {
@@ -555,23 +527,23 @@ public class CurrencyCommands {
                         .setTitle("Top " + arrangedUsers.size() + " richest user(s) in "
                                 + event.getServer().get().getName() + ":-")
                         .setDescription(formattedTopUsers.toString())
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder()
                         .setTitle("No one has more than :coin: 0 in this server!")
-                        .setColor(BasicCommands.getRandomColor()));
+                        .setColor(Helper.getRandomColor()));
             }
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")
                     .setDescription("This command only works in servers!")
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
     public static void globalLeaderboard(MessageCreateEvent event) {
         ArrayList<User> users = new ArrayList<>();
-        for (Long id : balanceMap.keySet()) {
+        for (Long id : Helper.balanceMap.keySet()) {
             try {
                 if (!Main.api.getUserById(id).get().isBot()) {
                     users.add(Main.api.getUserById(id).get());
@@ -583,12 +555,12 @@ public class CurrencyCommands {
         ArrayList<User> arrangedUsers = new ArrayList<>();
         for (User user : users) {
             if (!user.isBot()) {
-                if (balanceMap.containsKey(user.getId())) {
+                if (Helper.balanceMap.containsKey(user.getId())) {
                     arrangedUsers.add(arrangedUsers.size(), user);
                 }
             }
         }
-        SortByBalance sortByBalance = new SortByBalance(balanceMap);
+        SortByBalance sortByBalance = new SortByBalance(Helper.balanceMap);
         arrangedUsers.sort(Collections.reverseOrder(sortByBalance));
         arrangedUsers.removeIf(user -> arrangedUsers.indexOf(user) > 4);
         System.out.println(arrangedUsers);
@@ -599,7 +571,7 @@ public class CurrencyCommands {
             formattedTopUsers
                     .append(win)
                     .append(") ")
-                    .append(user.getDiscriminatedName()).append(" (:coin: ").append(balanceMap.get(user.getId()))
+                    .append(user.getDiscriminatedName()).append(" (:coin: ").append(Helper.balanceMap.get(user.getId()))
                     .append(")")
                     .append("\n");
         }
@@ -607,11 +579,11 @@ public class CurrencyCommands {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Top " + arrangedUsers.size() + " richest user(s) of UnknownBot:-")
                     .setDescription(formattedTopUsers.toString())
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         } else {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("No one has more than :coin: 0 in our database!")
-                    .setColor(BasicCommands.getRandomColor()));
+                    .setColor(Helper.getRandomColor()));
         }
     }
 
@@ -645,251 +617,5 @@ public class CurrencyCommands {
                     .setTitle("Error!")
                     .setDescription("You are not a user! Maybe you are a bot."));
         }
-    }
-
-    public static boolean creditBalance(int creditAmount, User user, MessageCreateEvent event) {
-        if (!balanceMap.containsKey(user.getId())) {
-            balanceMap.put(user.getId(), 0L);
-            refreshBalances();
-        }
-        long oldBal = balanceMap.get(user.getId());
-        if (creditAmount > 0) {
-            long newBal = oldBal + creditAmount;
-            balanceMap.replace(user.getId(), oldBal, newBal);
-            if (Main.userSettingsMap.get(user.getId()).isBankDmEnabled()) {
-                try {
-                    user.openPrivateChannel().get().sendMessage(new EmbedBuilder()
-                            .setTitle("Successfully updated account! Details:-")
-                            .addField("Opening Balance", ":coin: " + oldBal)
-                            .addField("Deposited", ":coin: " + creditAmount)
-                            .addField("Closing Balance", ":coin: " + newBal)
-                            .setColor(BasicCommands.getRandomColor()));
-                    System.out.println("User " + user.getDiscriminatedName() + " A/C updated:-\n" +
-                            "Before: " + oldBal + ", Credited: " + creditAmount + ", After: " + newBal);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-            refreshBalances();
-            return true;
-        } else {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Error!")
-                    .setDescription("Value should be more than 0.")
-                    .setColor(BasicCommands.getRandomColor()));
-        }
-        return false;
-    }
-
-    public static boolean debitBalance(int debitAmount, User user, MessageCreateEvent event) {
-        if (!balanceMap.containsKey(user.getId())) {
-            balanceMap.put(user.getId(), 0L);
-            refreshBalances();
-        }
-        long oldBal = balanceMap.get(user.getId());
-        if (debitAmount > 0) {
-            if (debitAmount <= oldBal) {
-                long newBal = oldBal - debitAmount;
-                balanceMap.replace(user.getId(), oldBal, newBal);
-                if (Main.userSettingsMap.get(user.getId()).isBankDmEnabled()) {
-                    try {
-                        user.openPrivateChannel().get().sendMessage(new EmbedBuilder()
-                                .setTitle("Successfully updated account! Details:-")
-                                .addField("Opening Balance", ":coin: " + oldBal)
-                                .addField("Withdrawn", ":coin: " + debitAmount)
-                                .addField("Closing Balance", ":coin: " + newBal)
-                                .setColor(BasicCommands.getRandomColor()));
-                        System.out.println("User " + event.getMessageAuthor().getDisplayName() + " A/C updated:-\n" +
-                                "Before: " + oldBal + ", Debited: " + debitAmount + ", After: " + newBal);
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-                refreshBalances();
-                return true;
-            } else if (oldBal == 0) {
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("Error!")
-                        .setDescription("You can't withdraw, because you have no money!")
-                        .setColor(BasicCommands.getRandomColor()));
-            } else {
-                event.getChannel().sendMessage(new EmbedBuilder()
-                        .setTitle("Error!")
-                        .setDescription("You can't withdraw more than you have in your bank!")
-                        .setColor(BasicCommands.getRandomColor()));
-            }
-        } else {
-            event.getChannel().sendMessage(new EmbedBuilder()
-                    .setTitle("Error!")
-                    .setDescription("Value should be more than 0.")
-                    .setColor(BasicCommands.getRandomColor()));
-        }
-        return false;
-    }
-
-    public static void refreshBalances() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    Document doc = new Document()
-                            .append("name", "balance")
-                            .append("key", balanceMap.keySet())
-                            .append("val", balanceMap.values());
-                    if (collection.countDocuments(Filters.eq("name", "balance")) > 0) {
-                        collection.replaceOne(Filters.eq("name", "balance"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated balances!";
-                };
-    
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-
-    public static void refreshWorks() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    List<Date> dates = new ArrayList<>();
-                    for (Instant i : Main.userWorkedTimes.values()) {
-                        dates.add(Date.from(i));
-                    }
-                    Document doc = new Document()
-                            .append("name", "work")
-                            .append("key", Main.userWorkedTimes.keySet())
-                            .append("val", dates);
-                    if (collection.countDocuments(Filters.eq("name", "work")) > 0) {
-                        collection.replaceOne(Filters.eq("name", "work"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated work times!";
-                };
-    
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-
-    public static void refreshRobs() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    List<Date> dates = new ArrayList<>();
-                    for (Instant i : Main.userRobbedTimes.values()) {
-                        dates.add(Date.from(i));
-                    }
-                    Document doc = new Document()
-                            .append("name", "rob")
-                            .append("key", Main.userRobbedTimes.keySet())
-                            .append("val", dates);
-                    if (collection.countDocuments(Filters.eq("name", "rob")) > 0) {
-                        collection.replaceOne(Filters.eq("name", "rob"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated rob times!";
-                };
-    
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-
-    public static void refreshDailies() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    List<Date> dates = new ArrayList<>();
-                    for (Instant i : Main.userDailyTimes.values()) {
-                        dates.add(Date.from(i));
-                    }
-                    Document doc = new Document()
-                            .append("name", "daily")
-                            .append("key", Main.userDailyTimes.keySet())
-                            .append("val", dates);
-                    if (collection.countDocuments(Filters.eq("name", "daily")) > 0) {
-                        collection.replaceOne(Filters.eq("name", "daily"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated daily times!";
-                };
-    
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-
-    public static void refreshWeeklies() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    List<Date> dates = new ArrayList<>();
-                    for (Instant i : Main.userWeeklyTimes.values()) {
-                        dates.add(Date.from(i));
-                    }
-                    Document doc = new Document()
-                            .append("name", "weekly")
-                            .append("key", Main.userWeeklyTimes.keySet())
-                            .append("val", dates);
-                    if (collection.countDocuments(Filters.eq("name", "weekly")) > 0) {
-                        collection.replaceOne(Filters.eq("name", "weekly"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated weekly times!";
-                };
-    
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-
-    public static void refreshMonthlies() {
-        new Thread(() -> {
-            try (MongoClient client = MongoClients.create(Main.settings); ClientSession session = client.startSession()) {
-                TransactionBody<String> txnBody = () -> {
-                    MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
-                    List<Date> dates = new ArrayList<>();
-                    for (Instant i : Main.userMonthlyTimes.values()) {
-                        dates.add(Date.from(i));
-                    }
-                    Document doc = new Document()
-                            .append("name", "monthly")
-                            .append("key", Main.userMonthlyTimes.keySet())
-                            .append("val", dates);
-                    if (collection.countDocuments(Filters.eq("name", "monthly")) > 0) {
-                        collection.replaceOne(Filters.eq("name", "monthly"), doc);
-                    } else {
-                        collection.insertOne(doc);
-                    }
-                    return "Updated monthly times!";
-                };
-    
-                System.out.println(session.withTransaction(txnBody));
-            }
-        }).start();
-    }
-
-    public static int getRandomInteger(int maxInclusive, int minInclusive) {
-        if (maxInclusive == minInclusive) return maxInclusive;
-        if (maxInclusive < minInclusive) return 0;
-        int val = (int) (Math.random() * (maxInclusive + 1));
-        while (val < minInclusive) {
-            val = (int) (Math.random() * (maxInclusive + 1));
-        }
-        return val;
-    }
-
-    public static String getRandomWork() {
-        return works[(int) (Math.random() * works.length)];
     }
 }

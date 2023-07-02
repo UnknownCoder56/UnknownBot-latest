@@ -1,4 +1,4 @@
-package com.uniqueapps.UnknownBot;
+package com.uniqueapps.unknownbot;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,14 +32,11 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.TransactionBody;
-import com.uniqueapps.UnknownBot.commands.AsyncCommands;
-import com.uniqueapps.UnknownBot.commands.BasicCommands;
-import com.uniqueapps.UnknownBot.commands.CurrencyCommands;
-import com.uniqueapps.UnknownBot.commands.ModCommands;
-import com.uniqueapps.UnknownBot.commands.SlashCommands;
-import com.uniqueapps.UnknownBot.objects.Shop;
-import com.uniqueapps.UnknownBot.objects.UserSettings;
-import com.uniqueapps.UnknownBot.objects.Warn;
+import com.uniqueapps.unknownbot.commands.AsyncCommands;
+import com.uniqueapps.unknownbot.commands.SlashCommands;
+import com.uniqueapps.unknownbot.objects.Shop;
+import com.uniqueapps.unknownbot.objects.UserSettings;
+import com.uniqueapps.unknownbot.objects.Warn;
 
 import spark.Spark;
 
@@ -102,6 +99,7 @@ public class Main {
         api.addMessageCreateListener(new CommandsListener());
         api.addSlashCommandCreateListener(new SlashCommands());
         api.addMessageComponentCreateListener(new ComponentsListener());
+        api.addModalSubmitListener(new ModalsListener());
         api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
         System.out.println("Invite link for UnknownBot: " + api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
     }
@@ -112,14 +110,14 @@ public class Main {
                 MongoCollection<Document> collection = client.getDatabase("UnknownDatabase").getCollection("UnknownCollection");
                 for (Document doc : collection.find()) {
                     if (doc.get("name").equals("reply")) {
-                        BasicCommands.customReplies = new HashMap<>();
+                        Helper.customReplies = new HashMap<>();
                         var keys = doc.getList("key", String.class);
                         var vals = doc.getList("val", String.class);
                         for (int i = 0; i < keys.size(); i++) {
-                            BasicCommands.customReplies.put(keys.get(i), vals.get(i));
+                            Helper.customReplies.put(keys.get(i), vals.get(i));
                         }
                     } else if (doc.get("name").equals("warn")) {
-                        ModCommands.warnMap = new HashMap<>();
+                        Helper.warnMap = new HashMap<>();
                         var keys = doc.getList("key", Long.class);
                         var vals = doc.getList("val", Document.class);
                         for (int i = 0; i < keys.size(); i++) {
@@ -141,14 +139,14 @@ public class Main {
                             for (int x = 0; x < keys.size(); x++) {
                                 map.put(keys1.get(x), warns.get(x));
                             }
-                            ModCommands.warnMap.put(keys.get(i), map);
+                            Helper.warnMap.put(keys.get(i), map);
                         }
                     } else if (doc.get("name").equals("balance")) {
-                        CurrencyCommands.balanceMap = new HashMap<>();
+                        Helper.balanceMap = new HashMap<>();
                         var keys = doc.getList("key", Long.class);
                         var vals = doc.getList("val", Long.class);
                         for (int i = 0; i < keys.size(); i++) {
-                            CurrencyCommands.balanceMap.put(keys.get(i), vals.get(i));
+                            Helper.balanceMap.put(keys.get(i), vals.get(i));
                         }
                     } else if (doc.get("name").equals("item")) {
                         Shop.ownedItems = new HashMap<>();

@@ -112,8 +112,8 @@
               <archive>
                 <manifest>
                   <mainClass>
-                        com.uniqueapps.UnknownBot.Main
-                    </mainClass>
+                      com.uniqueapps.unknownbot.Main
+                  </mainClass>
                 </manifest>
               </archive>
               <descriptorRefs>

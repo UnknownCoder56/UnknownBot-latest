@@ -1,4 +1,4 @@
-package com.uniqueapps.UnknownBot.objects;
+package com.uniqueapps.unknownbot.objects;
 
 import java.util.Comparator;
 import java.util.Map;
