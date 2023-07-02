@@ -38,8 +38,8 @@ public class ComponentsListener implements MessageComponentCreateListener {
                     return;
                 }
                 Pair<String, Integer> question = generatePattern();
-                messageComponentCreateEvent.getInteraction().respondWithModal("laptop_code_result", "What's the next number in the pattern?",
-                        ActionRow.of(TextInput.create(TextInputStyle.SHORT, "laptop_code_answer_" + question.getRight(), question.getLeft(), true)));
+                messageComponentCreateEvent.getInteraction().respondWithModal("laptop_code_result_" + question.getRight(), "What's the next number in the pattern?",
+                        ActionRow.of(TextInput.create(TextInputStyle.SHORT, "laptop_code_answer", question.getLeft(), true)));
             } else if (customId.contains("off")) {
                 messageComponentCreateEvent.getMessageComponentInteraction().createOriginalMessageUpdater()
                         .removeAllEmbeds()
