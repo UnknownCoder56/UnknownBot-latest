@@ -93,9 +93,9 @@ public class ComponentsListener implements MessageComponentCreateListener {
         int currentPatternNumber = 1;
         int answer;
         int[] pattern = new int[9];
-        for (int i = 0; i < 9; i++) {
-            currentPatternNumber += patternAdder * patternMultiplier;
-            pattern[i] = currentPatternNumber;
+        for (int i = 1; i < 10; i++) {
+            currentPatternNumber += (patternMultiplier * i) + patternAdder;
+            pattern[i - 1] = currentPatternNumber;
         }
 
         StringJoiner joiner = new StringJoiner(", ");
@@ -104,7 +104,7 @@ public class ComponentsListener implements MessageComponentCreateListener {
             joiner.add(String.valueOf(j));
         }
 
-        currentPatternNumber += patternAdder * patternMultiplier;
+        currentPatternNumber += (patternMultiplier * 10) + patternAdder;
         answer = currentPatternNumber;
 
         return Pair.of(joiner.toString(), answer);
