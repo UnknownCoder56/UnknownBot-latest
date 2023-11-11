@@ -5,3 +5,6 @@
 /.vscode/
 /unknownbot.iml
 /start.sh
+/.replit
+/release
+/replit.nix
