@@ -81,7 +81,9 @@ public class Main {
 
         String portEnv = System.getenv("PORT");
         if (portEnv != null && !Objects.equals(portEnv, "")) {
-            Spark.port(Integer.parseInt(portEnv));
+            if (!port.equals("0")) {
+                Spark.port(Integer.parseInt(portEnv));
+            }
         } else {
             Spark.port(8080);
         }
