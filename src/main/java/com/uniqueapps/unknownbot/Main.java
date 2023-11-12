@@ -259,14 +259,11 @@ public class Main {
 
     private static String getBotSiteHtmlCode() {
         StringBuilder content = new StringBuilder();
-        try {
-            BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("index.html"))));
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("index.html"))))) {    
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 content.append(line).append("\n");
             }
-            bufferedReader.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

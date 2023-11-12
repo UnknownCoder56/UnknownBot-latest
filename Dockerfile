@@ -1,7 +1,6 @@
 FROM openjdk:17
 WORKDIR /
-RUN mvn clean package
-ADD /target/unknownbot-1.0-jar-with-dependencies.jar /target/unknownbot-1.0-jar-with-dependencies.jar
+ADD /release/unknownbot-1.0-jar-with-dependencies.jar /release/unknownbot-1.0-jar-with-dependencies.jar
 EXPOSE 8080
 EXPOSE 12102
-CMD java -jar /target/unknownbot-1.0-jar-with-dependencies.jar
+CMD cd release && java -jar unknownbot-1.0-jar-with-dependencies.jar
