@@ -18,6 +18,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
@@ -205,8 +206,9 @@ public class BasicCommands {
     public static void dt(MessageCreateEvent event) {
         event.getChannel().sendMessage(new EmbedBuilder()
         		.setTitle("Current Time:-")
-        		.addField("UTC or GMT", LocalDateTime.now(ZoneId.of("UTC")).format(
-        				new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()).toUpperCase())
+                .addField("Local Time", "<t:" + Instant.now().getEpochSecond() + ":F>")
+        		.addField("UTC/GMT", LocalDateTime.now(ZoneId.of("UTC")).format(
+        				new DateTimeFormatterBuilder().appendPattern("dd MMMM yyyy hh:mm:ss a").toFormatter()))
         		.setColor(Helper.getRandomColor()));
     }
 
