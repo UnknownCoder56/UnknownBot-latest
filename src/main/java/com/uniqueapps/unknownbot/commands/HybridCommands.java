@@ -16,8 +16,6 @@ import org.javacord.api.entity.user.User;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -55,9 +53,9 @@ public class HybridCommands {
                     .addField("Is bot admin?", isBotServerAdmin.get() ? "Yes" : "No", true)
                     .addField("Invite Link", Main.api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())), true)
                     .addField("Version", Helper.VERSION, true)
-                    .addField("Bot website", "https://user783667580106702848.pepich.de/", true)
+                    .addField("Bot discord server", "https://discord.gg/HaVaeRkNhP", true)
                     .addField("Bot type", "Utility, Moderation and Economy Bot", true)
-                    .addField("Developer", "\uD835\uDE50\uD835\uDE63\uD835\uDE60\uD835\uDE63\uD835\uDE64\uD835\uDE6C\uD835\uDE63\uD835\uDE4B\uD835\uDE67\uD835\uDE64 56#9802", true)
+                    .addField("Developer", "unknownpro56", true)
                     .setColor(Helper.getRandomColor());
 
             return embed;
@@ -93,18 +91,12 @@ public class HybridCommands {
                     .setTitle("Information about " + (serverOptional.isPresent() ? user.getDisplayName(serverOptional.get()) : user.getDiscriminatedName()) + ":-")
                     .setImage(serverOptional.isPresent() ? user.getEffectiveAvatar(serverOptional.get()) : user.getAvatar())
                     .addField("Discriminated name: ", user.getDiscriminatedName(), true)
-                    .addField("Account id: ", user.getIdAsString(), true)
+                    .addField("User ID: ", user.getIdAsString(), true)
                     .addField("Is bot?: ", user.isBot() ? "Yes" : "No", true)
-                    .addField("Account created: ", user.getCreationTimestamp().atZone(ZoneId.of("UTC")).toLocalDateTime().format(
-                            new DateTimeFormatterBuilder()
-                                    .appendPattern("dd MMMM yyyy hh:mm:ss")
-                                    .toFormatter()) + " (UTC)", true);
+                    .addField("Account created: ", "<t:" + user.getCreationTimestamp().getEpochSecond() + ":F>", true);
 
             serverOptional.flatMap(user::getJoinedAtTimestamp).ifPresent(instant ->
-                    embed.addField("Joined server: ", instant.atZone(ZoneId.of("UTC")).toLocalDateTime().format(
-                            new DateTimeFormatterBuilder()
-                                    .appendPattern("dd MMMM yyyy hh:mm:ss")
-                                    .toFormatter()) + " (UTC)", true));
+                    embed.addField("Joined server: ", "<t:" + instant.getEpochSecond() + ":F>", true));
 
             embed.addField("Roles: ", stringBuilder.toString(), true)
                     .addField("Is server admin?: ", isUserServerAdmin.get() ? "Yes" : "No", true);
@@ -138,12 +130,10 @@ public class HybridCommands {
             EmbedBuilder embed = new EmbedBuilder()
                     .setTitle("Information about " + server.getName() + ":-")
                     .setImage(server.getIcon().isPresent() ? server.getIcon().get() : null)
-                    .addField("Server Id: ", server.getIdAsString(), true)
+                    .addField("Server ID: ", server.getIdAsString(), true)
                     .addField("Server owner: ", server.getOwner().isPresent() ? server.getOwner().get().getDisplayName(server) : "Not found!", true)
-                    .addField("Created on: ", server.getCreationTimestamp().atZone(ZoneId.of("UTC")).toLocalDateTime().format(new DateTimeFormatterBuilder()
-                            .appendPattern("dd MMMM yyyy hh:mm:ss")
-                            .toFormatter()), true)
-                    .addField("Member count: ", String.valueOf(server.getMemberCount()), true)
+                    .addField("Created on: ", "<t:" + server.getCreationTimestamp() + ":F>", true)
+                    .addField("Members count: ", String.valueOf(server.getMemberCount()), true)
                     .addField("Humans / Bots count: ", humans.size() + " / " + bots.size(), true)
                     .addField("Roles count: ", String.valueOf(server.getRoles().size()))
                     .addField("Total channels count: ", String.valueOf(server.getChannels().size()), true)

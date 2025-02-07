@@ -337,7 +337,7 @@ public class BasicCommands {
     }
 
     public static void userInfo(MessageCreateEvent event) {
-        User user = event.getMessage().getMentionedUsers().size() > 0 ? event.getMessage().getMentionedUsers().get(0) : null;
+        User user = !event.getMessage().getMentionedUsers().isEmpty() ? event.getMessage().getMentionedUsers().get(0) : null;
         event.getChannel().sendMessage(HybridCommands.userInfo(event.getMessageAuthor().asUser(), event.getServer(), user));
     }
 
@@ -350,7 +350,7 @@ public class BasicCommands {
         for (String reply : Helper.customReplies.keySet()) {
             repl.append(reply).append(": ").append(Helper.customReplies.get(reply)).append("\n");
         }
-        if (!repl.toString().equals("")) {
+        if (!repl.toString().isEmpty()) {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Currently set custom replies:-")
                     .setDescription(repl.toString())
