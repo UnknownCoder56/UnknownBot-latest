@@ -129,17 +129,51 @@ public class HybridCommands {
 
             EmbedBuilder embed = new EmbedBuilder()
                     .setTitle("Information about " + server.getName() + ":-")
-                    .setImage(server.getIcon().isPresent() ? server.getIcon().get() : null)
+                    .setImage(server.getIcon().orElse(null))
                     .addField("Server ID: ", server.getIdAsString(), true)
                     .addField("Server owner: ", server.getOwner().isPresent() ? server.getOwner().get().getDisplayName(server) : "Not found!", true)
-                    .addField("Created on: ", "<t:" + server.getCreationTimestamp() + ":F>", true)
+                    .addField("Server description: ", server.getDescription().orElse("None"), false)
+                    .addField("Created on: ", "<t:" + server.getCreationTimestamp().getEpochSecond() + ":F>", false)
                     .addField("Members count: ", String.valueOf(server.getMemberCount()), true)
-                    .addField("Humans / Bots count: ", humans.size() + " / " + bots.size(), true)
-                    .addField("Roles count: ", String.valueOf(server.getRoles().size()))
-                    .addField("Total channels count: ", String.valueOf(server.getChannels().size()), true)
-                    .addField("Text / Voice channels count: ", server.getTextChannels().size() + " / " + server.getVoiceChannels().size(), true)
+                    .addField("Members ratio: ", humans.size() + " Humans\n" + bots.size() + " Bots", true)
+                    .addField("Roles count: ", String.valueOf(server.getRoles().size()), true)
+                    .addField("Channels count: ", String.valueOf(server.getChannels().size()), true)
+                    .addField("Channels ratio: ", server.getTextChannels().size() + " Text\n" + server.getVoiceChannels().size() + " Voice/Stage\n" + server.getForumChannels().size() + " Forum", true)
                     .addField("Boosts count:", String.valueOf(server.getBoostCount()), true)
-                    .addField("Boost level: ", String.valueOf(server.getBoostLevel()), true)
+                    .addField("Boost level: ",
+                            switch (server.getBoostLevel()) {
+                                case NONE -> "None";
+                                case TIER_1 -> "Tier 1";
+                                case TIER_2 -> "Tier 2";
+                                case TIER_3 -> "Tier 3";
+                                case UNKNOWN -> "Unknown";
+                            }, true)
+                    .addField("Emojis count: ", String.valueOf(server.getCustomEmojis().size()), true)
+                    .addField("Verification level: ",
+                            switch (server.getVerificationLevel()) {
+                                case NONE -> "None";
+                                case LOW -> "Low";
+                                case MEDIUM -> "Medium";
+                                case HIGH -> "High";
+                                case VERY_HIGH -> "Very High";
+                                case UNKNOWN -> "Unknown";
+                            }, true)
+                    .addField("Content filter: ", 
+                            switch (server.getExplicitContentFilterLevel()) {
+                                case DISABLED -> "Disabled";
+                                case MEMBERS_WITHOUT_ROLES -> "Members without roles";
+                                case ALL_MEMBERS -> "All members";
+                                case UNKNOWN -> "Unknown";
+                            }, true)
+                    .addField("NSFW level: ",
+                            switch (server.getNsfwLevel()) {
+                                case DEFAULT -> "Default";
+                                case EXPLICIT -> "Explicit";
+                                case SAFE -> "Safe";
+                                case AGE_RESTRICTED -> "Age Restricted";
+                                case UNKNOWN -> "Unknown";
+                            }, true)
+                    .addField("Categories: ", String.valueOf(server.getChannelCategories().size()), true)
                     .setColor(Helper.getRandomColor());
 
             embedBuilder.set(embed);

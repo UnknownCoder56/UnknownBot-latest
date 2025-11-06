@@ -102,7 +102,7 @@ public class Main {
         api.addSlashCommandCreateListener(new SlashCommands());
         api.addMessageComponentCreateListener(new ComponentsListener());
         api.addModalSubmitListener(new ModalsListener());
-        api.updateActivity(ActivityType.WATCHING, " >help | UniqueApps Co.");
+        api.updateActivity(ActivityType.WATCHING, " >help");
         System.out.println("Invite link for UnknownBot: " + api.createBotInvite(Permissions.fromBitmask(PermissionType.ADMINISTRATOR.getValue())));
     }
 
