@@ -285,5 +285,4 @@ If you need help or have questions:
 
 <div align="center">
   <p>Made with ❤️ by UnknownPro 56</p>
-  <p>Part of Magnetars Co.</p>
 </div>
