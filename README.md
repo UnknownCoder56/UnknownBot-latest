@@ -1,5 +1,9 @@
 # UnknownBot
 
+<div align="center">
+  <img src="src/main/resources/public/favicon.png" alt="UnknownBot Logo" width="200">
+</div>
+
 > [!IMPORTANT]
 > **⚠️ This project is now ARCHIVED ⚠️**
 > 
