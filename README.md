@@ -1,6 +1,14 @@
 # UnknownBot
 
+> [!IMPORTANT]
+> **⚠️ This project is now ARCHIVED ⚠️**
+> 
+> This bot has been archived due to the sunset of the Javacord API. 
+> 
+> **Please use the successor bot:** [Maxis](https://github.com/UnknownCoder56/maxis) - Built with Python and discord.py
+
 <div align="center">
+  <img src="https://img.shields.io/badge/Status-Archived-red" alt="Status">
   <img src="https://img.shields.io/badge/Version-4.0.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/Java-17-orange" alt="Java">
   <img src="https://img.shields.io/badge/Discord-Bot-7289da" alt="Discord Bot">
@@ -260,7 +268,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔄 Updates
 
-UnknownBot is currently under active development. New features and updates are released regularly. Watch this repository to stay updated on the latest changes.
+**This project is archived and no longer under active development.** Please see the successor bot [Maxis](https://github.com/UnknownCoder56/maxis) for ongoing updates and improvements.
 
 ## 📞 Support
 
